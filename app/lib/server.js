@@ -4,7 +4,7 @@ import * as ENDPOINT from "./endpoints.js";
 export async function fetchGameData(gameDate) {
     const endpoint = ENDPOINT.GAME_DATA + dateToString(gameDate) + ".json"
     const request = new Request(endpoint, { credentials: "include" });
-    const response = await fetch(request);
+    const response = await (await fetch(request)).json();
     if (response.status !== "OK") {
         console.log(request, response);
         throw new Error(`Something went wrong while requesting game data from NYT servers. Status: ${response.status}`);
