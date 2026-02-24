@@ -1,11 +1,9 @@
 {
     "rewrites": [
-        { "source": "/", "destination": "/new-path" },
-        { "source": "/api/*", "destination": "/backend/api/*" }
     ],
     "crons": [
         {
-            "path": "/api/every-day",
+            "path": "/api/refresh-gamedata",
             "schedule": "0 0 * * *"
         }
     ]
