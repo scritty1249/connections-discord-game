@@ -1,4 +1,4 @@
-import { fetchGameData } from "/lib/server.js"
+import { fetchGameData } from "../lib/server.js"
 
 export default async function handler(req, res) {
     try {
