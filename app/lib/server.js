@@ -2,7 +2,7 @@ import { dateToString } from "./utils.js";
 import * as ENDPOINT from "./endpoints.js";
 
 export async function fetchGameData(gameDate) {
-    const endpoint = ENDPOINT.gaemData + dateToString(gameDate) + ".json"
+    const endpoint = ENDPOINT.GAME_DATA + dateToString(gameDate) + ".json"
     const request = new Request(endpoint, { credentials: "include" });
     const response = await fetch(request);
     if (response.status !== "OK")
