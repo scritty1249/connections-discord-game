@@ -1,0 +1,12 @@
+{
+    "rewrites": [
+        { "source": "/", "destination": "/new-path" },
+        { "source": "/api/*", "destination": "/backend/api/*" }
+    ],
+    "crons": [
+        {
+            "path": "/api/every-day",
+            "schedule": "0 0 * * *"
+        }
+    ]
+}
