@@ -32,7 +32,7 @@ window.onload = (e) => {
                 });
             });
             // main runtime
-            wordEls.reduce((biggestWordEl, wordEl) => biggestWordEl.offsetWidth > wordEl.offsetWidth ? biggestWordEl : wordEl)?.dataset.largest = "true";
+            wordEls.reduce((biggestWordEl, wordEl) => biggestWordEl.offsetWidth > wordEl.offsetWidth ? biggestWordEl : wordEl).dataset.largest = "true";
             resizeCardHandler();
         });
 }
