@@ -1,6 +1,7 @@
 // import { get, getAll, has, del, set, setAll } from '@vercel/edge-config';
 import * as Edge from "@vercel/edge-config";
 import { Redis } from "@upstash/redis";
+import { EDGE_WRITE } from "./endpoints.js";
 
 const redis = Redis.fromEnv();
 const GAMEDATA_KEY = "gamedata";
@@ -26,7 +27,21 @@ export const GameDB = {
     get: async function () {
         return await Edge.get(GAMEDATA_KEY);
     },
-    set: async function (gamedata) {
-        return await Edge.set(GAMEDATA_KEY, gamedata);
+    set: async function (gamedata) { // assumes key is already created, will fail if not.
+        return await fetch(EDGE_WRITE, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                items: [
+                    {
+                        operation: "update",
+                        key: GAMEDATA_KEY,
+                        value: gamedata
+                    }
+                ]
+            })
+        }).then(resp => resp.json());
     }
 };

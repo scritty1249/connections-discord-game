@@ -9,7 +9,7 @@ export default async function handler(req, res) {
         console.error("Fetch error:", err);
         res
             .status(500)
-            .json({ message: err.message });
+            .json({ error: err.message });
     }
 }
 
