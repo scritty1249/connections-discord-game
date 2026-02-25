@@ -7,7 +7,7 @@ export async function fetchGameData(gameDate) {
     const endpoint = ENDPOINT.GAME_DATA + dateToString(gameDate) + ".json"
     const request = new Request(endpoint, { credentials: "include" });
     const response = await (await fetch(request)).json();
-    if (response.status !== "OK") {
+    if (response.status?.toUpperCase() !== "OK") {
         console.error(request, response);
         throw new Error(`Something went wrong while requesting game data from NYT servers. Status: ${response.status}`);
     }
@@ -19,7 +19,7 @@ export async function fetchGameData(gameDate) {
 
 export async function storeGameData(gamedata) {
     const response = await GameDB.set(gamedata);
-    if (response.status !== "OK") {
+    if (response.status?.toUpperCase() !== "OK") {
         console.error(response);
         throw new Error(`Something went wrong while writing to Vercel Edge Database. Status: ${response.status}`);
     }
