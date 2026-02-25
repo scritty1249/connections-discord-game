@@ -28,7 +28,7 @@ export const GameDB = {
         return await Edge.get(GAMEDATA_KEY);
     },
     set: async function (gamedata) { // assumes key is already created, will fail if not.
-        return await fetch(EDGE_WRITE, {
+        const response = await fetch(EDGE_WRITE, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
@@ -43,6 +43,7 @@ export const GameDB = {
                     }
                 ]
             })
-        }).then(resp => resp.json());
+        });
+        return await response.json();
     }
 };
