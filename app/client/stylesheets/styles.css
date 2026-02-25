@@ -10,18 +10,13 @@
 }
 
 #card-grid {
-    display: flex;
-    justify-content: center;
-    align-content: center;
-    flex-direction: row;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
     gap: var(--unit);
-    --card-width: fit-content;
-    --columns: 4;
 }
 
 .card {
-    display: inline-flex;
+    display: inline-block;
     box-sizing: border-box;
     border-radius: var(--unit);
     padding: var(--unit);
@@ -31,8 +26,6 @@
     white-space: preserve nowrap;
     &.word {
         background-color: grey;
-        flex: 0 0 calc(100% / var(--columns));
-        min-width: var(--card-width);
     }
     &.category {
 
