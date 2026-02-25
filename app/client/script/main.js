@@ -37,4 +37,4 @@ window.onload = (e) => {
         });
 }
 
-window.addEventListener("resize", resizeCardHandler);
+window.onresize = resizeCardHandler;
