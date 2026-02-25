@@ -11,3 +11,7 @@ export function dateToString(dateObj) {
     const day = _pad2Digits((dateObj.getDate()));
     return `${year}-${month}-${day}`;
 }
+
+export function unixTimestamp() {
+    return Math.floor(Date.now() / 1000);
+}

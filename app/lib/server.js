@@ -1,5 +1,7 @@
 import { dateToString } from "./utils.js";
 import * as ENDPOINT from "./endpoints.js";
+import { GameDB, UserDB } from "./store.js";
+
 
 export async function fetchGameData(gameDate) {
     const endpoint = ENDPOINT.GAME_DATA + dateToString(gameDate) + ".json"
@@ -11,6 +13,38 @@ export async function fetchGameData(gameDate) {
     }
     const data = response.categories;
     const categories = {};
-    data.forEach(({title, cards}) => categories[title] = Array.from(cards, c => c.content)); // don't care about preserving card location/order
+    data.forEach(({title, cards}) => categories[title] = Array.from(cards, c => ({word: c.content, id: c.position}) )); // card "position" is actually id (internally). The "positions" stay the same even after shuffing
     return categories;
+}
+
+export async function storeGameData(gamedata) {
+    return await GameDB.set(gamedata);
+}
+
+export async function getGameData() {
+    return await GameDB.get();
+}
+
+export async function wipeAttempts() {
+    // deletes attempts for all users
+    return await UserDB.drop();s
+}
+
+export async function getAttempts(userid) {
+    if (await UserDB.exists(userid)) {
+        return await UserDB.get(userid);
+    } else {
+        return [];
+    }
+}
+
+export async function newAttempt(userid, attempt) { // attempt here is a Set of 4 ids (Numbers)
+    // [!] might need to validate a timestamp here
+    if (await UserDB.exists(userid)) {
+        const attempts = await UserDB.get(userid);
+        attempts.push(attempt);
+        return await UserDB.set(userid, attempts);
+    } else {
+        return await UserDB.set(userid, [attempt]);
+    }
 }

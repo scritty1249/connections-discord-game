@@ -3,7 +3,7 @@
     ],
     "crons": [
         {
-            "path": "/api/refresh-gamedata",
+            "path": "/api/refresh-gamestate",
             "schedule": "0 0 * * *"
         }
     ]
