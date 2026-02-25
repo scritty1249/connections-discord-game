@@ -31,7 +31,8 @@ export const GameDB = {
         return await fetch(EDGE_WRITE, {
             method: "PATCH",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${process.env.VERCEL_API_TOKEN}`
             },
             body: JSON.stringify({
                 items: [
