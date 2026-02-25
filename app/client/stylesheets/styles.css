@@ -1,0 +1,48 @@
+:root {
+    --unit: 15px;
+}
+
+.content-container {
+    width: 80%;
+    height: auto;
+    margin: auto;
+
+}
+
+#item-grid {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--unit);
+    --item-width: fit-content;
+    --columns: 4;
+}
+
+.card {
+    display: inline-flex;
+    box-sizing: border-box;
+    border-radius: var(--unit);
+    padding: var(--unit);
+    text-align: center;
+    justify-content: center;
+    text-transform: uppercase;
+    &.word {
+        background-color: grey;
+        flex: 0 0 calc(100% / var(--columns));
+        min-width: var(--item-width);
+    }
+    &.category {
+
+    }
+}
+
+#category-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    width: 80%; /* may be wrong */
+    height: min-content;
+    margin: auto;
+}
