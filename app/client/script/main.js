@@ -2,6 +2,12 @@ import { createCardElement } from "/client/script/utils.js";
 
 const API_ENDPOINT = window.origin + "/api/";
 
+function resizeCardHandler () {
+    const biggestCardEl = document.querySelector('#card-grid .card[data-largest="true"]');
+    if (biggestCardEl)
+        document.getElementById("card-grid").style.setProperty("--card-width", `${biggestCardEl?.offsetWidth}px`);
+}
+
 window.onload = (e) => {
     const cardGridEl = document.getElementById("card-grid");
     const categoryStackEl = document.getElementById("categories");
@@ -26,9 +32,9 @@ window.onload = (e) => {
                 });
             });
             // main runtime
-            {
-                let maxWidth = Math.max(...Array.from(wordEls, wordEl => wordEl.offsetWidth));
-                cardGridEl.style.setProperty("--card-width", `${maxWidth}px`);
-            }
+            wordEls.reduce((biggestWordEl, wordEl) => biggestWordEl.offsetWidth > wordEl.offsetWidth ? biggestWordEl : wordEl)?.dataset.largest = "true";
+            resizeCardHandler();
         });
 }
+
+window.addEventListener("resize", resizeCardHandler);
