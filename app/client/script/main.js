@@ -11,6 +11,7 @@ window.onload = (e) => {
                 console.error("Failed to contact API"); // [!] add UI notification for this
             }
         }).then(categories => {
+            console.debug(categories);
             const categoryEls = [];
             const wordEls = [];
             // create card elements
