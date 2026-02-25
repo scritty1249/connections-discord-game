@@ -28,6 +28,7 @@
     text-align: center;
     justify-content: center;
     text-transform: uppercase;
+    white-space: preserve nowrap;
     &.word {
         background-color: grey;
         flex: 0 0 calc(100% / var(--columns));
