@@ -6,7 +6,8 @@
     width: 80%;
     height: auto;
     margin: auto;
-
+    font-family: "HelveticaNeue-Bold", "Helvetica Neue Bold", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+    font-weight: 350;
 }
 
 #card-grid {
@@ -24,8 +25,12 @@
     justify-content: center;
     text-transform: uppercase;
     white-space: preserve nowrap;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
     &.word {
         background-color: grey;
+        font-weight: 500;
     }
     &.category {
 
