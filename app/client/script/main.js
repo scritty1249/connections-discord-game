@@ -1,4 +1,4 @@
-import { createCardElement } from "./utils";
+import { createCardElement } from "/client/script/utils.js";
 
 const API_ENDPOINT = window.origin + "/api/";
 
