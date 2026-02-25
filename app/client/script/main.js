@@ -19,11 +19,16 @@ window.onload = (e) => {
             Object.entries(categories).forEach(([category, words]) => {
                 categoryEls.push(createCardElement(category, "category"));
                 words.forEach(({word, id}) => {
-                    let wordEl = createCardElement(word, "word")
+                    let wordEl = createCardElement(word, "word");
                     wordEl.dataset.id = id;
                     wordEls.push(wordEl);
                     cardGridEl.append(wordEl);
                 });
             });
+            // main runtime
+            {
+                let maxWidth = Math.max(...Array.from(wordEls, wordEl => wordEl.offsetWidth));
+                cardGridEl.style.setProperty("--card-width", `${maxWidth}px`);
+            }
         });
 }

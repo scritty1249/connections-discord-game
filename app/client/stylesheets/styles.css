@@ -16,7 +16,7 @@
     flex-direction: row;
     flex-wrap: wrap;
     gap: var(--unit);
-    --item-width: fit-content;
+    --card-width: fit-content;
     --columns: 4;
 }
 
@@ -31,7 +31,7 @@
     &.word {
         background-color: grey;
         flex: 0 0 calc(100% / var(--columns));
-        min-width: var(--item-width);
+        min-width: var(--card-width);
     }
     &.category {
 
