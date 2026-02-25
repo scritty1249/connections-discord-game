@@ -1,3 +1,5 @@
+import { createCardElement } from "./utils";
+
 const API_ENDPOINT = window.origin + "/api/";
 
 window.onload = (e) => {
@@ -15,15 +17,10 @@ window.onload = (e) => {
             const wordEls = [];
             // create card elements
             Object.entries(categories).forEach(([category, words]) => {
-                let categoryEl = document.createElement("div");
-                categoryEl.classList.add("category");
-                categoryEl.innerHTML = category;
-                categoryEls.push(categoryEl);
+                categoryEls.push(createCardElement(category, "category"));
                 words.forEach(({word, id}) => {
-                    let wordEl = document.createElement("div");
-                    wordEl.classList.add("word");
+                    let wordEl = createCardElement(word, "word")
                     wordEl.dataset.id = id;
-                    wordEl.innerHTML = word;
                     wordEls.push(wordEl);
                     cardGridEl.append(wordEl);
                 });
