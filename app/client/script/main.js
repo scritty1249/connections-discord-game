@@ -11,11 +11,10 @@ window.onload = (e) => {
                 console.error("Failed to contact API"); // [!] add UI notification for this
             }
         }).then(categories => {
-            console.debug(categories);
             const categoryEls = [];
             const wordEls = [];
             // create card elements
-            categories.entries().forEach(([category, words]) => {
+            Object.entries(categories).forEach(([category, words]) => {
                 let categoryEl = document.createElement("div");
                 categoryEl.classList.add("category");
                 categoryEl.innerHTML = category;
