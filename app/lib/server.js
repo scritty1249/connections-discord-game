@@ -32,7 +32,7 @@ export async function getGameData() {
 
 export async function wipeAttempts() {
     // deletes attempts for all users
-    return await UserDB.drop();s
+    return await UserDB.drop();
 }
 
 export async function getAttempts(userid) {

@@ -8,6 +8,7 @@
     margin: auto;
     font-family: "HelveticaNeue-Bold", "Helvetica Neue Bold", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     font-weight: 350;
+    overflow: scroll; /* never clip- need to detect with JS */
 }
 
 #card-grid {
