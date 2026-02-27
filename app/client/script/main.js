@@ -26,7 +26,7 @@ function selectWord(wordEl) {
     }
 }
 
-const wordClickHandler = (e) => selectWord(e.target)
+const wordClickHandler = (e) => { console.log(`clicked ${e.target?.innerHTML}`); selectWord(e.target) }
 
 window.onload = (e) => {
     const containerEl = document.getElementsByClassName("content-container")?.[0];
@@ -63,6 +63,9 @@ window.onload = (e) => {
     ]).then(([categories, oldAttempts]) => {
             const categoryEls = [];
             const wordEls = [];
+
+            console.debug(`Loaded previous attempts: ${oldAttempts}`);
+
             // create card elements
             Object.entries(categories).forEach(([category, words]) => {
                 categoryEls.push(createCardElement(category, null, "category"));
