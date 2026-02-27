@@ -27,7 +27,7 @@ export function animateMove (element, transform, duration) { // FLIP method
     ).finished;
 }
 
-export function createCardElement (content, onclick = (e) => {}, ...classList) {
+export function createCardElement (content, onclick, ...classList) {
     const cardEl = document.createElement("div");
     cardEl.classList.add("card", ...classList);
     cardEl.innerHTML = content;
