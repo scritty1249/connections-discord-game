@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "type": "module",
     "scripts": {
-        "build": "esbuild client/script/index.js --bundle --minify --outfile=public/script/bundle.js"
+        "build": "esbuild /client/script/index.js --bundle --minify --outfile=public/script/bundle.js"
     },
     "dependencies": {
         "@vercel/edge-config": "latest",
