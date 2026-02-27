@@ -39,7 +39,7 @@ export async function initDiscordSdk (client_id, serverEndpoint) {
     });
     const { token } = await response.json();
 
-    auth = await discordSdk.commands.authenticate({ access_token });
+    auth = await discordSdk.commands.authenticate({ token });
 
     if (auth == null) {
         throw new Error("Discord authentication failed");
