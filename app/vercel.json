@@ -1,10 +1,5 @@
 {
-    "builds": [
-        {
-            "src": "/client/script/auth.js",
-            "use": "@discord/embedded-app-sdk"
-        }
-    ],
+    "version": 1,
     "rewrites": [
         {
             "source": "/",
