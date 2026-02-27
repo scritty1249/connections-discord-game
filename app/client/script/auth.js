@@ -18,7 +18,7 @@ export async function initDiscordSdk (client_id, serverEndpoint) {
     const discordSdk = new DiscordSDK(client_id);
     await discordSdk.ready();
     console.info("Discord SDK ready");
-    const { code } = await discordSdk.commands.authorize({
+    const { code: clientCode } = await discordSdk.commands.authorize({
         client_id: client_id,
         response_type: "code",
         state: "",
@@ -35,11 +35,11 @@ export async function initDiscordSdk (client_id, serverEndpoint) {
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ code }),
+        body: JSON.stringify({ code: clientCode }),
     });
-    const { token: access_token } = await response.json();
+    const { token } = await response.json();
 
-    auth = await discordSdk.commands.authenticate({ access_token });
+    const auth = await discordSdk.commands.authenticate({ access_token: token });
 
     if (auth == null) {
         throw new Error("Discord authentication failed");

@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "type": "module",
     "scripts": {
-        "build": "mkdir -p public/stylesheets && cp client/index.html public/index.html && cp -a client/stylesheets/. public/stylesheets/ && esbuild client/script/main.js --bundle --outfile=public/script/bundle.js"
+        "build": "mkdir -p public/stylesheets && cp client/index.html public/index.html && cp -a client/stylesheets/. public/stylesheets/ && esbuild client/script/main.js --bundle --minify --outfile=public/script/bundle.js"
     },
     "dependencies": {
         "@vercel/edge-config": "latest",
