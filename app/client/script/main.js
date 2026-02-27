@@ -5,6 +5,7 @@ import * as Discord from "./discord.js";
 const API_ENDPOINT = window.origin + "/api";
 let discordSdk = null;
 let userData = null;
+let selectedWords = 0;
 
 function resizeCardHandler () {
     const biggestCardEl = document.querySelector('#card-grid .card[data-largest="true"]');
@@ -14,6 +15,18 @@ function resizeCardHandler () {
         // [!] TODO: hide page, display screen size message
     }
 }
+
+function selectWord(wordEl) {
+    if (wordEl.classList.has("selected")) {
+        selectedWords--;
+        wordEl.classList.remove("selected");
+    } else if (selectedWords < 3) {
+        selectedWords++;
+        wordEl.classList.add("selected");
+    }
+}
+
+const wordClickHandler = (e) => selectWord(e.target)
 
 window.onload = (e) => {
     const containerEl = document.getElementsByClassName("content-container")?.[0];
@@ -52,9 +65,9 @@ window.onload = (e) => {
             const wordEls = [];
             // create card elements
             Object.entries(categories).forEach(([category, words]) => {
-                categoryEls.push(createCardElement(category, (e) => {console.log(`clicked: ${e.target?.innerHTML}`)}, "category"));
+                categoryEls.push(createCardElement(category, null, "category"));
                 words.forEach(({word, id}) => {
-                    let wordEl = createCardElement(word, (e) => {console.log(`clicked: ${e.target?.innerHTML}`)}, "word");
+                    let wordEl = createCardElement(word, wordClickHandler, "word");
                     wordEl.dataset.id = id;
                     wordEls.push(wordEl);
                     cardGridEl.append(wordEl);

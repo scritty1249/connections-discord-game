@@ -5,6 +5,7 @@
 }
 body > * {
     margin: auto;
+    background-color: #121212;
 }
 
 .content-container {
@@ -45,8 +46,16 @@ body > * {
     -ms-user-select: none;
     user-select: none;
     &.word {
-        background-color: grey;
+        background-color: #efefe6;
+        color: #121212;
         font-weight: 500;
+        transition:
+            background-color .65s ease-in-out,
+            color .65s ease-in-out;
+        &.selected {
+            background-color: #5a594e;
+            color: #f8f8f8;
+        }
     }
     &.category {
 

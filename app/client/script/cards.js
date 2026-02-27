@@ -31,7 +31,8 @@ export function createCardElement (content, onclick, ...classList) {
     const cardEl = document.createElement("div");
     cardEl.classList.add("card", ...classList);
     cardEl.innerHTML = content;
-    cardEl.addEventListener("click", onclick);
+    if (onclick)
+        cardEl.addEventListener("click", onclick);
     return cardEl;
 }
 
