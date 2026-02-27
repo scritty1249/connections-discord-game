@@ -1,8 +1,9 @@
 import { DISCORD_AUTH } from "../lib/endpoints.js"
 
 export async function POST(req) {
-    if (!req.body?.code) {
-        return new Response(null, {status: 400, statusText: "Missing required payload."});
+    const { code: clientCode }  = await req.json();
+    if (!clientCode) {
+        return new Response("Missing required payload.", {status: 400, statusText: "Missing required payload."});
     } else {
         try {
             const response = await fetch(DISCORD_AUTH, {
@@ -14,7 +15,7 @@ export async function POST(req) {
                     client_id: process.env.DISCORD_CLIENT_ID,
                     client_secret: process.env.DISCORD_CLIENT_SECRET,
                     grant_type: "authorization_code",
-                    code: req.body.code,
+                    code: clientCode,
                 }),
             });
             const { access_token } = await response.json();

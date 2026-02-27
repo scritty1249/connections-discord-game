@@ -3,7 +3,7 @@ import { getAttempts } from "../lib/server.js"
 export async function GET(req) {
     const { searchParams: params } = new URL(req.url);
     if (!params.has("id")) {
-        return new Response(null, { status: 400, statusText: "Missing required parameter(s)."});
+        return new Response("Missing required parameter(s).", { status: 400, statusText: "Missing required parameter(s)."});
     } else {
         try {
             const id = params.get("id");
