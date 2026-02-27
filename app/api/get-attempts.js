@@ -1,19 +1,17 @@
 import { getAttempts } from "../lib/server.js"
 
-export default async function handler(req, res) {
+export async function GET(req) {
     const { searchParams: params } = new URL(req.url);
     if (!params.has("id")) {
-        res.status(400).json({error: "Missing required parameter(s)."});
+        return new Response(null, { status: 400, statusText: "Missing required parameter(s)."});
     } else {
         try {
             const id = params.get("id");
             const data = await getAttempts(id);
-            res.status(200).json(data);
+            return Response.json(data);
         } catch (err) {
-            console.error("Fetch error:", err);
-            res
-                .status(500)
-                .json({ error: err.message });
+            console.error("Vercel API error:", err);
+            return Response.json({error: err.message}, {status: 500, statusText: "Internal server error"});
         }
     }
 }

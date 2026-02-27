@@ -1,6 +1,6 @@
 import { fetchGameData, storeGameData, wipeAttempts } from "../lib/server.js"
 
-export default async function handler(req, res) {
+export async function GET(req) {
     try {
         const data = await fetchGameData(new Date());
         console.debug(data);
@@ -9,11 +9,9 @@ export default async function handler(req, res) {
         console.info("Saved gamedata");
         await wipeAttempts();
         console.log("Cleared userdata");
-        res.status(200).json({status: "OK"});
+        return new Response();
     } catch (err) {
         console.error("Execution error:", err);
-        res
-            .status(500)
-            .json({ error: err.message });
+        return Response.json({error: err.message}, {status: 500, statusText: "Internal server error"});
     }
 }

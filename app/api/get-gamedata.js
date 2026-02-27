@@ -1,14 +1,12 @@
 import { getGameData } from "../lib/server.js"
 
-export default async function handler(req, res) {
+export async function GET(req) {
     try {
         const data = await getGameData();
-        res.status(200).json(data);
+        return Response.json(data);
     } catch (err) {
         console.error("Fetch error:", err);
-        res
-            .status(500)
-            .json({ error: err.message });
+        return Response.json({error: err.message}, {status: 500, statusText: "Internal server error"});
     }
 }
 
