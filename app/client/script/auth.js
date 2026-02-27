@@ -18,7 +18,7 @@ export async function initDiscordSdk (client_id, serverEndpoint) {
     const discordSdk = new DiscordSDK(client_id);
     await discordSdk.ready();
     console.info("Discord SDK ready");
-    const { code: clientCode } = await discordSdk.commands.authorize({
+    const { code } = await discordSdk.commands.authorize({
         client_id: client_id,
         response_type: "code",
         state: "",
@@ -35,7 +35,7 @@ export async function initDiscordSdk (client_id, serverEndpoint) {
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ clientCode }),
+        body: JSON.stringify({ code }),
     });
     const { token } = await response.json();
 
