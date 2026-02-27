@@ -88,7 +88,7 @@ window.onload = (e) => {
             }
             {
                 const avatarSize = 128;
-                const avatarUrl = Discord.AVATAR_URL(user.id, user.avatar, avatarSize);
+                const avatarUrl = Discord.AVATAR_URL(userData.id, userData.avatar, avatarSize);
                 const avatarEl = document.createElement("img");
                 avatarEl.classList.add("icon");
                 avatarEl.src = avatarUrl;
