@@ -1,11 +1,25 @@
 import { DiscordSDK } from "@discord/embedded-app-sdk";
 
-export async function initDiscordSdk (server_api_endpoint) {
-    const discordSdk = new DiscordSDK(process.env.DISCORD_CLIENT_ID);
+export async function getDiscordClient (serverEndpoint) {
+    return await fetch(serverEndpoint, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+        },
+    }).then(resp => {
+        if (!resp.ok)
+            throw new Error("Failed to retrieve discord client id from server");
+        return resp.json();  
+    }).then(
+        ({ client_id }) => client_id);
+}
+
+export async function initDiscordSdk (client_id, serverEndpoint) {
+    const discordSdk = new DiscordSDK(client_id);
     await discordSdk.ready();
     console.info("Discord SDK ready");
     const { code: clientCode } = await discordSdk.commands.authorize({
-        client_id: process.env.DISCORD_CLIENT_ID,
+        client_id: client_id,
         response_type: "code",
         state: "",
         prompt: "none",
@@ -16,7 +30,7 @@ export async function initDiscordSdk (server_api_endpoint) {
         ],
     }); 
 
-  const response = await fetch(server_api_endpoint, {
+  const response = await fetch(serverEndpoint, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

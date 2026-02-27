@@ -1,6 +1,6 @@
 import { isOverflowed } from "/client/script/utils.js";
 import { animateMove, createCardElement } from "/client/script/cards.js";
-import { initDiscordSdk } from "/client/script/auth.js";
+import { getDiscordClient, initDiscordSdk } from "/client/script/auth.js";
 
 const API_ENDPOINT = window.origin + "/api";
 let discordSdk = null;
@@ -27,7 +27,9 @@ window.onload = (e) => {
                 console.error("Failed to contact gamedata API endpoint"); // [!] add UI notification for this
             }
         }),
-        initDiscordSdk(API_ENDPOINT + "/discord-token")
+        getDiscordClient(API_ENDPOINT + "/discord-auth")
+        .then(client_id =>
+            initDiscordSdk(client_id, API_ENDPOINT + "/discord-auth"))
         .then(({discordSdk: sdk, user})=> {
             discordSdk = sdk;
             userData = user;
