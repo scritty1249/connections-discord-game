@@ -1,6 +1,6 @@
 import { isOverflowed } from "./utils.js";
 import { animateMove, createCardElement } from "./cards.js";
-import { getDiscordClient, initDiscordSdk } from "./auth.js";
+import * as Discord from "./discord.js";
 
 const API_ENDPOINT = window.origin + "/api";
 let discordSdk = null;
@@ -16,6 +16,7 @@ function resizeCardHandler () {
 }
 
 window.onload = (e) => {
+    const containerEl = document.getElementsByClassName("content-container")?.[0];
     const cardGridEl = document.getElementById("card-grid");
     const categoryStackEl = document.getElementById("categories");
     Promise.all([
@@ -27,9 +28,9 @@ window.onload = (e) => {
                 console.error("Failed to contact gamedata API endpoint"); // [!] add UI notification for this
             }
         }),
-        getDiscordClient(API_ENDPOINT + "/discord-auth")
+        Discord.getClient(API_ENDPOINT + "/discord-auth")
         .then(client_id =>
-            initDiscordSdk(client_id, API_ENDPOINT + "/discord-auth"))
+            Discord.initSdk(client_id, API_ENDPOINT + "/discord-auth"))
         .then(({discordSdk: sdk, user})=> {
             discordSdk = sdk;
             userData = user;
@@ -68,6 +69,16 @@ window.onload = (e) => {
                 biggestWordEl.dataset.largest = "true";
                 biggestWordEl.style.setProperty("--card-width", "min-content");
                 resizeCardHandler();
+            }
+            {
+                const avatarSize = 128;
+                const avatarUrl = Discord.AVATAR_URL(user.id, user.avatar, avatarSize);
+                const avatarEl = document.createElement("img");
+                avatarEl.classList.add("icon");
+                avatarEl.src = avatarUrl;
+                avatarEl.width = avatarSize;
+                avatarEl.height = avatarSize;
+                containerEl.prepend(avaterEl);
             }
         });
 }

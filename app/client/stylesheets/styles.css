@@ -1,11 +1,20 @@
 :root {
-    --unit: 15px;
+    --round: 15px;
+    --spacing: 5px;
+    --unit: 10px;
+}
+body > * {
+    margin: auto;
 }
 
 .content-container {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-content: center;
     width: 80%;
     height: auto;
-    margin: auto;
     font-family: "HelveticaNeue-Bold", "Helvetica Neue Bold", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     font-weight: 350;
     overflow: scroll; /* never clip- need to detect with JS */
@@ -20,8 +29,8 @@
 .card {
     display: inline-block;
     box-sizing: border-box;
-    border-radius: var(--unit);
-    padding: var(--unit);
+    border-radius: var(--round);
+    padding: var(--spacing);
     text-align: center;
     justify-content: center;
     text-transform: uppercase;
@@ -45,4 +54,28 @@
     width: 80%; /* may be wrong */
     height: min-content;
     margin: auto;
+}
+
+.icon {
+    --size: auto;
+    border-radius: 50%;
+    /*
+    width: var(--size);
+    height: var(--size);
+    &.xsm {
+        --size: 32px;
+    }
+    &.sm {
+        --size: 64px;
+    }
+    &.md {
+        --size: 128px;
+    }
+    &.lg {
+        --size: 256px;
+    }
+    &.xlg {
+        --size: 512px;
+    }
+    */
 }

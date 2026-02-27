@@ -1,6 +1,8 @@
 import { DiscordSDK } from "@discord/embedded-app-sdk";
 
-export async function getDiscordClient (serverEndpoint) {
+export const AVATAR_URL = (userid, avatar, sizepx = 128) => `https://cdn.discordapp.com/avatars/${userid}/${avatar}.png?size=${sizepx}`;
+
+export async function getClient (serverEndpoint) {
     return await fetch(serverEndpoint, {
         method: "GET",
         headers: {
@@ -14,7 +16,7 @@ export async function getDiscordClient (serverEndpoint) {
         ({ client_id }) => client_id);
 }
 
-export async function initDiscordSdk (client_id, serverEndpoint) {
+export async function initSdk (client_id, serverEndpoint) {
     const discordSdk = new DiscordSDK(client_id);
     await discordSdk.ready();
     console.info("Discord SDK ready");
