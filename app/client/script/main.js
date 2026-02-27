@@ -1,6 +1,6 @@
-import { isOverflowed } from "/client/script/utils.js";
-import { animateMove, createCardElement } from "/client/script/cards.js";
-import { getDiscordClient, initDiscordSdk } from "/client/script/auth.js";
+import { isOverflowed } from "utils.js";
+import { animateMove, createCardElement } from "cards.js";
+import { getDiscordClient, initDiscordSdk } from "auth.js";
 
 const API_ENDPOINT = window.origin + "/api";
 let discordSdk = null;

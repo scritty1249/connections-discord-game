@@ -2,9 +2,15 @@
     "name": "connections-discord-game",
     "version": "1.0.0",
     "type": "module",
+    "scripts": {
+        "build": "esbuild client/script/index.js --bundle --minify --outfile=public/script/bundle.js"
+    },
     "dependencies": {
         "@vercel/edge-config": "latest",
         "@upstash/redis": "latest",
         "@discord/embedded-app-sdk": "latest"
+    },
+    "devDependencies": {
+        "esbuild": "latest"
     }
 }
