@@ -37,7 +37,7 @@ export async function initDiscordSdk (client_id, serverEndpoint) {
         },
         body: JSON.stringify({ code }),
     });
-    const { access_token } = await response.json();
+    const { token: access_token } = await response.json();
 
     auth = await discordSdk.commands.authenticate({ access_token });
 
