@@ -3,6 +3,7 @@
     "version": "1.0.0",
     "dependencies": {
         "@vercel/edge-config": "latest",
-        "@upstash/redis": "latest"
+        "@upstash/redis": "latest",
+        "@discord/embedded-app-sdk": "latest"
     }
 }

@@ -1,7 +1,10 @@
 import { isOverflowed } from "/client/script/utils.js";
 import { animateMove, createCardElement } from "/client/script/cards.js";
+import { initDiscordSdk } from "/client/script/auth.js";
 
-const API_ENDPOINT = window.origin + "/api/";
+const API_ENDPOINT = window.origin + "/api";
+let discordSdk = null;
+let userData = null;
 
 function resizeCardHandler () {
     const biggestCardEl = document.querySelector('#card-grid .card[data-largest="true"]');
@@ -16,7 +19,7 @@ window.onload = (e) => {
     const cardGridEl = document.getElementById("card-grid");
     const categoryStackEl = document.getElementById("categories");
     Promise.all([
-        fetch(API_ENDPOINT + "get-gamedata")
+        fetch(API_ENDPOINT + "/get-gamedata")
         .then(resp => {
             if (resp.ok) {
                 return resp.json();
@@ -24,33 +27,38 @@ window.onload = (e) => {
                 console.error("Failed to contact gamedata API endpoint"); // [!] add UI notification for this
             }
         }),
-        fetch(API_ENDPOINT + "get-attempts", 
-        {
-            // [!] TODO: include user identifier from Discord SDK
-        }).then(resp => {
-            if (resp.ok) {
-                return resp.json();
-            } else {
-                console.error("Failed to contact userdata API endpoint"); // [!] add UI notification for this
-            }
-        }).then(attempts => {
-            if (attempts)
-                return Array.from(attempts, attempt => attempt.sort());
-        })
-    ]).then(([categories, attempts]) => {
+        initDiscordSdk(API_ENDPOINT + "/discord-token")
+        .then(({discordSdk: sdk, user})=> {
+            discordSdk = sdk;
+            userData = user;
+            return fetch(
+                    `${API_ENDPOINT}/get-attempts?id=${userData?.id}`
+                ).then(resp => {
+                    if (resp.ok) {
+                        return resp.json();
+                    } else {
+                        console.error("Failed to contact userdata API endpoint"); // [!] add UI notification for this
+                    }
+                }).then(attempts => {
+                    if (attempts)
+                        return Array.from(attempts, attempt => attempt.sort());
+                })
+        }),
+    ]).then(([categories, oldAttempts]) => {
             const categoryEls = [];
             const wordEls = [];
             // create card elements
             Object.entries(categories).forEach(([category, words]) => {
-                categoryEls.push(createCardElement(category, "category"));
+                categoryEls.push(createCardElement(category, (e) => {console.log(`clicked: ${e.target?.innerHTML}`)}, "category"));
                 words.forEach(({word, id}) => {
-                    let wordEl = createCardElement(word, "word");
+                    let wordEl = createCardElement(word, (e) => {console.log(`clicked: ${e.target?.innerHTML}`)}, "word");
                     wordEl.dataset.id = id;
                     wordEls.push(wordEl);
                     cardGridEl.append(wordEl);
                 });
             });
             // init previous correct attempts (if any)
+
             
             // main runtime
             {
