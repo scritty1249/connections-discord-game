@@ -1,4 +1,4 @@
-// import { DiscordSDK } from "@discord/embedded-app-sdk";
+import { DiscordSDK } from "@discord/embedded-app-sdk";
 
 export async function initDiscordSdk (server_api_endpoint) {
     const discordSdk = new DiscordSDK(process.env.DISCORD_CLIENT_ID);
