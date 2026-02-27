@@ -21,7 +21,7 @@ body {
     flex-wrap: nowrap;
     flex-direction: column;
     justify-content: flex-start;
-    align-content: center;
+    align-items: center;
     box-sizing: border-box;
     width: 80%;
     height: auto;
@@ -32,6 +32,9 @@ body {
     -ms-overflow-style: none;
     &::-webkit-scrollbar {
         display: none;
+    }
+    & > .icon {
+        margin: 10% auto;
     }
 }
 
@@ -58,8 +61,8 @@ body {
         color: #121212;
         font-weight: 500;
         transition:
-            background-color .65s ease-in-out,
-            color .65s ease-in-out;
+            background-color .3s ease-in-out,
+            color .3s ease-in-out;
         &.selected {
             background-color: #5a594e;
             color: #f8f8f8;

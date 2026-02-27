@@ -20,7 +20,7 @@ function selectWord(wordEl) {
     if (wordEl.classList.contains("selected")) {
         selectedWords--;
         wordEl.classList.remove("selected");
-    } else if (selectedWords < 3) {
+    } else if (selectedWords < 4) { // [!] this should be 3, but I can't fucking count I guess
         selectedWords++;
         wordEl.classList.add("selected");
     }
