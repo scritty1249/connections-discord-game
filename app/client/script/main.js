@@ -94,7 +94,7 @@ window.onload = (e) => {
                 avatarEl.src = avatarUrl;
                 avatarEl.width = avatarSize;
                 avatarEl.height = avatarSize;
-                containerEl.prepend(avaterEl);
+                containerEl.prepend(avatarEl);
             }
         });
 }
