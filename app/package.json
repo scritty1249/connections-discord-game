@@ -1,6 +1,7 @@
 {
     "name": "connections-discord-game",
     "version": "1.0.0",
+    "type": "module",
     "dependencies": {
         "@vercel/edge-config": "latest",
         "@upstash/redis": "latest",
