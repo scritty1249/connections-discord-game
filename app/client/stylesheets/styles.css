@@ -1,5 +1,5 @@
 :root {
-    --round: 15px;
+    --round: 8px;
     --spacing: 5px;
     --unit: 10px;
 }
@@ -13,11 +13,17 @@ body > * {
     flex-direction: column;
     justify-content: flex-start;
     align-content: center;
+    box-sizing: border-box;
     width: 80%;
     height: auto;
     font-family: "HelveticaNeue-Bold", "Helvetica Neue Bold", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     font-weight: 350;
     overflow: scroll; /* never clip- need to detect with JS */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    &::-webkit-scrollbar {
+        display: none;
+    }
 }
 
 #card-grid {
@@ -30,7 +36,7 @@ body > * {
     display: inline-block;
     box-sizing: border-box;
     border-radius: var(--round);
-    padding: var(--spacing);
+    padding: calc(var(--spacing) * 3) var(--spacing);
     text-align: center;
     justify-content: center;
     text-transform: uppercase;
