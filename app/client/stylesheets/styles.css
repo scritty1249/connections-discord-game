@@ -3,13 +3,17 @@
     --spacing: 5px;
     --unit: 10px;
 }
-body > * {
-    margin: auto;
+
+
+body {
     background-color: #121212;
     overflow: hidden;
     width: 100vw;
     height: 100vh;
     margin: 0;
+    & > * {
+        margin: auto;
+    }
 }
 
 .content-container {

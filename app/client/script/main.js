@@ -17,7 +17,7 @@ function resizeCardHandler () {
 }
 
 function selectWord(wordEl) {
-    if (wordEl.classList.has("selected")) {
+    if (wordEl.classList.contains("selected")) {
         selectedWords--;
         wordEl.classList.remove("selected");
     } else if (selectedWords < 3) {
