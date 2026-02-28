@@ -9,9 +9,10 @@ export async function verifyDiscordRequest(request) {
     const body = request.rawBody; // should be a str, not bytes
 
     return nacl.sign.detached.verify(
-        new Uint8Array(stamp + body), // these are supposedly what Nodejs Buffers can be interchanged with, NOT vanilla ArrayBuffers
-        Uint8Array.fromHex(sig),
-        Uint8Array.fromHex(process.env.DISCORD_PUBLIC_KEY)
+        // Buffers are Nodejs things, since vercel's Uint8Array.fromHex isn't fucking working
+        Buffer.from(stamp + body),
+        Buffer.from(sig, "hex"),
+        Buffer.from(process.env.DISCORD_PUBLIC_KEY, "hex")
     );
 }
 
