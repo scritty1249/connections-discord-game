@@ -6,7 +6,7 @@ import * as nacl from "tweetnacl";
 export async function verifyDiscordRequest(request) {
     const sig = request?.headers?.get("X-Signature-Ed25519");
     const stamp = request?.headers?.get("X-Signature-Timestamp");
-    const body = req.rawBody; // should be a str, not bytes
+    const body = request.rawBody; // should be a str, not bytes
 
     return nacl.sign.detached.verify(
         new Uint8Array(stamp + body), // these are supposedly what Nodejs Buffers can be interchanged with, NOT vanilla ArrayBuffers
