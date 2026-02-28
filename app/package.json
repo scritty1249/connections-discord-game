@@ -9,7 +9,7 @@
         "@vercel/edge-config": "latest",
         "@upstash/redis": "latest",
         "@discord/embedded-app-sdk": "latest",
-        "@dashkite/tweetnacl": "latest"
+        "tweetnacl": "latest"
     },
     "devDependencies": {
         "esbuild": "latest"
