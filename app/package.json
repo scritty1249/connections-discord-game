@@ -8,7 +8,8 @@
     "dependencies": {
         "@vercel/edge-config": "latest",
         "@upstash/redis": "latest",
-        "@discord/embedded-app-sdk": "latest"
+        "@discord/embedded-app-sdk": "latest",
+        "tweetnacl": "latest"
     },
     "devDependencies": {
         "esbuild": "latest"

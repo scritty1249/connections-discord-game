@@ -1,7 +1,19 @@
 import { dateToString } from "./utils.js";
 import * as ENDPOINT from "./endpoints.js";
 import { GameDB, UserDB } from "./store.js";
+import * as nacl from "tweetnacl";
 
+export async function verifyDiscordRequest(request) {
+    const sig = request?.headers?.get("X-Signature-Ed25519");
+    const stamp = request?.headers?.get("X-Signature-Timestamp");
+    const body = req.rawBody; // should be a str, not bytes
+
+    return nacl.sign.detached.verify(
+        new Uint8Array(stamp + body), // these are supposedly what Nodejs Buffers can be interchanged with, NOT vanilla ArrayBuffers
+        Uint8Array.fromHex(sig),
+        Uint8Array.fromHex(process.env.DISCORD_PUBLIC_KEY)
+    );
+}
 
 export async function fetchGameData(gameDate) {
     const endpoint = ENDPOINT.GAME_DATA + dateToString(gameDate) + ".json"
