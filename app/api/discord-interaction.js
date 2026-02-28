@@ -1,4 +1,4 @@
-import { verifyDiscordRequest } from "../lib/server";
+import { verifyDiscordRequest } from "../lib/server.js";
 
 export async function POST(req) {
     const { type, data } = await req.json();
