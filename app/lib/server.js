@@ -1,7 +1,7 @@
 import { dateToString } from "./utils.js";
 import * as ENDPOINT from "./endpoints.js";
 import { GameDB, UserDB } from "./store.js";
-import * as nacl from "tweetnacl";
+import { nacl } from "tweetnacl";
 
 export async function verifyDiscordRequest(request) {
     const sig = request?.headers?.get("X-Signature-Ed25519");
