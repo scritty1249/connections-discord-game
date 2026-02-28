@@ -1,13 +1,13 @@
 import { dateToString } from "./utils.js";
 import * as ENDPOINT from "./endpoints.js";
 import { GameDB, UserDB } from "./store.js";
-import * as nacl from "tweetnacl";
+import { default as nacl } from "tweetnacl";
 
 export async function verifyDiscordRequest(request) {
     const sig = request?.headers?.get("X-Signature-Ed25519");
     const stamp = request?.headers?.get("X-Signature-Timestamp");
     const body = request.rawBody; // should be a str, not bytes
-    console.debug("Keys available:", Object.keys(nacl));
+
     return nacl.sign.detached.verify(
         new Uint8Array(stamp + body), // these are supposedly what Nodejs Buffers can be interchanged with, NOT vanilla ArrayBuffers
         Uint8Array.fromHex(sig),
