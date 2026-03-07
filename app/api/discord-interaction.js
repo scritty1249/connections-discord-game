@@ -17,6 +17,7 @@ export async function POST(req) {
                     case 4: // PRIMARY ENTRY POINT
                         switch (data?.name?.toLowerCase()) {
                             case "launch":
+                                console.info("Activity launched through interaction call"); // [!] Remove once we figure out how to stop the automatic "Activity Launched" messages
                                 return Response.json({
                                     type: 12,
                                     data: {
