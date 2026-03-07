@@ -8,9 +8,6 @@ export function verifyDiscordRequest(requestHeaders, requestBodyStr) {
     const stamp = requestHeaders?.get("X-Signature-Timestamp");
     const body = requestBodyStr; // raw body should be a str, not bytes
 
-    // [!] Testing headers
-    console.debug(`Header data:\n  X-Signature-Ed25519: ${sig}\n  X-Signature-Timestamp: ${stamp}\n  RawBody: ${body}`)
-
     return nacl.sign.detached.verify(
         // Buffers are Nodejs things, since vercel's Uint8Array.fromHex isn't fucking working
         Buffer.from(stamp + body),

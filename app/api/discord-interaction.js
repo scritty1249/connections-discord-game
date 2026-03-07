@@ -17,7 +17,12 @@ export async function POST(req) {
                     case 4: // PRIMARY ENTRY POINT
                         switch (data?.name?.toLowerCase()) {
                             case "launch":
-                                return Response.json({type: 12});
+                                return Response.json({
+                                    type: 12,
+                                    data: {
+                                        flags: 4 // send as silent message
+                                    }
+                                });
                         };
                 };
             case 1: // PING
