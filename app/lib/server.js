@@ -3,10 +3,10 @@ import * as ENDPOINT from "./endpoints.js";
 import { GameDB, UserDB } from "./store.js";
 import { default as nacl } from "tweetnacl";
 
-export async function verifyDiscordRequest(request) {
-    const sig = request?.headers?.get("X-Signature-Ed25519");
-    const stamp = request?.headers?.get("X-Signature-Timestamp");
-    const body = await request.text(); // raw body should be a str, not bytes
+export async function verifyDiscordRequest(requestHeaders, requestBodyStr) {
+    const sig = requestHeaders?.get("X-Signature-Ed25519");
+    const stamp = requestHeaders?.get("X-Signature-Timestamp");
+    const body = requestBodyStr; // raw body should be a str, not bytes
 
     // [!] Testing headers
     console.debug(`Header data:\n  X-Signature-Ed25519: ${sig}\n  X-Signature-Timestamp: ${stamp}\n  RawBody: ${body}`)

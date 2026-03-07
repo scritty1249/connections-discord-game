@@ -2,12 +2,14 @@ import { verifyDiscordRequest } from "../lib/server.js";
 
 export async function POST(req) {
     try {
-        const isVerified = await verifyDiscordRequest(req);
+        const reqRawBody = await req.text();
+        const reqHeaders = req.headers;
+        const isVerified = verifyDiscordRequest(reqHeaders, reqRawBody);
         if (!isVerified) {
             console.info("Recieved an invalid interaction request"); // discord will purposefully send invalid requests to test the endpoint periodically
             return new Response("Invalid request signature", {status: 401}); // specified by discord api guidelines
         }
-        const { type, data } = await req.json();
+        const { type, data } = JSON.parse(reqRawBody); // body should be JSON, should this should never fail...
         switch (type) {
             case 2: // APPLICATION COMMAND
             // [!] holy aids nested switch, clean this up later...
