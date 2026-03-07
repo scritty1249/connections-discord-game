@@ -2,7 +2,8 @@ import { verifyDiscordRequest } from "../lib/server.js";
 
 export async function POST(req) {
     try {
-        if (!verifyDiscordRequest(req)) {
+        const isVerified = await verifyDiscordRequest(req);
+        if (!isVerified) {
             console.info("Recieved an invalid interaction request"); // discord will purposefully send invalid requests to test the endpoint periodically
             return new Response("Invalid request signature", {status: 401}); // specified by discord api guidelines
         }
