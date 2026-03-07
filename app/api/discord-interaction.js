@@ -7,7 +7,7 @@ export async function POST(req) {
         const isVerified = verifyDiscordRequest(reqHeaders, reqRawBody);
         if (!isVerified) {
             console.info("Recieved an invalid interaction request"); // discord will purposefully send invalid requests to test the endpoint periodically
-            return new Response("Invalid request signature", {status: 401}); // specified by discord api guidelines
+            return new Response("invalid request signature", {status: 401}); // specified by discord api guidelines
         }
         const { type, data } = JSON.parse(reqRawBody); // body should be JSON, should this should never fail...
         switch (type) {

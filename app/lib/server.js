@@ -3,7 +3,7 @@ import * as ENDPOINT from "./endpoints.js";
 import { GameDB, UserDB } from "./store.js";
 import { default as nacl } from "tweetnacl";
 
-export async function verifyDiscordRequest(requestHeaders, requestBodyStr) {
+export function verifyDiscordRequest(requestHeaders, requestBodyStr) {
     const sig = requestHeaders?.get("X-Signature-Ed25519");
     const stamp = requestHeaders?.get("X-Signature-Timestamp");
     const body = requestBodyStr; // raw body should be a str, not bytes
