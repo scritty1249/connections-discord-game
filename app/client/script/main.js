@@ -1,4 +1,4 @@
-import { isOverflowed } from "./utils.js";
+import { isOverflowed, attemptIsRepeat } from "./utils.js";
 import { animateMove, createCardElement } from "./cards.js";
 import * as Discord from "./discord.js";
 
@@ -6,6 +6,36 @@ const API_ENDPOINT = window.origin + "/api";
 let discordSdk = null;
 let userData = null;
 let selectedWords = 0;
+let oldAttempts = [];
+
+async function recordAttempt (attempt) { // attempt is expected to be a Set of 4 numbers
+    try {
+        const resp = await fetch(API_ENDPOINT + "/record-attempt?id=" + userData?.id, {
+            method: "POST",
+            body: JSON.stringify({attempt: attempt})
+        });
+        return resp.ok ? true : undefined;
+    } catch (err) {
+        console.error(err);
+        return undefined;
+    }
+}
+
+// returns a Promise. Instantly resolves to false if attempt is a repeat
+function submitAttempt () { // old attempts returned from api as an Array of 4-Number Arrays (2D).
+    const selectedWordEls = document.getElementsByClassName("selected");
+    if (selectedWordEls.length > 4) {
+        console.error("Something went wrong while submitting! More than 4 words selected");
+        return;
+    }
+    const words = Array.from(selectedWordEls, (wordEl) => wordEl.dataset.id).sort();
+    // attempts within oldAttempts should already be sorted
+    if (attemptIsRepeat(words, oldAttempts)) {
+        return Promise(false);
+    } else {
+        return recordAttempt(Set(words));
+    }
+}
 
 function resizeCardHandler () {
     const biggestCardEl = document.querySelector('#card-grid .card[data-largest="true"]');
@@ -23,6 +53,10 @@ function selectWord(wordEl) {
     } else if (selectedWords < 4) { // [!] this should be 3, but I can't fucking count I guess
         selectedWords++;
         wordEl.classList.add("selected");
+
+        // [!] Temporary, remove soon
+        if (selectedWords == 4)
+            submitAttempt().then(res => console.debug(res));
     }
 }
 
@@ -60,9 +94,10 @@ window.onload = (e) => {
                         return Array.from(attempts, attempt => attempt.sort());
                 })
         }),
-    ]).then(([categories, oldAttempts]) => {
+    ]).then(([categories, prevAttempts]) => {
             const categoryEls = [];
             const wordEls = [];
+            oldAttempts = prevAttempts;
 
             console.debug(`Loaded previous attempts: ${oldAttempts}`);
 

@@ -9,3 +9,9 @@ export function attemptIsCorrect (attempt, categories) { // categories is an Arr
         category.every(([id, idx]) => id === attempt[idx])
     );
 }
+
+export function attemptIsRepeat (attempt, oldAttempts) { // attempt and attempts within oldAttempts should already be sorted
+    return oldAttempts.some((oldAttempt) =>
+        attempt.every((_, i) => 
+            oldAttempt[i] == attempt[i]));
+}
