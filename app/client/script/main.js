@@ -28,7 +28,7 @@ function submitAttempt () { // old attempts returned from api as an Array of 4-N
         console.error("Something went wrong while submitting! More than 4 words selected");
         return;
     }
-    const words = Array.from(selectedWordEls, (wordEl) => wordEl.dataset.id).sort();
+    const words = Array.from(selectedWordEls, (wordEl) => parseInt(wordEl.dataset.id)).sort();
     // attempts within oldAttempts should already be sorted
     if (attemptIsRepeat(words, oldAttempts)) {
         return Promise.resolve(false);
