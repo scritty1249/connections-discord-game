@@ -1,0 +1,1 @@
+export const GIT_COMMIT_ID = "<!--BUILD_ID-->";

@@ -1,12 +1,16 @@
 import { isOverflowed, attemptIsRepeat } from "./utils.js";
 import { animateMove, createCardElement } from "./cards.js";
 import * as Discord from "./discord.js";
+// for testing
+import { GIT_COMMIT_ID } from "./version.js";
 
 const API_ENDPOINT = window.origin + "/api";
 let discordSdk = null;
 let userData = null;
 let selectedWords = 0;
 let oldAttempts = [];
+
+console.log("BUILD ID: " + GIT_COMMIT_ID);
 
 async function recordAttempt (attempt) { // attempt is expected to be a Set of 4 numbers
     try {
