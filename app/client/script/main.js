@@ -53,18 +53,20 @@ function selectWord(wordEl) {
     } else if (selectedWords < 4) { // [!] this should be 3, but I can't fucking count I guess
         selectedWords++;
         wordEl.classList.add("selected");
-
-        // [!] Temporary, remove soon
-        if (selectedWords == 3) {
-            console.debug("Submitting...");
-            submitAttempt().then(res => console.debug(res));
-        } else {
-            console.debug(`Wordcount: ${selectedWords}`);
-        }
     }
 }
 
-const wordClickHandler = (e) => { console.log(`clicked ${e.target?.innerHTML}`); selectWord(e.target) }
+function wordClickHandler (e) {
+    console.info(`clicked ${e.target?.innerHTML}`);
+    selectWord(e.target);
+    if (selectedWords <= 3) {
+        console.debug("Submitting...");
+        submitAttempt().then(res =>
+            console.debug(res));
+    } else {
+        console.debug(`Wordcount: ${selectedWords}`);
+    }
+}
 
 window.onload = (e) => {
     const containerEl = document.getElementsByClassName("content-container")?.[0];
