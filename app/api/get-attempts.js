@@ -7,8 +7,8 @@ export async function GET(req) {
     } else {
         try {
             const id = params.get("id");
-            const data = await getAttempts(id);
-            return Response.json(data);
+            const prevAttempts = await getAttempts(id);
+            return Response.json({attempts: prevAttempts});
         } catch (err) {
             console.error("Vercel API error:", err);
             return Response.json({error: err.message}, {status: 500, statusText: "Internal server error"});

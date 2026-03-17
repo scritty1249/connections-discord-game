@@ -55,7 +55,7 @@ window.onload = (e) => {
                     } else {
                         console.error("Failed to contact userdata API endpoint"); // [!] add UI notification for this
                     }
-                }).then(attempts => {
+                }).then(({attempts}) => {
                     if (attempts)
                         return Array.from(attempts, attempt => attempt.sort());
                 })
