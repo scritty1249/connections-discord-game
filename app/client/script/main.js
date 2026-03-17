@@ -37,7 +37,7 @@ function submitAttempt () { // old attempts returned from api as an Array of 4-N
     if (attemptIsRepeat(words, oldAttempts)) {
         return Promise.resolve(false);
     } else {
-        return recordAttempt(Set(words));
+        return recordAttempt(new Set(words));
     }
 }
 
@@ -147,13 +147,8 @@ window.onload = (e) => {
             }
             // create submit button
             {
-                console.log("?");
                 const submitBtn = createCardElement("submit", submitHandler, "submit");
                 menuEl.append(submitBtn);
-                // am i going insane?
-                console.log("test");
-                console.info("test");
-                console.debug("test");
             }
         });
 }

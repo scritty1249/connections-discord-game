@@ -8,7 +8,7 @@ export async function POST(req) {
     } else {
         try {
             const id = params.get("id");
-            await newAttempt(id, Set(attempt));
+            await newAttempt(id, new Set(attempt));
             return new Response();
         } catch (err) {
             console.error("Vercel API error:", err);
