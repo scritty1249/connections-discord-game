@@ -73,6 +73,8 @@ body {
     }
     &.submit {
         margin: 10% auto;
+        width: auto;
+        height: 5%;
     }
 }
 

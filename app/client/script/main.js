@@ -142,10 +142,7 @@ window.onload = (e) => {
             }
             // create submit button
             {
-                const submitBtn = document.createElement("div");
-                submitBtn.classList.add("submit", "card");
-                submitBtn.addEventListener("click", submitHandler);
-                submitBtn.innerHTML = "submit";
+                const submitBtn = createCardElement("submit", submitHandler, "submit");
                 document.getElementById("buttons").append(submitBtn);
             }
         });
