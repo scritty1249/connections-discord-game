@@ -11,11 +11,11 @@ body {
     width: 100vw;
     height: 100vh;
     margin: 0;
-    & > * {
+    > * {
         margin: auto;
-    }
-    & > *:not(.content-container) {
-        visibility: hidden;
+        &:not(.content-container) {
+            visibility: hidden;
+        }
     }
 }
 
@@ -76,7 +76,7 @@ body {
     }
     &.submit {
         margin: 10% auto;
-        width: auto;
+        width: 20%;
         height: 5%;
     }
 }
