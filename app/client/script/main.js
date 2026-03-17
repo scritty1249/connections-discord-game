@@ -144,6 +144,10 @@ window.onload = (e) => {
             {
                 const submitBtn = createCardElement("submit", submitHandler, "submit");
                 document.getElementById("buttons").append(submitBtn);
+                // am i going insane?
+                console.log("test");
+                console.info("test");
+                console.debug("test");
             }
         });
 }
