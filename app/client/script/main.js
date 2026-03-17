@@ -62,7 +62,7 @@ function wordClickHandler (e) {
 }
 
 function submitHandler (e) {
-    if (selectedWords <= 3) {
+    if (selectedWords >= 3) {
         console.debug("Submitting...");
         submitAttempt().then(res =>
             console.debug(res));
