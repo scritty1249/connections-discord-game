@@ -145,6 +145,8 @@ window.onload = (e) => {
                 const submitBtn = document.createElement("div");
                 submitBtn.classList.add("submit", "card");
                 submitBtn.addEventListener("click", submitHandler);
+                submitBtn.innerHTML = "submit";
+                document.getElementById("buttons").append(submitBtn);
             }
         });
 }
