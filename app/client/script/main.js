@@ -74,6 +74,7 @@ function submitHandler (e) {
 window.onload = (e) => {
     const containerEl = document.getElementsByClassName("content-container")?.[0];
     const cardGridEl = document.getElementById("card-grid");
+    const menuEl = document.getElementById("buttons");
     const categoryStackEl = document.getElementById("categories");
     Promise.all([
         fetch(API_ENDPOINT + "/get-gamedata")
@@ -142,8 +143,9 @@ window.onload = (e) => {
             }
             // create submit button
             {
+                console.log("?");
                 const submitBtn = createCardElement("submit", submitHandler, "submit");
-                document.getElementById("buttons").append(submitBtn);
+                menuEl.append(submitBtn);
                 // am i going insane?
                 console.log("test");
                 console.info("test");
