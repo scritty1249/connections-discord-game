@@ -55,8 +55,12 @@ function selectWord(wordEl) {
         wordEl.classList.add("selected");
 
         // [!] Temporary, remove soon
-        if (selectedWords == 4)
+        if (selectedWords == 4) {
+            console.debug("Submitting...");
             submitAttempt().then(res => console.debug(res));
+        } else {
+            console.debug(`Wordcount: ${selectedWords}`);
+        }
     }
 }
 
