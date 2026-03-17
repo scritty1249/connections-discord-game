@@ -31,7 +31,7 @@ function submitAttempt () { // old attempts returned from api as an Array of 4-N
     const words = Array.from(selectedWordEls, (wordEl) => wordEl.dataset.id).sort();
     // attempts within oldAttempts should already be sorted
     if (attemptIsRepeat(words, oldAttempts)) {
-        return Promise(false);
+        return Promise.resolve(false);
     } else {
         return recordAttempt(Set(words));
     }
