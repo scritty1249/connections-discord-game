@@ -59,12 +59,15 @@ function selectWord(wordEl) {
 function wordClickHandler (e) {
     console.info(`clicked ${e.target?.innerHTML}`);
     selectWord(e.target);
+}
+
+function submitHandler (e) {
     if (selectedWords <= 3) {
         console.debug("Submitting...");
         submitAttempt().then(res =>
             console.debug(res));
     } else {
-        console.debug(`Wordcount: ${selectedWords}`);
+        console.debug(`Failed to submit. Wordcount: ${selectedWords}`);
     }
 }
 
@@ -119,7 +122,7 @@ window.onload = (e) => {
             });
             // init previous correct attempts (if any)
 
-            
+
             // main runtime
             {
                 let biggestWordEl = wordEls.reduce((biggestWordEl, wordEl) => biggestWordEl.offsetWidth > wordEl.offsetWidth ? biggestWordEl : wordEl);
@@ -136,6 +139,12 @@ window.onload = (e) => {
                 avatarEl.width = avatarSize;
                 avatarEl.height = avatarSize;
                 containerEl.prepend(avatarEl);
+            }
+            // create submit button
+            {
+                const submitBtn = document.createElement("div");
+                submitBtn.classList.add("submit", "card");
+                submitBtn.addEventListener("click", submitHandler);
             }
         });
 }

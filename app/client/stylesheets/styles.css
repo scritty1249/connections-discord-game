@@ -71,6 +71,9 @@ body {
     &.category {
 
     }
+    &.submit {
+        margin: 10% auto;
+    }
 }
 
 #category-grid {
