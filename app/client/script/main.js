@@ -16,12 +16,7 @@ async function recordAttempt (attempt) { // attempt is expected to be a Set of 4
             method: "POST",
             body: JSON.stringify({attempt: [...attempt]})
         });
-        if (resp.ok) {
-            oldAttempts.push(attempt);
-            return true;
-        } else {
-            return undefined;
-        }
+        return resp.ok ? true : undefined;
     } catch (err) {
         console.error(err);
         return undefined;
@@ -48,7 +43,11 @@ function submitAttempt () { // old attempts returned from api as an Array of 4-N
                 wordEl.style.backgroundColor = "#019a01";
             });
         }
-        return recordAttempt(new Set(words));
+        if (recordAttempt(new Set(words))) {
+            oldAttempts.push(words);
+        } else {
+            // something went wrong in backend
+        }
     }
 }
 
