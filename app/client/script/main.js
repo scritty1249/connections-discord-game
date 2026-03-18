@@ -98,7 +98,7 @@ window.onload = (e) => {
             if (data) {
                 categories = data;
                 categoryIds = Array.from(Object.values(categories), wordData =>
-                    Array.from(wordData, ({id}) => id));
+                    Array.from(wordData, ({id}) => id).sort());
             }
         }),
         Discord.getClient(API_ENDPOINT + "/discord-auth")

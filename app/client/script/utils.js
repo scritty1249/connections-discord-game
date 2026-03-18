@@ -6,7 +6,7 @@ export function attemptIsCorrect (attempt, categories) { // categories is an Arr
     // expects attempt as Array of Numbers, nested categories should already be sorted
     return categories.some(category =>
         attempt.length === category.length &&
-        category.every(([id, idx]) => id === attempt[idx])
+        category.every((id, idx) => id === attempt[idx])
     );
 }
 
