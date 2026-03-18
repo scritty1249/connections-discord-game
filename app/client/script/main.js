@@ -88,10 +88,13 @@ window.onload = (e) => {
         fetch(API_ENDPOINT + "/get-gamedata")
         .then(resp => {
             if (resp.ok) {
-                categories = resp.json();
+                return resp.json();
             } else {
                 console.error("Failed to contact gamedata API endpoint"); // [!] add UI notification for this
             }
+        }).then(data => {
+            if (data)
+                categories = data;  
         }),
         Discord.getClient(API_ENDPOINT + "/discord-auth")
         .then(client_id =>
