@@ -117,6 +117,7 @@ window.onload = (e) => {
             const wordEls = [];
 
             console.debug(`Loaded previous attempts: ${oldAttempts}`);
+            console.log(categories);
 
             // create card elements
             Object.entries(categories).forEach(([category, words]) => {
