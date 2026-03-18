@@ -1,4 +1,4 @@
-import { isOverflowed, attemptIsRepeat } from "./utils.js";
+import { isOverflowed, attemptIsRepeat, attemptIsCorrect } from "./utils.js";
 import { animateMove, createCardElement } from "./cards.js";
 import * as Discord from "./discord.js";
 
@@ -6,7 +6,8 @@ const API_ENDPOINT = window.origin + "/api";
 let discordSdk = null;
 let userData = null;
 let selectedWords = 0;
-let oldAttempts = [];
+let categories = null;
+const oldAttempts = [];
 
 async function recordAttempt (attempt) { // attempt is expected to be a Set of 4 numbers
     try {
@@ -24,6 +25,7 @@ async function recordAttempt (attempt) { // attempt is expected to be a Set of 4
 // returns a Promise. Instantly resolves to false if attempt is a repeat
 function submitAttempt () { // old attempts returned from api as an Array of 4-Number Arrays (2D).
     const selectedWordEls = document.getElementsByClassName("selected");
+    [...selectedWordEls].forEach((wordEl) => wordEl.classList.remove("selected"));
     if (selectedWordEls.length != 4) {
         console.error(`Something went wrong while submitting! ${selectedWordEls.length} words selected - 4 required`);
         return;
@@ -33,6 +35,12 @@ function submitAttempt () { // old attempts returned from api as an Array of 4-N
     if (attemptIsRepeat(words, oldAttempts)) {
         return Promise.resolve(false);
     } else {
+        if (attemptIsCorrect(words, categories)) {
+            // [!] temporary
+            [...selectedWordEls].forEach((wordEl) => {
+                wordEl.style.backgroundColor = "#019a01";
+            });
+        }
         return recordAttempt(new Set(words));
     }
 }
@@ -80,7 +88,7 @@ window.onload = (e) => {
         fetch(API_ENDPOINT + "/get-gamedata")
         .then(resp => {
             if (resp.ok) {
-                return resp.json();
+                categories = resp.json();
             } else {
                 console.error("Failed to contact gamedata API endpoint"); // [!] add UI notification for this
             }
@@ -101,13 +109,12 @@ window.onload = (e) => {
                     }
                 }).then(({attempts}) => {
                     if (attempts)
-                        return Array.from(attempts, attempt => attempt.toSorted());
+                        oldAttempts.concat(Array.from(attempts, attempt => attempt.toSorted()));
                 })
         }),
-    ]).then(([categories, prevAttempts]) => {
+    ]).then((_) => {
             const categoryEls = [];
             const wordEls = [];
-            oldAttempts = prevAttempts;
 
             console.debug(`Loaded previous attempts: ${oldAttempts}`);
 
