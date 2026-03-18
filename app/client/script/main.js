@@ -109,7 +109,7 @@ window.onload = (e) => {
                     }
                 }).then(({attempts}) => {
                     if (attempts)
-                        oldAttempts.concat(Array.from(attempts, attempt => attempt.toSorted()));
+                        oldAttempts.push(Array.from(attempts, attempt => attempt.toSorted()));
                 })
         }),
     ]).then((_) => {
