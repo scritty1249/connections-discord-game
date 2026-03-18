@@ -64,6 +64,6 @@ export async function newAttempt(userid, attempt) { // attempt here is a Set of 
         attempts.push(attemptArr);
         return await UserDB.set(userid, attempts);
     } else {
-        return await UserDB.set(userid, attemptArr);
+        return await UserDB.set(userid, [attemptArr]);
     }
 }
