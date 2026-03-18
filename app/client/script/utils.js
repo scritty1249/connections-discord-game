@@ -4,7 +4,7 @@ export function isOverflowed (el) {
 
 export function attemptIsCorrect (attempt, categories) { // categories is an Array of category word ids ([[Number, ...], ...])
     // expects attempt as Array of Numbers, nested categories should already be sorted
-    return categories.any(category =>
+    return categories.some(category =>
         attempt.length === category.length &&
         category.every(([id, idx]) => id === attempt[idx])
     );
