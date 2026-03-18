@@ -25,13 +25,13 @@ async function recordAttempt (attempt) { // attempt is expected to be a Set of 4
 
 // returns a Promise. Instantly resolves to false if attempt is a repeat
 function submitAttempt () { // old attempts returned from api as an Array of 4-Number Arrays (2D).
-    const selectedWordEls = document.getElementsByClassName("selected");
+    const selectedWordEls = [...document.getElementsByClassName("selected")];
     if (selectedWordEls.length != 4) {
         console.error(`Something went wrong while submitting! ${selectedWordEls.length} words selected - 4 required`);
         return;
     }
     const words = Array.from(selectedWordEls, (wordEl) => parseInt(wordEl.dataset.id)).sort();
-    [...selectedWordEls].forEach((wordEl) => wordEl.classList.remove("selected"));
+    selectedWordEls.forEach((wordEl) => wordEl.classList.remove("selected"));
     selectedWords = 0;
     // attempts within oldAttempts should already be sorted
     if (attemptIsRepeat(words, oldAttempts)) {
@@ -39,7 +39,7 @@ function submitAttempt () { // old attempts returned from api as an Array of 4-N
     } else {
         if (attemptIsCorrect(words, categoryIds)) {
             // [!] temporary
-            [...selectedWordEls].forEach((wordEl) => {
+            selectedWordEls.forEach((wordEl) => {
                 wordEl.style.backgroundColor = "#019a01";
             });
         }
