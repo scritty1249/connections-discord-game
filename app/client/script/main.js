@@ -16,7 +16,12 @@ async function recordAttempt (attempt) { // attempt is expected to be a Set of 4
             method: "POST",
             body: JSON.stringify({attempt: [...attempt]})
         });
-        return resp.ok ? true : undefined;
+        if (resp.ok) {
+            oldAttempts.push(attempt);
+            return true;
+        } else {
+            return undefined;
+        }
     } catch (err) {
         console.error(err);
         return undefined;
