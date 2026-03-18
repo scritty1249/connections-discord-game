@@ -101,7 +101,7 @@ window.onload = (e) => {
                     }
                 }).then(({attempts}) => {
                     if (attempts)
-                        return Array.from(attempts, attempt => attempt.sort());
+                        return Array.from(attempts, attempt => attempt.toSorted());
                 })
         }),
     ]).then(([categories, prevAttempts]) => {
