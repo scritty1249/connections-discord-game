@@ -12,7 +12,7 @@ async function recordAttempt (attempt) { // attempt is expected to be a Set of 4
     try {
         const resp = await fetch(API_ENDPOINT + "/record-attempt?id=" + userData?.id, {
             method: "POST",
-            body: JSON.stringify({attempt: attempt})
+            body: JSON.stringify({attempt: [...attempt]})
         });
         return resp.ok ? true : undefined;
     } catch (err) {
