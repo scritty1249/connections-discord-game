@@ -47,8 +47,10 @@ function submitAttempt () { // old attempts returned from api as an Array of 4-N
             .then(success => {
                 if (success) {
                     oldAttempts.push(words);
+                    return true;
                 } else {
                     // something went wrong in backend
+                    return undefined;
                 }
             });
     }
