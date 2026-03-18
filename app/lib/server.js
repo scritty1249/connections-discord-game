@@ -57,12 +57,13 @@ export async function getAttempts(userid) {
 }
 
 export async function newAttempt(userid, attempt) { // attempt here is a Set of 4 ids (Numbers)
+    let attemptArr = [...attempt];
     // [!] might need to validate a timestamp here
     if (await UserDB.exists(userid)) {
         const attempts = await UserDB.get(userid);
-        attempts.push(attempt);
+        attempts.push(attemptArr);
         return await UserDB.set(userid, attempts);
     } else {
-        return await UserDB.set(userid, [attempt]);
+        return await UserDB.set(userid, attemptArr);
     }
 }
