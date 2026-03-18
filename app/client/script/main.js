@@ -43,11 +43,14 @@ function submitAttempt () { // old attempts returned from api as an Array of 4-N
                 wordEl.style.backgroundColor = "#019a01";
             });
         }
-        if (recordAttempt(new Set(words))) {
-            oldAttempts.push(words);
-        } else {
-            // something went wrong in backend
-        }
+        return recordAttempt(new Set(words))
+            .then(success => {
+                if (success) {
+                    oldAttempts.push(words);
+                } else {
+                    // something went wrong in backend
+                }
+            });
     }
 }
 
