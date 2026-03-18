@@ -7,6 +7,7 @@ let discordSdk = null;
 let userData = null;
 let selectedWords = 0;
 let categories = null;
+let categoryIds = null;
 const oldAttempts = [];
 
 async function recordAttempt (attempt) { // attempt is expected to be a Set of 4 numbers
@@ -36,7 +37,7 @@ function submitAttempt () { // old attempts returned from api as an Array of 4-N
     if (attemptIsRepeat(words, oldAttempts)) {
         return Promise.resolve(false);
     } else {
-        if (attemptIsCorrect(words, categories)) {
+        if (attemptIsCorrect(words, categoryIds)) {
             // [!] temporary
             [...selectedWordEls].forEach((wordEl) => {
                 wordEl.style.backgroundColor = "#019a01";
@@ -94,8 +95,11 @@ window.onload = (e) => {
                 console.error("Failed to contact gamedata API endpoint"); // [!] add UI notification for this
             }
         }).then(data => {
-            if (data)
-                categories = data;  
+            if (data) {
+                categories = data;
+                categoryIds = Array.from(Object.values(categories), wordData =>
+                    Array.from(wordData, ({id}) => id));
+            }
         }),
         Discord.getClient(API_ENDPOINT + "/discord-auth")
         .then(client_id =>
