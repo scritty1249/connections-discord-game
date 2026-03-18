@@ -15,3 +15,5 @@ export function attemptIsRepeat (attempt, oldAttempts) { // attempt and attempts
         attempt.every((_, i) => 
             oldAttempt[i] == attempt[i]));
 }
+
+export function notify () {}

@@ -79,6 +79,13 @@ body {
         width: 20%;
         height: 5%;
     }
+    &.notif {
+        position: sticky;
+        margin: 0 0 !important;
+        font-size: xx-small;
+        transition: 
+            transform .8s ease-in-out;
+    }
 }
 
 #category-grid {
