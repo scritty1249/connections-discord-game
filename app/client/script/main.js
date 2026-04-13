@@ -1,5 +1,5 @@
-import { isOverflowed, attemptIsRepeat, attemptIsCorrect, shuffle } from "./utils.js";
-import { animateMove, createCardElement, cardFX } from "./cards.js";
+import { isOverflowed, attemptIsRepeat, attemptIsCorrect, shuffle, attemptIsOneAway } from "./utils.js";
+import { animateMove, createCardElement, cardFX, popup } from "./cards.js";
 import * as Discord from "./discord.js";
 
 const API_ENDPOINT = window.origin + "/api";
@@ -30,22 +30,28 @@ function submitAttempt () { // old attempts returned from api as an Array of 4-N
         console.error(`Something went wrong while submitting! ${selectedWordEls.length} words selected - 4 required`);
         return;
     }
-    const words = Array.from(selectedWordEls, (wordEl) => parseInt(wordEl.dataset.id)).sort();
+    const wordIds = Array.from(selectedWordEls, (wordEl) => parseInt(wordEl.dataset.id)).sort();
     selectedWordEls.forEach((wordEl) => wordEl.classList.remove("selected"));
     selectedWords = 0;
     // attempts within oldAttempts should already be sorted
-    if (attemptIsRepeat(words, oldAttempts)) {
+    if (attemptIsRepeat(wordIds, oldAttempts)) {
         console.debug("Repeated attempt");
-        return cardFX.repeatAttempt(selectedWordEls).then(() => false);
+        return cardFX.repeatAttempt(selectedWordEls)
+            .then(() => popup("Already guessed!", 2000))
+            .then(() => false);
     } else {
         // jesus, how readable is this for others?
-        return (attemptIsCorrect(words, categoryIds) ?
-            (console.debug("Correct attempt"), cardFX.correct(selectedWordEls))
-            : (console.debug("Incorrect attempt"), cardFX.incorrect(selectedWordEls)))
-            .then(() => recordAttempt(new Set(words)))
+        return (attemptIsCorrect(wordIds, categoryIds)
+            ? (console.debug("Correct attempt"), cardFX.correct(selectedWordEls))
+            : (
+                attemptIsOneAway(wordIds, categoryIds)
+                    ? (console.debug("Close attempt"), popup("One away...", 2000))
+                    : console.debug("Incorrect attempt"),
+                cardFX.incorrect(selectedWordEls)))
+            .then(() => recordAttempt(new Set(wordIds)))
             .then(success => {
                 if (success) {
-                    oldAttempts.push(words);
+                    oldAttempts.push(wordIds);
                     return true;
                 } else {
                     // something went wrong in backend

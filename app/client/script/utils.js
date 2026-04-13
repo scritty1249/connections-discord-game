@@ -10,6 +10,13 @@ export function attemptIsCorrect (attempt, categories) { // categories is an Arr
     );
 }
 
+export function attemptIsOneAway(attempt, categories) { // categories is an Array of category word ids ([[Number, ...], ...])
+    // expects attempt as Array of Numbers, nested categories should already be sorted
+
+    // could parse as a Set here but the sizes are so negligable that conversion isn't worth the resources
+    return categories.some(category => category.filter(wordId => attempt.includes(wordId)).length == 3);
+}
+
 export function attemptIsRepeat (attempt, oldAttempts) { // attempt and attempts within oldAttempts should already be sorted
     return oldAttempts.some((oldAttempt) =>
         attempt.every((_, i) => 
@@ -24,5 +31,3 @@ export function shuffle(array) {
     }
     return array;
 }
-
-export function notify () {}

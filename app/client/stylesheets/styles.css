@@ -11,7 +11,7 @@ body {
     width: 100vw;
     height: 100vh;
     margin: 0;
-    > * {
+    > *:not(.card.popup) {
         margin: auto;
         &:not(.content-container) {
             visibility: hidden;
@@ -60,6 +60,20 @@ body {
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    &.popup {
+        background-color: #efefe6;
+        color: #121212;
+        position: fixed;
+        left: 50%;
+        top: 5%;
+        width: 20%;
+        height: 5%;
+        transition: top .45s ease-in-out;
+
+        @starting-style {
+            top: -5%;
+        }
+    }
     &.word {
         background-color: #efefe6;
         color: #121212;
@@ -130,6 +144,7 @@ body {
     }
     */
 }
+
 
 .shake-incorrect {
     animation: shake-incorrect 0.2s ease-in-out 0s 2;

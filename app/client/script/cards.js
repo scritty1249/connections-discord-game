@@ -40,6 +40,27 @@ export function getCardElements (cardElements, ...ids) {
     return [...cardElements].filter(cardEl => ids.includes(cardEl.dataset.id));
 }
 
+// resolves to false if duration expires, and true if popup is dismissed by user
+export function popup (message, durationMs = 1500) {
+    // durationMs is added to css transition duration
+    return new Promise((resolve, reject) => {
+        try {
+            const el = createCardElement(message, null, "popup");
+            el.addEventListener("transitionend", () => {
+                const timer = setTimeout(() => (resolve(false), el.remove()), durationMs);
+                el.addEventListener("click", () => {
+                    clearTimeout(timer);
+                    resolve(true);
+                    el.remove();
+                }, { once: true });
+            }, { once: true });
+            document.body.appendChild(el);
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
 function playAnimation (element, ...classNames) {
     return new Promise((resolve, reject) => {
         try {
