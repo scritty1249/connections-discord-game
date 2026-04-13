@@ -45,6 +45,7 @@ body {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
     gap: var(--unit);
+    margin-bottom: 15%; /* don't overlap with submit button */
 }
 
 .card {
@@ -82,7 +83,9 @@ body {
 
     }
     &.submit {
-        margin: 10% auto;
+        position: fixed;
+        left: 50%;
+        bottom: 5%;
         width: 20%;
         height: 5%;
     }
