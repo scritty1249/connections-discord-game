@@ -57,9 +57,8 @@ function playAnimation (element, className) {
 export const cardFX = {
     incorrect: function (cardEls) {
         cardEls.forEach(cardEl => cardEl.classList.add("incorrect"));
-        return Promise.all(Array.from(cardEls,
-            (cardEl) => playAnimation(cardEl, "shake-incorrect")
-        )).finally(cardEls.forEach(cardEl => cardEl.classList.remove("incorrect")));
+        return this.repeatAttempt(cardEls)
+            .finally(cardEls.forEach(cardEl => cardEl.classList.remove("incorrect")));
     },
     // [!] temp function, remove when animateMove() works
     correct: function (cardEls) {

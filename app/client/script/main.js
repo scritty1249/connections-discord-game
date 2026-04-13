@@ -35,12 +35,13 @@ function submitAttempt () { // old attempts returned from api as an Array of 4-N
     selectedWords = 0;
     // attempts within oldAttempts should already be sorted
     if (attemptIsRepeat(words, oldAttempts)) {
+        console.debug("Repeated attempt");
         return cardFX.repeatAttempt(selectedWordEls).then(() => false);
     } else {
         // jesus, how readable is this for others?
         return (attemptIsCorrect(words, categoryIds) ?
-            cardFX.correct(selectedWordEls)
-            : cardFX.incorrect(selectedWordEls))
+            (console.debug("Correct attempt"), cardFX.correct(selectedWordEls))
+            : (console.debug("Incorrect attempt"), cardFX.incorrect(selectedWordEls)))
             .then(() => recordAttempt(new Set(words)))
             .then(success => {
                 if (success) {
