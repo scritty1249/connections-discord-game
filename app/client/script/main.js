@@ -40,7 +40,7 @@ function submitAttempt () { // old attempts returned from api as an Array of 4-N
         // jesus, how readable is this for others?
         return (attemptIsCorrect(words, categoryIds) ?
             cardFX.correct(selectedWordEls)
-            : cardFX.incorrect(selectedWords))
+            : cardFX.incorrect(selectedWordEls))
             .then(() => recordAttempt(new Set(words)))
             .then(success => {
                 if (success) {
