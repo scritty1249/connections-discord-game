@@ -1,5 +1,5 @@
-import { isOverflowed, attemptIsRepeat, attemptIsCorrect } from "./utils.js";
-import { animateMove, createCardElement } from "./cards.js";
+import { isOverflowed, attemptIsRepeat, attemptIsCorrect, shuffle } from "./utils.js";
+import { animateMove, createCardElement, cardFX } from "./cards.js";
 import * as Discord from "./discord.js";
 
 const API_ENDPOINT = window.origin + "/api";
@@ -35,15 +35,13 @@ function submitAttempt () { // old attempts returned from api as an Array of 4-N
     selectedWords = 0;
     // attempts within oldAttempts should already be sorted
     if (attemptIsRepeat(words, oldAttempts)) {
-        return Promise.resolve(false);
+        return cardFX.repeatAttempt(selectedWordEls).then(() => false);
     } else {
-        if (attemptIsCorrect(words, categoryIds)) {
-            // [!] temporary
-            selectedWordEls.forEach((wordEl) => {
-                wordEl.style.backgroundColor = "#019a01";
-            });
-        }
-        return recordAttempt(new Set(words))
+        // jesus, how readable is this for others?
+        return (attemptIsCorrect(words, categoryIds) ?
+            cardFX.correct(selectedWordEls)
+            : cardFX.incorrect(selectedWords))
+            .then(() => recordAttempt(new Set(words)))
             .then(success => {
                 if (success) {
                     oldAttempts.push(words);
@@ -143,11 +141,13 @@ window.onload = (e) => {
                     let wordEl = createCardElement(word, wordClickHandler, "word");
                     wordEl.dataset.id = id;
                     wordEls.push(wordEl);
-                    cardGridEl.append(wordEl);
                 });
             });
-            // init previous correct attempts (if any)
+            // shuffle elements before inserting to page
+            shuffle(wordEls).forEach(wordEl => cardGridEl.append(wordEl));
 
+            // init previous correct attempts (if any)
+            
 
             // main runtime
             {

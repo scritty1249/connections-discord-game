@@ -39,3 +39,36 @@ export function createCardElement (content, onclick, ...classList) {
 export function getCardElements (cardElements, ...ids) {
     return [...cardElements].filter(cardEl => ids.includes(cardEl.dataset.id));
 }
+
+function playAnimation (element, className) {
+    return new Promise((resolve, reject) => {
+        try {
+            element.classList.add(className);
+            element.addEventListener("animationend", (event) => {
+                element.classList.remove(className);
+                resolve(event);
+            }, { once: true });
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
+export const cardFX = {
+    incorrect: function (cardEls) {
+        cardEls.forEach(cardEl => cardEl.classList.add("incorrect"));
+        return Promise.all(Array.from(cardEls,
+            (cardEl) => playAnimation(cardEl, "shake-incorrect")
+        )).finally(cardEls.forEach(cardEl => cardEl.classList.remove("incorrect")));
+    },
+    // [!] temp function, remove when animateMove() works
+    correct: function (cardEls) {
+        cardEls.forEach(cardEl => cardEl.classList.add("correct"));
+        return Promise.resolve();
+    },
+    repeatAttempt: function (cardEls) {
+        return Promise.all(Array.from(cardEls,
+            (cardEl) => playAnimation(cardEl, "shake-incorrect")
+        ));
+    },
+};

@@ -70,6 +70,13 @@ body {
             background-color: #5a594e;
             color: #f8f8f8;
         }
+        &.correct {
+            pointer-events: none;
+            background-color: #019a01;
+        }
+        &.incorrect {
+            background-color: #ff746c;
+        }
     }
     &.category {
 
@@ -119,4 +126,15 @@ body {
         --size: 512px;
     }
     */
+}
+
+.shake-incorrect {
+    animation: shake-incorrect 0.2s ease-in-out 0s 2;
+}
+
+@keyframes shake-incorrect {
+    0% { transform: translateX(0) }
+    25% { transform: translateX(calc(var(--spacing)/2)) }
+    75% { transform: translateX(calc(-1 * var(--spacing)/2)) }
+    100% { transform: translateX(0) }
 }
