@@ -46,12 +46,18 @@ export function popup (message, durationMs = 1500) {
     return new Promise((resolve, reject) => {
         try {
             const el = createCardElement(message, null, "popup");
+
+            const removeEl = () => {
+                el.classList.add("hide");
+                el.addEventListener("transitionend", () => el.remove(), { once: true });
+            };
+
             el.addEventListener("transitionend", () => {
-                const timer = setTimeout(() => (resolve(false), el.remove()), durationMs);
+                const timer = setTimeout(() => (removeEl(), resolve(false)), durationMs);
                 el.addEventListener("click", () => {
                     clearTimeout(timer);
+                    removeEl();
                     resolve(true);
-                    el.remove();
                 }, { once: true });
             }, { once: true });
             document.body.appendChild(el);

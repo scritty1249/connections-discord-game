@@ -65,14 +65,15 @@ body {
         color: #121212;
         position: fixed;
         left: 50%;
+        transform: translateX(-50%);
         top: 5%;
         width: 20%;
-        height: 5%;
+        min-height: 5%;
+        font-weight: 500;
+        padding: calc(var(--spacing) / 2);
         transition: top .45s ease-in-out;
-
-        @starting-style {
-            top: -5%;
-        }
+        &.hide { top: -5%; }
+        @starting-style { top: -5%; }
     }
     &.word {
         background-color: #efefe6;
