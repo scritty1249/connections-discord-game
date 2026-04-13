@@ -40,15 +40,16 @@ export function getCardElements (cardElements, ...ids) {
     return [...cardElements].filter(cardEl => ids.includes(cardEl.dataset.id));
 }
 
-function playAnimation (element, className) {
+function playAnimation (element, ...classNames) {
     return new Promise((resolve, reject) => {
         try {
-            element.classList.add(className);
+            element.classList.add(...classNames);
             element.addEventListener("animationend", (event) => {
-                element.classList.remove(className);
+                element.classList.remove(...classNames);
                 resolve(event);
             }, { once: true });
         } catch (error) {
+            element.classList.remove(...classNames);
             reject(error);
         }
     });
@@ -56,9 +57,9 @@ function playAnimation (element, className) {
 
 export const cardFX = {
     incorrect: function (cardEls) {
-        cardEls.forEach(cardEl => cardEl.classList.add("incorrect"));
-        return this.repeatAttempt(cardEls)
-            .finally(cardEls.forEach(cardEl => cardEl.classList.remove("incorrect")));
+        return Promise.all(Array.from(cardEls,
+            (cardEl) => playAnimation(cardEl, "shake-incorrect", "incorrect")
+        ));
     },
     // [!] temp function, remove when animateMove() works
     correct: function (cardEls) {
