@@ -60,7 +60,7 @@ export function popup (message, durationMs = 1500) {
                     resolve(true);
                 }, { once: true });
             }, { once: true });
-            document.body.appendChild(el);
+            document.getElementById("content-container").appendChild(el);
         } catch (error) {
             reject(error);
         }

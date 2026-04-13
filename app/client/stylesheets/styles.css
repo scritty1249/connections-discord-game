@@ -19,7 +19,7 @@ body {
     }
 }
 
-.content-container {
+#content-container {
     display: flex;
     flex-wrap: nowrap;
     flex-direction: column;
@@ -67,9 +67,10 @@ body {
         left: 50%;
         transform: translateX(-50%);
         top: 5%;
-        width: 20%;
+        min-width: 20%;
+        max-width: 80%;
         min-height: 5%;
-        font-weight: 500;
+        max-height: 40%;
         justify-content: center;
         align-items: center;
         padding: calc(var(--spacing) / 2);

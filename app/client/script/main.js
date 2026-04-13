@@ -96,7 +96,7 @@ function submitHandler (e) {
 }
 
 window.onload = (e) => {
-    const containerEl = document.getElementsByClassName("content-container")?.[0];
+    const containerEl = document.getElementById("content-container");
     const cardGridEl = document.getElementById("card-grid");
     const menuEl = document.getElementById("buttons");
     const categoryStackEl = document.getElementById("categories");
