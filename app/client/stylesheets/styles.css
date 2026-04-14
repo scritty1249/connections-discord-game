@@ -13,7 +13,7 @@ body {
     margin: 0;
     > *:not(.card.popup) {
         margin: auto;
-        &:not(.content-container) {
+        &:not(#content-container) {
             visibility: hidden;
         }
     }
@@ -103,6 +103,7 @@ body {
 
     }
     &.submit {
+        transform: translateX(-50%);
         position: fixed;
         left: 50%;
         bottom: 5%;
