@@ -39,8 +39,8 @@ export function softHypenateText (text, maxlen) {
     const hypenated = Array.from(words,
         (word, idx) => {
             const result = [];
-            for (let i = 0; i < text.length; i += maxlen) {
-                result.push(text.substring(i, i + maxlen));
+            for (let i = 0; i < word.length; i += maxlen) {
+                result.push(word.substring(i, i + maxlen));
             }
             return result.join("&shy;") + spaces[idx];
     });
