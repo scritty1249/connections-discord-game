@@ -42,7 +42,7 @@ export function softHypenateText (text, maxlen) {
             for (let i = 0; i < word.length; i += maxlen) {
                 result.push(word.substring(i, i + maxlen));
             }
-            return result.join("&shy;") + spaces[idx];
+            return result.join("&shy;") + (spaces[idx] == undefined ? "" : spaces[idx]);
     });
     return hypenated.join("");
 }
