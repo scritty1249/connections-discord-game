@@ -1,4 +1,4 @@
-import { isOverflowed, attemptIsRepeat, attemptIsCorrect, shuffle, attemptIsOneAway } from "./utils.js";
+import { isOverflowed, attemptIsRepeat, attemptIsCorrect, shuffle, attemptIsOneAway, softHypenateText } from "./utils.js";
 import { animateMove, createCardElement, cardFX, popup } from "./cards.js";
 import * as Discord from "./discord.js";
 
@@ -145,7 +145,7 @@ window.onload = (e) => {
             Object.entries(categories).forEach(([category, words]) => {
                 categoryEls.push(createCardElement(category, null, "category"));
                 words.forEach(({word, id}) => {
-                    let wordEl = createCardElement(word, wordClickHandler, "word");
+                    let wordEl = createCardElement(softHypenateText(word), wordClickHandler, "word");
                     wordEl.dataset.id = id;
                     wordEls.push(wordEl);
                 });

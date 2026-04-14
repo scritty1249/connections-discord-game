@@ -24,10 +24,25 @@ export function attemptIsRepeat (attempt, oldAttempts) { // attempt and attempts
 }
 
 // Fisher-Yates, shuffles in place
-export function shuffle(array) {
+export function shuffle (array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]];
     }
     return array;
+}
+
+export function softHypenateText (text, maxlen) {
+    const segments = text.split(/(\s+)/);
+    const words = segments.filter((_, i) => i % 2 === 0);
+    const spaces = segments.filter((_, i) => i % 2 === 1);
+    const hypenated = Array.from(words,
+        (word, idx) => {
+            const result = [];
+            for (let i = 0; i < text.length; i += maxlen) {
+                result.push(text.substring(i, i + maxlen));
+            }
+            return result.join("&shy;") + spaces[idx];
+    });
+    return hypenated.join("");
 }

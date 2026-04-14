@@ -7,7 +7,7 @@
 
 body {
     background-color: #121212;
-    overflow: hidden;
+    overflow: scroll;
     width: 100vw;
     height: 100vh;
     margin: 0;
@@ -82,6 +82,8 @@ body {
         background-color: #efefe6;
         color: #121212;
         font-weight: 500;
+        overflow-wrap: break-word;
+        hyphens: manual;
         transition:
             background-color .3s ease-in-out,
             color .3s ease-in-out;
