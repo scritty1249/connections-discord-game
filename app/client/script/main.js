@@ -145,7 +145,7 @@ window.onload = (e) => {
             Object.entries(categories).forEach(([category, words]) => {
                 categoryEls.push(createCardElement(category, null, "category"));
                 words.forEach(({word, id}) => {
-                    let wordEl = createCardElement(softHypenateText(word), wordClickHandler, "word");
+                    let wordEl = createCardElement(softHypenateText(word, 5), wordClickHandler, "word");
                     wordEl.dataset.id = id;
                     wordEls.push(wordEl);
                 });
