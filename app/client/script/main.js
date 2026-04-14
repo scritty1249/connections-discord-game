@@ -65,7 +65,7 @@ function resizeCardHandler () {
     const biggestCardEl = document.querySelector('#card-grid .card[data-largest="true"]');
     if (biggestCardEl)
         document.getElementById("card-grid").style.setProperty("--card-width", `${biggestCardEl?.offsetWidth}px`);
-    if (isOverflowed(document.getElementsByClassName("content-container")?.[0])) {
+    if (isOverflowed(document.getElementById("content-container"))) {
         // [!] TODO: hide page, display screen size message
     }
 }
@@ -101,39 +101,41 @@ window.onload = (e) => {
     const menuEl = document.getElementById("buttons");
     const categoryStackEl = document.getElementById("categories");
     Promise.all([
+        // retreive categories
         fetch(API_ENDPOINT + "/get-gamedata")
-        .then(resp => {
-            if (resp.ok) {
-                return resp.json();
-            } else {
-                console.error("Failed to contact gamedata API endpoint"); // [!] add UI notification for this
-            }
-        }).then(data => {
-            if (data) {
-                categories = data;
-                categoryIds = Array.from(Object.values(categories), wordData =>
-                    Array.from(wordData, ({id}) => id).sort());
-            }
-        }),
+            .then(resp => {
+                if (resp.ok) {
+                    return resp.json();
+                } else {
+                    console.error("Failed to contact gamedata API endpoint"); // [!] add UI notification for this
+                }
+            }).then(data => {
+                if (data) {
+                    categories = data;
+                    categoryIds = Array.from(Object.values(categories), wordData =>
+                        Array.from(wordData, ({id}) => id).sort());
+                }
+            }),
+        // connect to discord actvity sdk
         Discord.getClient(API_ENDPOINT + "/discord-auth")
-        .then(client_id =>
-            Discord.initSdk(client_id, API_ENDPOINT + "/discord-auth"))
-        .then(({discordSdk: sdk, user})=> {
-            discordSdk = sdk;
-            userData = user;
-            return fetch(
-                    `${API_ENDPOINT}/get-attempts?id=${userData?.id}`
-                ).then(resp => {
-                    if (resp.ok) {
-                        return resp.json();
-                    } else {
-                        console.error("Failed to contact userdata API endpoint"); // [!] add UI notification for this
-                    }
-                }).then(({attempts}) => {
-                    if (attempts)
-                        oldAttempts.push(Array.from(attempts, attempt => attempt.toSorted()));
-                })
-        }),
+            .then(client_id =>
+                Discord.initSdk(client_id, API_ENDPOINT + "/discord-auth"))
+            .then(({discordSdk: sdk, user})=> {
+                discordSdk = sdk;
+                userData = user;
+                return fetch(
+                        `${API_ENDPOINT}/get-attempts?id=${userData?.id}`
+                    ).then(resp => {
+                        if (resp.ok) {
+                            return resp.json();
+                        } else {
+                            console.error("Failed to contact userdata API endpoint"); // [!] add UI notification for this
+                        }
+                    }).then(({attempts}) => {
+                        if (attempts)
+                            oldAttempts.push(Array.from(attempts, attempt => attempt.toSorted()));
+                    })
+            })        
     ]).then((_) => {
             const categoryEls = [];
             const wordEls = [];
