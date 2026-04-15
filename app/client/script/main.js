@@ -179,7 +179,7 @@ window.onload = (e) => {
                         if (categoryEl !== undefined) {
                             getCardElements(wordEls, correctAttempt)
                                 .forEach(cardEl => cardEl.remove());
-                            const ogTransDuration = categoryEl.style.getProperty("--transition-duration");
+                            const ogTransDuration = getComputedStyle(categoryEl)?.getPropertyValue("--transition-duration");
                             categoryEl.style.setProperty("--transition-duration", "0");
                             categoryStackEl.appendChild(categoryEl);
                             categoryEl.style.setProperty("--transition-duration", ogTransDuration);
