@@ -110,6 +110,7 @@ body {
         background-color: var(--color);
         color: var(--black);
         pointer-events: none;
+        font-weight: 650;
         transition:
             background-color var(--transition-duration) ease-in
             color var(--transition-duration) ease-in;
