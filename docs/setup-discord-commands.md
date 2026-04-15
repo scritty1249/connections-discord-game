@@ -1,4 +1,4 @@
-
+# Overriding the default entry point command (slash command)
 Getting the default entry command ID
 ```
 curl -X GET "https://discord.com/api/v10/applications/<APPLICATION ID>/commands" \

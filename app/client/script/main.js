@@ -109,7 +109,7 @@ function getCategoryElement (attempt) { // attempt is an Array of Numbers
 
 window.onload = (e) => {
     const containerEl = document.getElementById("content-container");
-    const cardGridEl = document.getElementById("card-grid");
+    const wordGridEl = document.getElementById("words");
     const menuEl = document.getElementById("buttons");
     const categoryStackEl = document.getElementById("categories");
     Promise.all([
@@ -186,7 +186,7 @@ window.onload = (e) => {
                     });
                 });
                 // shuffle elements before inserting to page
-                shuffle(wordEls).forEach(wordEl => cardGridEl.append(wordEl));
+                shuffle(wordEls).forEach(wordEl => wordGridEl.append(wordEl));
             }
 
             // main runtime
