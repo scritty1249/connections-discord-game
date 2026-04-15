@@ -172,7 +172,7 @@ window.onload = (e) => {
             shuffle(wordEls).forEach(wordEl => cardGridEl.append(wordEl));
 
             // init previous correct attempts (if any)
-            if (!oldAttempts.length) {
+            if (oldAttempts.length) {
                 oldAttempts.filter(attempt => attemptIsCorrect(attempt, categoryIds))
                     .forEach(correctAttempt => {
                         const categoryEl = getCategoryElement(correctAttempt);
