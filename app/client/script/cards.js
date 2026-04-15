@@ -5,8 +5,8 @@ export function animateMove (element, transform, durationMs) { // FLIP method
     const lastElement = transform(); // transform function should return the element with the new position
     const lastPos = lastElement.getBoundingClientRect();
     // invert
-    const deltaX = lastPos.left - firstPos.left;
-    const deltaY = lastPos.top - firstPos.top;
+    const deltaX = firstPos.left - lastPos.left;
+    const deltaY = firstPos.top - lastPos.top;
     const deltaW = firstPos.width / lastPos.width;
     const deltaH = firstPos.height / lastPos.height;
     return element.animate([
