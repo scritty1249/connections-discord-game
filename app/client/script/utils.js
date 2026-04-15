@@ -26,7 +26,7 @@ export function attemptIsRepeat (attempt, oldAttempts) { // attempt and attempts
 export function getCategoryData (categoryIds, categories) {
     const categoryIdSet = new Set(categoryIds);
     const categorySets = Array.from(Object.entries(categories), ([category, words]) =>
-        [category, new Set(words)]
+        [category, new Set(Array.from(words, ({id}) => id))]
     );
     for (const [category, wordSet] of categorySets) {
         if (wordSet.symmetricDifference(categoryIdSet).size === 0)
