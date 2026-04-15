@@ -42,7 +42,8 @@ export function createCategoryElements (categories) { // categories here is an A
 }
 
 export function getCardElements (cardElements, ...ids) {
-    return [...cardElements].filter(cardEl => ids.includes(cardEl.dataset.id));
+    const idStrs = Array.from(ids, id => String(id));
+    return cardElements.filter(cardEl => idStrs.includes(cardEl.dataset.id));
 }
 
 // resolves to false if duration expires, and true if popup is dismissed by user
