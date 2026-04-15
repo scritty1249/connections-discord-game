@@ -60,6 +60,7 @@ body {
 #categories {
     z-index: 2;
     grid-template-columns: 1fr;
+    pointer-events: none;
 }
 
 .card {
@@ -125,7 +126,6 @@ body {
         --color: var(--white);
         background-color: var(--color);
         color: var(--black);
-        pointer-events: none;
         font-weight: 650;
         opacity: 1;
         transition: opacity var(--category-reveal-transition-duration) ease-in;

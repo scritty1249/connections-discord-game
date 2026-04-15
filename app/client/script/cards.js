@@ -9,10 +9,7 @@ export async function animateMove (originEl, targetEl, durationMs) { // FLIP
     return originEl.animate([
         {
             transformOrigin: "top left",
-            transform: `
-                translate(${deltaX}px, ${deltaY}px)
-                scale(${deltaW}, ${deltaH})
-            `
+            transform: `translate(${deltaX}px, ${deltaY}px)`
         }, {
             transformOrigin: "top left",
             transform: "none"
