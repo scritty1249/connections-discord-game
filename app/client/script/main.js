@@ -100,7 +100,7 @@ function submitHandler (e) {
 function displayCategory (categoryEl, cardEls) { // [!] to be refactored upon completion
     const reveal = (categoryEl) => (document.getElementById("categories").appendChild(categoryEl), categoryEl);
     return Promise.all(Array.from(cardEls, cardEl => 
-            animateMove(cardEl, () => reveal(categoryEl), 2)
+            animateMove(cardEl, () => reveal(categoryEl), 2000)
         )).then(() =>
             cardEls.forEach(cardEl => cardEl.remove())
         );
