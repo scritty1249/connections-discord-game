@@ -1,15 +1,14 @@
 // https://css-tricks.com/animating-layouts-with-the-flip-technique/
 
-export function animateMove (element, transform, durationMs) { // FLIP method
-    const firstPos = element.getBoundingClientRect();
-    const lastElement = transform(); // transform function should return the element with the new position
-    const lastPos = lastElement.getBoundingClientRect();
+export function animateMove (originEl, targetEl, durationMs) { // FLIP
+    const firstPos = originEl.getBoundingClientRect();
+    const lastPos = targetEl.getBoundingClientRect();
     // invert
     const deltaX = firstPos.left - lastPos.left;
     const deltaY = firstPos.top - lastPos.top;
     const deltaW = firstPos.width / lastPos.width;
     const deltaH = firstPos.height / lastPos.height;
-    return element.animate([
+    return originEl.animate([
         {
             transformOrigin: "top left",
             transform: `
