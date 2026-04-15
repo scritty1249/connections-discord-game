@@ -42,8 +42,9 @@ body {
 #card-grid {
     --category-reveal-transition-duration: 1s;
     margin-bottom: 15%; /* don't overlap with submit button */
+    display: grid;
     > div {
-        position: fixed;
+        grid-area: 1 / 1;
         display: grid;
         gap: var(--unit);
         width: 100%;

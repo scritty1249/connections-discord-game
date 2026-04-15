@@ -86,7 +86,7 @@ function playAnimation (element, ...classNames) {
 }
 
 export function getRowWordElements (rowIdx, wordContainer, columnCount = 4) {
-    return wordContainer.children.slice(rowIdx, rowIdx + columnCount);
+    return [...wordContainer.children].slice(rowIdx, rowIdx + columnCount);
 }
 
 export const cardFX = {
