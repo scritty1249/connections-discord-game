@@ -22,11 +22,7 @@ body {
 }
 
 #content-container {
-    display: flex;
-    flex-wrap: nowrap;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
+    margin: 0 auto;
     box-sizing: border-box;
     width: 80%;
     height: auto;
