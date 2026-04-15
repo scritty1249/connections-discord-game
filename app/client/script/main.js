@@ -158,35 +158,40 @@ window.onload = (e) => {
             console.log(categories);
 
             // create card elements
-            Object.entries(categories).forEach(([_, words]) => {
-                words.forEach(({word, id}) => {
-                    let wordEl = createCardElement(softHypenateText(word, 5), wordClickHandler, "word");
-                    wordEl.dataset.id = id;
-                    wordEls.push(wordEl);
-                });
-            });
-            createCategoryElements(Object.keys(categories))
-                .forEach(categoryEl => categoryEls.push(categoryEl));
+            {
+                const omittedWordIds = [];
+                createCategoryElements(Object.keys(categories))
+                    .forEach(categoryEl => categoryEls.push(categoryEl));
 
-            // shuffle elements before inserting to page
-            shuffle(wordEls).forEach(wordEl => cardGridEl.append(wordEl));
-
-            // init previous correct attempts (if any)
-            if (oldAttempts.length) {
-                oldAttempts.filter(attempt => attemptIsCorrect(attempt, categoryIds))
-                    .forEach(correctAttempt => {
-                        const categoryEl = getCategoryElement(correctAttempt);
-                        if (categoryEl !== undefined) {
-                            getCardElements(wordEls, correctAttempt)
-                                .forEach(cardEl => cardEl.remove());
-                            const ogTransDuration = getComputedStyle(categoryEl)?.getPropertyValue("--transition-duration");
-                            categoryEl.style.setProperty("--transition-duration", "0");
-                            categoryStackEl.appendChild(categoryEl);
-                            categoryEl.style.setProperty("--transition-duration", ogTransDuration);
-                        } else {
-                            console.warn(`Failed to find a matching category with word IDs: ${correctAttempt}`)
+                // init previous correct attempts (if any)
+                if (oldAttempts.length) {
+                    oldAttempts.filter(attempt => attemptIsCorrect(attempt, categoryIds))
+                        .forEach(correctAttempt => {
+                            const categoryEl = getCategoryElement(correctAttempt);
+                            if (categoryEl !== undefined) {
+                                // add word id to blacklist
+                                omittedWordIds.push(...correctAttempt);
+                                // display the category
+                                const ogTransDuration = getComputedStyle(categoryEl)?.getPropertyValue("--transition-duration");
+                                categoryEl.style.setProperty("--transition-duration", "0");
+                                categoryStackEl.appendChild(categoryEl);
+                                categoryEl.style.setProperty("--transition-duration", ogTransDuration);
+                            } else {
+                                console.warn(`Failed to find a matching category with word IDs: ${correctAttempt}`)
+                            }
+                        });
+                }
+                Object.entries(categories).forEach(([_, words]) => {
+                    words.forEach(({word, id}) => {
+                        if (!omittedWordIds.includes(id)) {
+                            let wordEl = createCardElement(softHypenateText(word, 5), wordClickHandler, "word");
+                            wordEl.dataset.id = id;
+                            wordEls.push(wordEl);
                         }
                     });
+                });
+                // shuffle elements before inserting to page
+                shuffle(wordEls).forEach(wordEl => cardGridEl.append(wordEl));
             }
 
             // main runtime
