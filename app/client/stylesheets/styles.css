@@ -44,10 +44,25 @@ body {
 }
 
 #card-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    gap: var(--unit);
+    --category-reveal-transition-duration: 1s;
     margin-bottom: 15%; /* don't overlap with submit button */
+    > div {
+        position: fixed;
+        display: grid;
+        gap: var(--unit);
+        width: 100%;
+        top: 0;
+    }
+}
+
+#words {
+    z-index: 1;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+#categories {
+    z-index: 2;
+    grid-template-columns: 1fr;
 }
 
 .card {
@@ -63,6 +78,7 @@ body {
     -ms-user-select: none;
     user-select: none;
     &.popup {
+        z-index: 10;
         background-color: var(--white);
         color: var(--black);
         position: fixed;
@@ -81,15 +97,18 @@ body {
         @starting-style { top: -5%; }
     }
     &.word {
+        --transition-duration: .3s;
         z-index: 1;
         background-color: var(--white);
         color: var(--black);
         font-weight: 500;
         overflow-wrap: break-word;
         hyphens: manual;
+        opacity: 1;
         transition:
-            background-color .3s ease-in-out,
-            color .3s ease-in-out;
+            opacity var(--category-reveal-transition-duration) ease-in-out,
+            background-color var(--transition-duration) ease-in-out,
+            color var(--transition-duration) ease-in-out;
         &.selected {
             background-color: #5a594e;
             color: #f8f8f8;
@@ -101,19 +120,18 @@ body {
         &.incorrect {
             background-color: #ff7169;
         }
+        &.hide {
+            opacity: 0;
+        }
     }
     &.category {
         --color: var(--white);
-        --transition-duration: 1s;
-        z-index: 2; /* needs to cover the word cards */
-        width: 100%;
         background-color: var(--color);
         color: var(--black);
         pointer-events: none;
         font-weight: 650;
-        transition:
-            background-color var(--transition-duration) ease-in
-            color var(--transition-duration) ease-in;
+        opacity: 1;
+        transition: opacity var(--category-reveal-transition-duration) ease-in;
         &.color-1 {
             --color: #f7Da21; /* yellow */
         }
@@ -127,8 +145,7 @@ body {
             --color: #a354a8; /* purple */
         }
         @starting-style {
-            background-color: transparent;
-            color: transparent;
+            opacity: 0;
         }
     }
     &.submit {
@@ -139,17 +156,6 @@ body {
         width: 20%;
         height: 5%;
     }
-}
-
-#categories {
-    display: flex;
-    flex-wrap: nowrap;
-    flex-direction: column;
-    width: 100%;
-    min-height: min-content;
-    height: min-content;
-    margin: var(--spacing) 0;
-    gap: var(--unit);
 }
 
 .icon {

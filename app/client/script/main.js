@@ -1,5 +1,5 @@
 import { isOverflowed, attemptIsRepeat, attemptIsCorrect, shuffle, attemptIsOneAway, softHypenateText, getCategoryData } from "./utils.js";
-import { animateMove, createCardElement, cardFX, popup, getCardElements, createCategoryElements } from "./cards.js";
+import { getRowWordElements, createCardElement, cardFX, popup, getCardElements, createCategoryElements } from "./cards.js";
 import * as Discord from "./discord.js";
 
 const API_ENDPOINT = window.origin + "/api";
@@ -44,7 +44,7 @@ function submitAttempt () { // old attempts returned from api as an Array of 4-N
     } else {
         // jesus, how readable is this for others?
         return (attemptIsCorrect(wordIds, categoryIds)
-            ? (console.debug("Correct attempt"), displayCategory(getCategoryElement(wordIds), selectedWordEls))
+            ? (console.debug("Correct attempt"), playCorrectAttemptAnimation(getCategoryElement(wordIds), selectedWordEls, document.getElementById("words"), document.getElementById("categories")))
             : (
                 attemptIsOneAway(wordIds, categoryIds)
                     ? (console.debug("Close attempt"), popup("One away...", 2000))
@@ -60,15 +60,6 @@ function submitAttempt () { // old attempts returned from api as an Array of 4-N
                     return undefined;
                 }
             });
-    }
-}
-
-function resizeCardHandler () {
-    const biggestCardEl = document.querySelector('#card-grid .card[data-largest="true"]');
-    if (biggestCardEl)
-        document.getElementById("card-grid").style.setProperty("--card-width", `${biggestCardEl?.offsetWidth}px`);
-    if (isOverflowed(document.getElementById("content-container"))) {
-        // [!] TODO: hide page, display screen size message
     }
 }
 
@@ -97,13 +88,17 @@ function submitHandler (e) {
     }
 }
 
-function displayCategory (categoryEl, cardEls) { // [!] to be refactored upon completion
-    document.getElementById("categories").appendChild(categoryEl);
-    return Promise.all(Array.from(cardEls, cardEl => 
-            animateMove(cardEl, categoryEl, 2000)
-        )).then(() =>
-            cardEls.forEach(cardEl => cardEl.remove())
-        );
+function playCorrectAttemptAnimation (categoryEl, wordEls, wordContainer, categoryContainer) {
+    const sortedWordEls = wordEls.toSorted((a, b) => parseInt(a.dataset.id) - parseInt(b.dataset.id));
+    const topRowWordEls = getRowWordElements(categoryContainer.children.length, wordContainer);
+    return Promise.all(Array.from(sortedWordEls, (wordEl, idx) => {
+        const targetEl = topRowWordEls[idx];
+        if (topRowWordEls.includes(wordEl))
+            return cardFX.moveElement(wordEl, targetEl);
+        else
+            return cardFX.swapElements(wordEl, targetEl);
+    })).then(() => 
+        cardFX.fadeInCategory(categoryEl, categoryContainer, wordContainer));
 }
 
 function getCategoryElement (attempt) { // attempt is an Array of Numbers
@@ -218,5 +213,3 @@ window.onload = (e) => {
             }
         });
 }
-
-window.onresize = resizeCardHandler;
