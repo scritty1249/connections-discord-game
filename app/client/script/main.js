@@ -191,10 +191,10 @@ window.onload = (e) => {
 
             // main runtime
             {
-                let biggestWordEl = wordEls.reduce((biggestWordEl, wordEl) => biggestWordEl.offsetWidth > wordEl.offsetWidth ? biggestWordEl : wordEl);
-                biggestWordEl.dataset.largest = "true";
-                biggestWordEl.style.setProperty("--card-width", "min-content");
-                resizeCardHandler();
+                // let biggestWordEl = wordEls.reduce((biggestWordEl, wordEl) => biggestWordEl.offsetWidth > wordEl.offsetWidth ? biggestWordEl : wordEl);
+                // biggestWordEl.dataset.largest = "true";
+                // biggestWordEl.style.setProperty("--card-width", "min-content");
+                // resizeCardHandler();
             }
             {
                 const avatarSize = 128;
