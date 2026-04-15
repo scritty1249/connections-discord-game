@@ -1,13 +1,11 @@
 // https://css-tricks.com/animating-layouts-with-the-flip-technique/
 
-export function animateMove (originEl, targetEl, durationMs) { // FLIP
+export async function animateMove (originEl, targetEl, durationMs) { // FLIP
     const firstPos = originEl.getBoundingClientRect();
     const lastPos = targetEl.getBoundingClientRect();
     // invert
     const deltaX = firstPos.left - lastPos.left;
     const deltaY = firstPos.top - lastPos.top;
-    const deltaW = firstPos.width / lastPos.width;
-    const deltaH = firstPos.height / lastPos.height;
     return originEl.animate([
         {
             transformOrigin: "top left",
@@ -87,6 +85,10 @@ function playAnimation (element, ...classNames) {
     });
 }
 
+export function getRowWordElements (rowIdx, wordContainer, columnCount = 4) {
+    return wordContainer.children.slice(rowIdx, rowIdx + columnCount);
+}
+
 export const cardFX = {
     incorrect: function (cardEls) {
         return Promise.all(Array.from(cardEls,
@@ -103,4 +105,33 @@ export const cardFX = {
             (cardEl) => playAnimation(cardEl, "shake-incorrect")
         ));
     },
+    moveElement: function (originEl, targetEl) {
+        return animateMove(originEl, targetEl, 2000)
+            .then(() => 
+                targetEl.replaceWith(originEl));
+    },
+    swapElements: function (originEl, targetEl) {
+        return Promise.all([
+            animateMove(originEl, targetEl, 2000),
+            animateMove(targetEl, originEl, 2000)
+        ]).then(() => {
+            const targetNextSibling = targetEl.nextSibling;
+            const targetParent = targetEl.parentNode;
+            originEl.replaceWith(targetEl);
+            if (targetNextSibling)
+                targetParent.insertBefore(originEl, targetNextSibling);
+            else // no next sibling, element must be last
+                targetParent.appendChild(originEl);
+        });
+    },
+    fadeInCategory: function (categoryEl, categoryContainer, wordContainer) {
+        const startIdx = categoryContainer.children.length * 4;
+        const wordEls = getRowWordElements(startIdx, wordContainer);
+        categoryContainer.appendChild(categoryEl);
+        return Promise.all(Array.from(wordEls, wordEl => {
+            wordEl.classList.add("hide");
+        })).then(() => {
+            
+        });
+    }
 };
