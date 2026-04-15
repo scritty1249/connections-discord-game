@@ -1,5 +1,5 @@
-import { isOverflowed, attemptIsRepeat, attemptIsCorrect, shuffle, attemptIsOneAway, softHypenateText } from "./utils.js";
-import { animateMove, createCardElement, cardFX, popup } from "./cards.js";
+import { isOverflowed, attemptIsRepeat, attemptIsCorrect, shuffle, attemptIsOneAway, softHypenateText, getCategoryData } from "./utils.js";
+import { animateMove, createCardElement, cardFX, popup, getCardElements, createCategoryElements } from "./cards.js";
 import * as Discord from "./discord.js";
 
 const API_ENDPOINT = window.origin + "/api";
@@ -9,6 +9,8 @@ let selectedWords = 0;
 let categories = null;
 let categoryIds = null;
 const oldAttempts = [];
+const categoryEls = [];
+const wordEls = [];
 
 async function recordAttempt (attempt) { // attempt is expected to be a Set of 4 numbers
     try {
@@ -42,7 +44,7 @@ function submitAttempt () { // old attempts returned from api as an Array of 4-N
     } else {
         // jesus, how readable is this for others?
         return (attemptIsCorrect(wordIds, categoryIds)
-            ? (console.debug("Correct attempt"), cardFX.correct(selectedWordEls))
+            ? (console.debug("Correct attempt"), displayCategory(getCategoryElement(wordIds), selectedWordEls))
             : (
                 attemptIsOneAway(wordIds, categoryIds)
                     ? (console.debug("Close attempt"), popup("One away...", 2000))
@@ -95,6 +97,21 @@ function submitHandler (e) {
     }
 }
 
+function displayCategory (categoryEl, cardEls) { // [!] to be refactored upon completion
+    const reveal = (categoryEl) => (document.getElementById("categories").appendChild(categoryEl), categoryEl);
+    return Promise.all(Array.from(cardEls, cardEl => 
+            animateMove(cardEl, () => reveal(categoryEl), 2)
+        )).then(() =>
+            cardEls.forEach(cardEl => cardEl.remove())
+        );
+}
+
+function getCategoryElement (attempt) { // attempt is an Array of Numbers
+    const categoryEl = categoryEls.filter(categoryEl =>
+        categoryEl.innerHTML == getCategoryData(attempt, categories));
+    return (categoryEl.length) ? categoryEl[0] : undefined;
+}
+
 window.onload = (e) => {
     const containerEl = document.getElementById("content-container");
     const cardGridEl = document.getElementById("card-grid");
@@ -137,26 +154,40 @@ window.onload = (e) => {
                     })
             })        
     ]).then((_) => {
-            const categoryEls = [];
-            const wordEls = [];
-
             console.debug(`Loaded previous attempts: ${oldAttempts}`);
             console.log(categories);
 
             // create card elements
-            Object.entries(categories).forEach(([category, words]) => {
-                categoryEls.push(createCardElement(category, null, "category"));
+            Object.entries(categories).forEach(([_, words]) => {
                 words.forEach(({word, id}) => {
                     let wordEl = createCardElement(softHypenateText(word, 5), wordClickHandler, "word");
                     wordEl.dataset.id = id;
                     wordEls.push(wordEl);
                 });
             });
+            createCategoryElements(Object.keys(categories))
+                .forEach(categoryEl => categoryEls.push(categoryEl));
+
             // shuffle elements before inserting to page
             shuffle(wordEls).forEach(wordEl => cardGridEl.append(wordEl));
 
             // init previous correct attempts (if any)
-            
+            if (!oldAttempts.length) {
+                oldAttempts.filter(attempt => attemptIsCorrect(attempt, categoryIds))
+                    .forEach(correctAttempt => {
+                        const categoryEl = getCategoryElement(correctAttempt);
+                        if (categoryEl !== undefined) {
+                            getCardElements(wordEls, correctAttempt)
+                                .forEach(cardEl => cardEl.remove());
+                            const ogTransDuration = categoryEl.style.getProperty("--transition-duration");
+                            categoryEl.style.setProperty("--transition-duration", "0");
+                            categoryStackEl.appendChild(categoryEl);
+                            categoryEl.style.setProperty("--transition-duration", ogTransDuration);
+                        } else {
+                            console.warn(`Failed to find a matching category with word IDs: ${correctAttempt}`)
+                        }
+                    });
+            }
 
             // main runtime
             {

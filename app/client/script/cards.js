@@ -1,6 +1,6 @@
 // https://css-tricks.com/animating-layouts-with-the-flip-technique/
 
-export function animateMove (element, transform, duration) { // FLIP method
+export function animateMove (element, transform, durationSecs) { // FLIP method
     const firstPos = element.getBoundingClientRect();
     const lastElement = transform(); // transform function should return the element with the new position
     const lastPos = lastElement.getBoundingClientRect();
@@ -20,7 +20,7 @@ export function animateMove (element, transform, duration) { // FLIP method
             transformOrigin: "top left",
             transform: "none"
         }], {
-            duration: `${duration}s`,
+            duration: `${durationSecs}s`,
             easing: "ease-in-out",
             fill: "both"
         }
@@ -34,6 +34,11 @@ export function createCardElement (content, onclick, ...classList) {
     if (onclick)
         cardEl.addEventListener("click", onclick);
     return cardEl;
+}
+
+export function createCategoryElements (categories) { // categories here is an Array of Strings, containing the category names
+    return Array.from(categories.toSorted(), (category, idx) =>
+        createCardElement(category, null, "category", `color-${idx + 1}`));
 }
 
 export function getCardElements (cardElements, ...ids) {

@@ -23,6 +23,18 @@ export function attemptIsRepeat (attempt, oldAttempts) { // attempt and attempts
             oldAttempt[i] == attempt[i]));
 }
 
+export function getCategoryData (categoryIds, categories) {
+    const categoryIdSet = new Set(categoryIds);
+    const categorySets = Array.from(Object.entries(categories), ([category, words]) =>
+        [category, new Set(words)]
+    );
+    for (const [category, wordSet] of categorySets) {
+        if (wordSet.symmetricDifference(categoryIdSet).size === 0)
+            return category;
+    }
+    return undefined;
+}
+
 // Fisher-Yates, shuffles in place
 export function shuffle (array) {
     for (let i = array.length - 1; i > 0; i--) {

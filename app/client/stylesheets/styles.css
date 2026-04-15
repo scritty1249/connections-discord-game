@@ -2,11 +2,13 @@
     --round: 8px;
     --spacing: 5px;
     --unit: 10px;
+    --black: #121212;
+    --white: #efefe6;
 }
 
 
 body {
-    background-color: #121212;
+    background-color: var(--black);
     overflow: scroll;
     width: 100vw;
     height: 100vh;
@@ -61,8 +63,8 @@ body {
     -ms-user-select: none;
     user-select: none;
     &.popup {
-        background-color: #efefe6;
-        color: #121212;
+        background-color: var(--white);
+        color: var(--black);
         position: fixed;
         left: 50%;
         transform: translateX(-50%);
@@ -79,8 +81,9 @@ body {
         @starting-style { top: -5%; }
     }
     &.word {
-        background-color: #efefe6;
-        color: #121212;
+        z-index: 1;
+        background-color: var(--white);
+        color: var(--black);
         font-weight: 500;
         overflow-wrap: break-word;
         hyphens: manual;
@@ -96,11 +99,36 @@ body {
             background-color: #019a01;
         }
         &.incorrect {
-            background-color: #ff746c;
+            background-color: #ff7169;
         }
     }
     &.category {
-
+        --color: var(--white);
+        --transition-duration: 1s;
+        z-index: 2; /* needs to cover the word cards */
+        width: 100%;
+        background-color: var(--color);
+        color: var(--black);
+        pointer-events: none;
+        transition:
+            background-color var(--transition-duration) ease-in
+            color var(--transition-duration) ease-in;
+        &.color-1 {
+            --color: #f7Da21; /* yellow */
+        }
+        &.color-2 {
+            --color: #b5e352; /* green */
+        }
+        &.color-3 {
+            --color: #00a2b3; /* blue */
+        }
+        &.color-4 {
+            --color: #a354a8; /* purple */
+        }
+        @starting-style {
+            background-color: transparent;
+            color: transparent;
+        }
     }
     &.submit {
         transform: translateX(-50%);
@@ -110,22 +138,17 @@ body {
         width: 20%;
         height: 5%;
     }
-    &.notif {
-        position: sticky;
-        margin: 0 0 !important;
-        font-size: xx-small;
-        transition: 
-            transform .8s ease-in-out;
-    }
 }
 
-#category-grid {
+#categories {
     display: flex;
     flex-wrap: nowrap;
     flex-direction: column;
-    width: 80%; /* may be wrong */
+    width: 100%;
+    min-height: min-content;
     height: min-content;
-    margin: auto;
+    margin: var(--spacing) 0;
+    gap: var(--unit);
 }
 
 .icon {
