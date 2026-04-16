@@ -41,6 +41,9 @@ export async function POST(req) {
                                             })
                                     );
                                     return commands.deferResponse(true);
+                                case "amiadmin":
+                                    const isAdmin = await isUserAdmin(user?.id);
+                                    return commands.messageResponse(isAdmin ? "Yes" : "No");
                             };
                         break;
                         case 2: // DM or group DM, does not need bot user to be a member

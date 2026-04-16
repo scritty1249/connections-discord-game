@@ -44,6 +44,15 @@ export function invalidContext() { // tried to invoke an admin tool without bein
     });
 }
 
+export function messageResponse(content) {
+    return Response.json({
+        type: 4,
+        data: {
+            content: content,
+        }
+    });
+}
+
 export const adminTools = { // responses only meant for commands invoked by (project-defined) admins
     "refresh-gamestate": async function (token, success) { // triggers the refresh-gamestate cron job
     },
