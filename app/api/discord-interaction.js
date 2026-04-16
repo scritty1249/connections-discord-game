@@ -30,7 +30,8 @@ export async function POST(req) {
                                             case "nuke-userdata":
                                                 waitUntil(
                                                     wipeAttempts()
-                                                        .then((success) => commands.adminTools["nuke-userdata"](token, success)));
+                                                        .then((success) => commands.adminTools["nuke-userdata"](token, success))
+                                                        .then((resp) => console.debug(resp)));
                                             break;
                                         };
                                         return commands.deferResponse(true);

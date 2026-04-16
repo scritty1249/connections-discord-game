@@ -44,7 +44,7 @@ export const adminTools = { // responses only meant for commands invoked by (pro
     "refresh-gamestate": async function (token, success) { // triggers the refresh-gamestate cron job
     },
     "nuke-userdata": async function (token, success) { // wipes all userdata, everywhere
-        return updateDeferredResponse(success ? "Cleared all userdata." : "Operation failed!", token);
+        return await updateDeferredResponse(success ? "Cleared all userdata." : "Operation failed!", token);
     },
     "drop-userdata": async function (token, success) { // drops a specific user's data from the database
     },
