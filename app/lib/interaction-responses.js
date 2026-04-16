@@ -1,6 +1,6 @@
 // Handlers for various discord interactions (commands)
 
-import { DISCORD_WEBHOOK_BASE } from "./endpoints";
+import { DISCORD_WEBHOOK_BASE } from "./endpoints.js";
 
 const interactionMessageURI = (interactionToken) => `${DISCORD_WEBHOOK_BASE}/${interactionToken}/messages/@original`;
 
