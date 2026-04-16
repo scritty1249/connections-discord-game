@@ -178,15 +178,15 @@ window.onload = (e) => {
                 }
                 Object.entries(categories).forEach(([_, words]) => {
                     words.forEach(({word, id}) => {
-                        if (!omittedWordIds.includes(id)) {
-                            let wordEl = createCardElement(softHypenateText(word, 5), wordClickHandler, "word");
-                            wordEl.dataset.id = id;
-                            wordEls.push(wordEl);
-                        }
+                        let wordEl = createCardElement(softHypenateText(word, 5), wordClickHandler, "word");
+                        wordEl.dataset.id = id;
+                        if (omittedWordIds.includes(id))
+                            wordEl.classList.add("hide");
+                        wordEls.push(wordEl);
                     });
                 });
                 // shuffle elements before inserting to page
-                shuffle(wordEls).forEach(wordEl => wordGridEl.append(wordEl));
+                [...wordEls.filter(e => e.classList.contains("hide")), ...shuffle([...wordEls.filter(e => !e.classList.contains("hide"))])].forEach(wordEl => wordGridEl.append(wordEl));
             }
 
             // main runtime
