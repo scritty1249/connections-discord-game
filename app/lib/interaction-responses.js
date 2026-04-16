@@ -9,10 +9,14 @@ export async function updateDeferredResponse (content, token) {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content: content })
+    }).then(response => {
+        console.debug(`Response deferred for interaction ${token}`);
+        return response;
     });
 }
 
 export function deferResponse(ephemeral = true) {
+    console.debug("Deferred response");
     return Response.json({
         type: 5,
         data: ephemeral ? {
