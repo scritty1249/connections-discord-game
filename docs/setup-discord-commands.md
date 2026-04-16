@@ -20,5 +20,5 @@ curl -X PATCH "https://discord.com/api/v10/applications/<APPLICATION_ID>/command
 curl -X POST "https://discord.com/api/v10/applications/<APPLICATION_ID>/commands" \
   -H "Authorization: Bot <BOT_TOKEN>" \
   -H "Content-Type: application/json" \
-  -d '{"name": "permissions", "description": "API function invocations for testing", "options": [ {"name": "nuke-userdata", "description": "Clear all stored user data, everywhere", "type": 1}, {"name": "refresh-gamestate", "description": "Clears all userdata and retrieves new gamedata", "type": 1}, {"name": "drop-userdata", "description": "Clears a specific user's data", "type": 1, "options": [ {"name": "user", "description": "The user to drop data for", "type": 6, "required": true} ]} ]}'
+  -d '{"name": "api", "description": "API function invocations for testing", "options": [ {"name": "nuke-userdata", "description": "Clear all stored user data, everywhere", "type": 1}, {"name": "refresh-gamestate", "description": "Clears all userdata and retrieves new gamedata", "type": 1}, {"name": "drop-userdata", "description": "Clears a specific user\'s data", "type": 1, "options": [ {"name": "user", "description": "The user to drop data for", "type": 6, "required": true} ]} ]}'
 ```
