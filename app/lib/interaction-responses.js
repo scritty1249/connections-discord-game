@@ -12,7 +12,7 @@ async function updateDeferredResponse (content, token) {
     });
 }
 
-function deferResponse(ephemeral = true) {
+export function deferResponse(ephemeral = true) {
     return Response.json({
         type: 5,
         data: ephemeral ? {
