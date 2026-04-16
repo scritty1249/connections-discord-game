@@ -48,6 +48,11 @@ export async function wipeAttempts() {
     return await UserDB.drop();
 }
 
+export async function isUserAdmin(userid) {
+    const adminList = await GameDB.admins();
+    return adminList.includes(userid);
+}
+
 export async function getAttempts(userid) {
     if (await UserDB.exists(userid)) {
         return await UserDB.get(userid);

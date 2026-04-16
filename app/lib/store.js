@@ -5,12 +5,19 @@ import { EDGE_WRITE } from "./endpoints.js";
 
 const redis = Redis.fromEnv();
 const GAMEDATA_KEY = "gamedata";
+const ADM_LIST_KEY = "admins";
 
 // [!] TODO: determine if quota limits will allow for logging. If so, implement at THIS LAYER.
 export const UserDB = {
     _prefix: "U_",
     drop: async function () { // deletes ALL ENTRIES.
-        return await redis.flushdb();
+        try {
+            await redis.flushdb();
+            return true;
+        } catch (error) {
+            console.error("UserDB Flush failed!", error);
+            return false;
+        }
     },
     exists: async function (userid) {
         return await redis.exists(this._prefix + userid);
@@ -24,6 +31,9 @@ export const UserDB = {
 };
 
 export const GameDB = {
+    admins: async function () {
+        return await Edge.get(ADM_LIST_KEY);
+    },
     get: async function () {
         return await Edge.get(GAMEDATA_KEY);
     },

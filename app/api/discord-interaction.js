@@ -1,4 +1,6 @@
-import { verifyDiscordRequest } from "../lib/server.js";
+import { verifyDiscordRequest, isUserAdmin, wipeAttempts } from "../lib/server.js";
+import * as commands from "../lib/interaction-responses.js";
+import { waitUntil } from "@vercel/functions";
 
 export async function POST(req) {
     try {
@@ -9,21 +11,39 @@ export async function POST(req) {
             console.info("Recieved an invalid interaction request"); // discord will purposefully send invalid requests to test the endpoint periodically
             return new Response("invalid request signature", {status: 401}); // specified by discord api guidelines
         }
-        const { type, data } = JSON.parse(reqRawBody); // body should be JSON, should this should never fail...
+        const requestBody = JSON.parse(reqRawBody); // body should be JSON, should this should never fail...
+        const { type, data, user, token } = requestBody;
+        const { options } = data;
+        const commandName = data?.name?.toLowerCase();
         switch (type) {
             case 2: // APPLICATION COMMAND
             // [!] holy aids nested switch, clean this up later...
                 switch (data?.type) { // shouldn't be null
-                    case 4: // PRIMARY ENTRY POINT
-                        switch (data?.name?.toLowerCase()) {
-                            case "launch":
-                                console.info("Activity launched through interaction call"); // [!] Remove once we figure out how to stop the automatic "Activity Launched" messages
-                                return Response.json({
-                                    type: 12,
-                                    data: {
-                                        flags: 4 // send as silent message
+                    case 1: // chat command, usually a slash command
+                        case 0: // Invoked in server
+                        break;
+                        case 1: // DM with the bot only
+                            switch (commandName) {
+                                case "api":
+                                    if (isUserAdmin(user?.id)) {
+                                        switch (options?.name.toLowerCase()) {
+                                            case "nuke-userdata":
+                                                waitUntil(
+                                                    wipeAttempts()
+                                                        .then((success) => commands.adminTools["nuke-userdata"](token, success)));
+                                            break;
+                                        };
+                                        return commands.deferResponse(true);
+                                    } else {
+                                        return commands.invalidContext();
                                     }
-                                });
+                            };
+                        break;
+                        case 2: // DM or group DM, does not need bot user to be a member
+                        break;
+                    case 4: // PRIMARY ENTRY POINT
+                        switch (commandName) {
+                            case "launch": return commands.launch();
                         };
                 };
             case 1: // PING
