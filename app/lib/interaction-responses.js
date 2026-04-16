@@ -4,8 +4,8 @@ import { DISCORD_WEBHOOK_BASE } from "./endpoints.js";
 
 const interactionMessageURI = (interactionToken) => `${DISCORD_WEBHOOK_BASE}/${interactionToken}/messages/@original`;
 
-async function updateDeferredResponse (content, token) {
-    return fetch(interactionMessageURI(token), {
+export async function updateDeferredResponse (content, token) {
+    return await fetch(interactionMessageURI(token), {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content: content })

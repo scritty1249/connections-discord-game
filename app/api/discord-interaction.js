@@ -25,19 +25,22 @@ export async function POST(req) {
                         case 1: // DM with the bot only
                             switch (commandName) {
                                 case "api":
-                                    if (isUserAdmin(user?.id)) {
-                                        switch (options?.name.toLowerCase()) {
-                                            case "nuke-userdata":
-                                                waitUntil(
-                                                    wipeAttempts()
-                                                        .then((success) => commands.adminTools["nuke-userdata"](token, success))
-                                                        .then((resp) => console.debug(resp)));
-                                            break;
-                                        };
-                                        return commands.deferResponse(true);
-                                    } else {
-                                        return commands.invalidContext();
-                                    }
+                                    waitUntil(
+                                        isUserAdmin(user?.id)
+                                            .then((isAdmin) => {
+                                                if (isAdmin) {
+                                                    switch (options?.name.toLowerCase()) {
+                                                        case "nuke-userdata":
+                                                            wipeAttempts().then((success) =>
+                                                                commands.adminTools["nuke-userdata"](token, success));
+                                                        break;
+                                                    };
+                                                } else {
+                                                    commands.updateDeferredResponse("Invalid context to use this command.", token);
+                                                }
+                                            })
+                                    );
+                                    return commands.deferResponse(true);
                             };
                         break;
                         case 2: // DM or group DM, does not need bot user to be a member
