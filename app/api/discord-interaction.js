@@ -25,11 +25,10 @@ export async function POST(req) {
                         break;
                         case 1: // DM with the bot only
                             switch (commandName) {
-                                case "api":
+                                case "api": // api subcommand interactions should include an option field
+                                    console.info("API command invoked from discord");
                                     waitUntil(
-                                        Promise.resolve()
-                                        .then(console.debug("waitUntil called"))
-                                        .then(() => isUserAdmin(user?.id))
+                                        isUserAdmin(user?.id)
                                         .then((isAdmin) => {
                                             if (isAdmin) {
                                                 switch (options?.name.toLowerCase()) {
@@ -45,7 +44,6 @@ export async function POST(req) {
                                     );
                                     return commands.deferResponse(true);
                                 case "amiadmin":
-                                    console.debug("amiadmin called");
                                     const isAdmin = await isUserAdmin(user?.id);
                                     return commands.messageResponse(isAdmin ? "Yes" : "No");
                             };
