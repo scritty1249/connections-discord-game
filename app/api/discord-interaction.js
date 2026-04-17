@@ -22,6 +22,7 @@ export async function POST(req) {
                 switch (data?.type) { // shouldn't be null
                     case 1: // chat command, usually a slash command
                         case 0: // Invoked in server
+                            console.debug("Command type 0");
                         break;
                         case 1: // DM with the bot only
                             switch (commandName) {
@@ -51,6 +52,7 @@ export async function POST(req) {
                             };
                         break;
                         case 2: // DM or group DM, does not need bot user to be a member
+                            console.debug("Command type 2");
                         break;
                     case 4: // PRIMARY ENTRY POINT
                         switch (commandName) {
