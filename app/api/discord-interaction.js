@@ -14,10 +14,10 @@ export async function POST(req) {
         const requestBody = JSON.parse(reqRawBody); // body should be JSON, should this should never fail...
         console.debug(requestBody);
         const { type, user, token } = requestBody;
-        const commandName = data?.name?.toLowerCase();
         switch (type) {
             case 2: // APPLICATION COMMAND
             const { data } = requestBody;
+            const commandName = data?.name?.toLowerCase();
             // [!] holy aids nested switch, clean this up later...
                 switch (data?.type) { // shouldn't be null
                     case 1: // chat command, usually a slash command
