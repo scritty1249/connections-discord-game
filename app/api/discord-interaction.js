@@ -27,22 +27,25 @@ export async function POST(req) {
                             switch (commandName) {
                                 case "api":
                                     waitUntil(
-                                        isUserAdmin(user?.id)
-                                            .then((isAdmin) => {
-                                                if (isAdmin) {
-                                                    switch (options?.name.toLowerCase()) {
-                                                        case "nuke-userdata":
-                                                            wipeAttempts().then((success) =>
-                                                                commands.adminTools["nuke-userdata"](token, success));
-                                                        break;
-                                                    };
-                                                } else {
-                                                    commands.updateDeferredResponse("Invalid context to use this command.", token);
-                                                }
-                                            })
+                                        Promise.resolve()
+                                        .then(console.debug("waitUntil called"))
+                                        .then(() => isUserAdmin(user?.id))
+                                        .then((isAdmin) => {
+                                            if (isAdmin) {
+                                                switch (options?.name.toLowerCase()) {
+                                                    case "nuke-userdata":
+                                                        wipeAttempts().then((success) =>
+                                                            commands.adminTools["nuke-userdata"](token, success));
+                                                    break;
+                                                };
+                                            } else {
+                                                commands.updateDeferredResponse("Invalid context to use this command.", token);
+                                            }
+                                        })
                                     );
                                     return commands.deferResponse(true);
                                 case "amiadmin":
+                                    console.debug("amiadmin called");
                                     const isAdmin = await isUserAdmin(user?.id);
                                     return commands.messageResponse(isAdmin ? "Yes" : "No");
                             };
