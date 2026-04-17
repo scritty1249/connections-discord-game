@@ -13,11 +13,11 @@ export async function POST(req) {
         }
         const requestBody = JSON.parse(reqRawBody); // body should be JSON, should this should never fail...
         console.debug(requestBody);
-        const { type, data, user, token } = requestBody;
-        const { options } = data;
+        const { type, user, token } = requestBody;
         const commandName = data?.name?.toLowerCase();
         switch (type) {
             case 2: // APPLICATION COMMAND
+            const { data } = requestBody;
             // [!] holy aids nested switch, clean this up later...
                 switch (data?.type) { // shouldn't be null
                     case 1: // chat command, usually a slash command
@@ -25,7 +25,9 @@ export async function POST(req) {
                         break;
                         case 1: // DM with the bot only
                             switch (commandName) {
-                                case "api": // api subcommand interactions should include an option field
+                                case "api":
+                                    // api subcommand interactions should include an option field
+                                    const { options } = data;
                                     console.info("API command invoked from discord");
                                     waitUntil(
                                         isUserAdmin(user?.id)
