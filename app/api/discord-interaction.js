@@ -35,20 +35,26 @@ export async function POST(req) {
                                     case "api":
                                         // api subcommand interactions should include an option field
                                         const { options } = data;
+                                        console.debug(JSON.stringify(options));
                                         console.info("API command invoked from discord");
                                         waitUntil(
                                             isUserAdmin(user?.id)
                                             .then((isAdmin) => {
                                                 if (isAdmin) {
-                                                    switch (options?.name.toLowerCase()) {
+                                                    switch (options?.name?.toLowerCase()) {
                                                         case "nuke-userdata":
                                                             wipeAttempts().then((success) =>
                                                                 commands.adminTools["nuke-userdata"](token, success));
                                                         break;
+                                                        default:
+                                                            commands.updateDeferredResponse(`Command '${options?.name}' not recognized!`, token);
                                                     };
                                                 } else {
                                                     commands.updateDeferredResponse("Invalid context to use this command.", token);
                                                 }
+                                            }).catch((error) => {
+                                                console.error(error);
+                                                commands.updateDeferredResponse("Something went wrong on our side.", token);
                                             })
                                         );
                                         return commands.deferResponse(true);
