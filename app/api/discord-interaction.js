@@ -47,7 +47,8 @@ export async function POST(req) {
                                                             console.debug("nuking userdata");
                                                             wipeAttempts()
                                                             .then((success) => commands.adminTools["nuke-userdata"](token, success))
-                                                            .then(() => console.debug("execution finished."));
+                                                            .then(() => console.debug("execution finished."))
+                                                            .catch((error) => console.error(error));
                                                         break;
                                                         default:
                                                             commands.updateDeferredResponse(`Command '${subCommandName}' not recognized!`, token);
