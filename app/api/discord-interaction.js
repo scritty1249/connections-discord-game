@@ -20,43 +20,46 @@ export async function POST(req) {
             const commandName = data?.name?.toLowerCase();
             // [!] holy aids nested switch, clean this up later...
                 switch (data?.type) { // shouldn't be null
-                    case 1: // chat command, usually a slash command
-                        case 0: // Invoked in server
-                            console.debug("Command type 0");
-                        break;
-                        case 1: // DM with the bot only
-                            switch (commandName) {
-                                case "api":
-                                    // api subcommand interactions should include an option field
-                                    const { options } = data;
-                                    console.info("API command invoked from discord");
-                                    waitUntil(
-                                        isUserAdmin(user?.id)
-                                        .then((isAdmin) => {
-                                            if (isAdmin) {
-                                                switch (options?.name.toLowerCase()) {
-                                                    case "nuke-userdata":
-                                                        wipeAttempts().then((success) =>
-                                                            commands.adminTools["nuke-userdata"](token, success));
-                                                    break;
-                                                };
-                                            } else {
-                                                commands.updateDeferredResponse("Invalid context to use this command.", token);
-                                            }
-                                        })
-                                    );
-                                    return commands.deferResponse(true);
-                                case "amiadmin":
-                                    const isAdmin = await isUserAdmin(user?.id);
-                                    return commands.messageResponse(isAdmin ? "Yes" : "No");
-                            };
-                        break;
-                        case 2: // DM or group DM, does not need bot user to be a member
-                            console.debug("Command type 2");
-                        break;
                     case 4: // PRIMARY ENTRY POINT
                         switch (commandName) {
                             case "launch": return commands.launch();
+                        };
+                    case 1: // chat command, usually a slash command
+                        const { context } = requestBody;
+                        switch (context) {
+                            case 0: // Invoked in server
+                                console.debug("Command type 0");
+                            break;
+                            case 1: // DM with the bot only
+                                switch (commandName) {
+                                    case "api":
+                                        // api subcommand interactions should include an option field
+                                        const { options } = data;
+                                        console.info("API command invoked from discord");
+                                        waitUntil(
+                                            isUserAdmin(user?.id)
+                                            .then((isAdmin) => {
+                                                if (isAdmin) {
+                                                    switch (options?.name.toLowerCase()) {
+                                                        case "nuke-userdata":
+                                                            wipeAttempts().then((success) =>
+                                                                commands.adminTools["nuke-userdata"](token, success));
+                                                        break;
+                                                    };
+                                                } else {
+                                                    commands.updateDeferredResponse("Invalid context to use this command.", token);
+                                                }
+                                            })
+                                        );
+                                        return commands.deferResponse(true);
+                                    case "amiadmin":
+                                        const isAdmin = await isUserAdmin(user?.id);
+                                        return commands.messageResponse(isAdmin ? "Yes" : "No");
+                                };
+                            break;
+                            case 2: // DM or group DM, does not need bot user to be a member
+                                console.debug("Command type 2");
+                            break;
                         };
                 };
             case 1: // PING
