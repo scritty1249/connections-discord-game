@@ -16,7 +16,7 @@ export function verifyDiscordRequest(requestHeaders, requestBodyStr) {
     );
 }
 
-export async function fetchGameData(gameDate) {
+async function fetchGameData(gameDate) {
     const endpoint = ENDPOINT.GAME_DATA + dateToString(gameDate) + ".json"
     const request = new Request(endpoint, { credentials: "include" });
     const response = await (await fetch(request)).json();
@@ -30,13 +30,29 @@ export async function fetchGameData(gameDate) {
     return categories;
 }
 
-export async function storeGameData(gamedata) {
+async function storeGameData(gamedata) {
     const response = await GameDB.set(gamedata);
     if (response.status?.toUpperCase() !== "OK") {
         console.error(response);
         throw new Error(`Something went wrong while writing to Vercel Edge Database. Status: ${response.status}`);
     }
     return response;
+}
+
+export async function refreshGamestate() {
+    try {
+        const data = await fetchGameData(new Date());
+        console.debug(data);
+        console.info("Fetched gamedata");
+        console.debug(await storeGameData(data));
+        console.info("Saved gamedata");
+        await wipeAttempts();
+        console.log("Cleared userdata");
+        return true;
+    } catch (error) {
+        console.error(error);
+        return false;
+    }
 }
 
 export async function getGameData() {

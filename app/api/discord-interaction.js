@@ -1,4 +1,4 @@
-import { verifyDiscordRequest, isUserAdmin, wipeAttempts } from "../lib/server.js";
+import { verifyDiscordRequest, isUserAdmin, wipeAttempts, refreshGamestate } from "../lib/server.js";
 import * as commands from "../lib/interaction-responses.js";
 import { promiseTimeout } from "../lib/utils.js";
 import { waitUntil } from "@vercel/functions";
@@ -45,6 +45,16 @@ export async function POST(req) {
                                                         case "nuke-userdata":
                                                             await wipeAttempts()
                                                                 .then((success) => commands.adminTools["nuke-userdata"](token, success))
+                                                                .then(() => console.info("Invoked: nuke-userdata"))
+                                                        break;
+                                                        case "refresh-gamestate":
+                                                            await refreshGamestate()
+                                                                .then((success) => commands.adminTools["refresh-gamestate"](token, success))
+                                                                .then(() => console.info("Invoked: refresh-gamestate"))
+                                                        break;
+                                                        case "drop-userdata":
+                                                            await commands.updateDeferredResponse("Command not yet supported.", token)
+                                                                .then(() => console.info("Invoked: drop-userdata (not implemented)"));
                                                         break;
                                                         default:
                                                             await commands.updateDeferredResponse(`Command '${subCommandName}' not recognized!`, token);
