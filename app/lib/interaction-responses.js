@@ -56,6 +56,7 @@ export function messageResponse(content, ephemeral = true) {
 
 export const adminTools = { // responses only meant for commands invoked by (project-defined) admins
     "refresh-gamestate": async function (token, success) { // triggers the refresh-gamestate cron job
+        return await updateDeferredResponse(success ? "Refreshed game data." : "Operation failed!", token);
     },
     "nuke-userdata": async function (token, success) { // wipes all userdata, everywhere
         return await updateDeferredResponse(success ? "Cleared all userdata." : "Operation failed!", token);
