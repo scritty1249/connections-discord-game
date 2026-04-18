@@ -1,5 +1,6 @@
-// https://css-tricks.com/animating-layouts-with-the-flip-technique/
+import { waitForElementEvents } from "./utils.js";
 
+// https://css-tricks.com/animating-layouts-with-the-flip-technique/
 export async function animateMove (originEl, targetEl, durationMs) { // FLIP
     const firstPos = originEl.getBoundingClientRect();
     const lastPos = targetEl.getBoundingClientRect();
@@ -15,10 +16,51 @@ export async function animateMove (originEl, targetEl, durationMs) { // FLIP
             transform: "none"
         }], {
             duration: durationMs,
-            easing: "ease-in-out",
+            easing: "ease",
             fill: "both"
         }
     ).finished;
+}
+
+export async function animateSwap (originEl, targetEl, durationMs) { // FLIP
+    const firstPos = originEl.getBoundingClientRect();
+    const lastPos = targetEl.getBoundingClientRect();
+    return await Promise.all([
+        originEl.animate([
+            {
+                transformOrigin: "top left",
+                transform: `translate(${
+                    firstPos.left - lastPos.left
+                }px, ${
+                    firstPos.top - lastPos.top
+                }px)`
+            }, {
+                transformOrigin: "top left",
+                transform: "none"
+            }], {
+                duration: durationMs,
+                easing: "ease",
+                fill: "both"
+            }
+        ).finished,
+        targetEl.animate([
+            {
+                transformOrigin: "top left",
+                transform: `translate(${
+                    lastPos.left - firstPos.left
+                }px, ${
+                    lastPos.top - firstPos.top
+                }px)`
+            }, {
+                transformOrigin: "top left",
+                transform: "none"
+            }], {
+                duration: durationMs,
+                easing: "ease",
+                fill: "both"
+            }
+        ).finished,
+    ]);
 }
 
 export function createCardElement (content, onclick, ...classList) {
@@ -67,7 +109,7 @@ export function popup (message, durationMs = 1500) {
     });
 };
 
-function playAnimation (element, ...classNames) {
+function playAnimation (element, ...classNames) { // [!] may be redundant now- see waitForElementEvents from utils.js
     return new Promise((resolve, reject) => {
         try {
             element.classList.add(...classNames);
@@ -84,6 +126,15 @@ function playAnimation (element, ...classNames) {
 
 export function getRowWordElements (rowIdx, wordContainer, columnCount = 4) {
     return [...wordContainer.children].slice(rowIdx, rowIdx + columnCount);
+}
+
+export function sortCardEls (cardEls, wordIds) {
+    wordIds.forEach((wordId, idx) => {
+        const idStr = String(wordId);
+        const el = cardEls.filter(cardEl => cardEl.dataset.id == idStr)?.[0];
+        if (el)
+            el.style.order = idx;
+    })
 }
 
 export const cardFX = {
@@ -108,17 +159,11 @@ export const cardFX = {
                 targetEl.replaceWith(originEl));
     },
     swapElements: function (originEl, targetEl) {
-        return Promise.all([
-            animateMove(originEl, targetEl, 2000),
-            animateMove(targetEl, originEl, 2000)
-        ]).then(() => {
-            const targetNextSibling = targetEl.nextSibling;
-            const targetParent = targetEl.parentNode;
-            originEl.replaceWith(targetEl);
-            if (targetNextSibling)
-                targetParent.insertBefore(originEl, targetNextSibling);
-            else // no next sibling, element must be last
-                targetParent.appendChild(originEl);
+        return animateSwap(originEl, targetEl, 2000)
+            .then(() => {
+                const originOrder = originEl.style.order;
+                originEl.style.order = targetEl.style.order;
+                targetEl.style.order = originOrder;
         });
     },
     fadeInCategory: function (categoryEl, categoryContainer, wordContainer) {
@@ -129,6 +174,20 @@ export const cardFX = {
             wordEl.classList.add("hide");
         })).then(() => {
             
+        });
+    },
+    // plays the animation for shuffling- does not actually shuffle
+    shuffle: function (cardEls, wordIds) {
+        return new Promise((resolve, reject) => {
+            waitForElementEvents("transitionend", ...cardEls)
+                .then(() => sortCardEls(cardEls, wordIds))
+                .then(() => {
+                    const transitionPromise = waitForElementEvents("transitionend", ...cardEls)
+                    cardEls.forEach(el => el.classList.remove("blank"))
+                    return transitionPromise; })
+                .then(() => resolve());
+            cardEls.forEach(cardEl =>
+                cardEl.classList.add("blank"));
         });
     }
 };

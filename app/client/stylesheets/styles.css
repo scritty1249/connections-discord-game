@@ -52,6 +52,17 @@ body {
     }
 }
 
+#buttons {
+    transform: translateX(-50%);
+    position: fixed;
+    left: 50%;
+    bottom: 5%;
+    width: 80%;
+    display: grid;
+    place-items: center;
+    gap: calc(var(--spacing) * 2);
+}
+
 #words {
     z-index: 1;
     grid-template-columns: 1fr 1fr 1fr 1fr;
@@ -65,6 +76,10 @@ body {
 }
 
 .card {
+    --bg-color: var(--white);
+    --fg-color: var(--black);
+    background-color: var(--bg-color);
+    color: var(--fg-color);
     display: inline-block;
     box-sizing: border-box;
     border-radius: var(--round);
@@ -77,9 +92,9 @@ body {
     -ms-user-select: none;
     user-select: none;
     &.popup {
+        --bg-color: var(--white);
+        --fg-color: var(--black);
         z-index: 10;
-        background-color: var(--white);
-        color: var(--black);
         position: fixed;
         left: 50%;
         transform: translateX(-50%);
@@ -98,8 +113,8 @@ body {
     &.word {
         --transition-duration: .3s;
         z-index: 1;
-        background-color: var(--white);
-        color: var(--black);
+        --bg-color: var(--white);
+        --fg-color: var(--black);
         font-weight: 500;
         overflow-wrap: break-word;
         hyphens: manual;
@@ -109,18 +124,21 @@ body {
             background-color var(--transition-duration) ease-in-out,
             color var(--transition-duration) ease-in-out;
         &.selected {
-            background-color: #5a594e;
-            color: #f8f8f8;
+            --bg-color: #5a594e;
+            --fg-color: #f8f8f8;
         }
         &.correct {
             pointer-events: none;
-            background-color: #019a01;
+            --bg-color: #019a01;
         }
         &.incorrect {
-            background-color: #ff7169;
+            --bg-color: #ff7169;
         }
         &.hide {
             opacity: 0;
+        }
+        &.blank {
+            --fg-color: var(--bg-color);
         }
     }
     &.category {
@@ -146,13 +164,19 @@ body {
             opacity: 0;
         }
     }
-    &.submit {
-        transform: translateX(-50%);
-        position: fixed;
-        left: 50%;
-        bottom: 5%;
-        width: 20%;
-        height: 5%;
+}
+
+.pill {
+    --color: var(--white);
+    width: 20%;
+    height: 5%;
+    border-radius: 8%;
+    border: 1px solid var(--color);
+    background-color: var(--black);
+    color: var(--color);
+    &.disabled {
+        --color: #8b8b8b;
+        pointer-events: none;
     }
 }
 

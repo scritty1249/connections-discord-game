@@ -58,3 +58,12 @@ export function softHypenateText (text, maxlen) {
     });
     return hypenated.join("");
 }
+
+export async function waitForElementEvents (eventName, ...elements) {
+    return await Promise.all(Array.from(elements, element =>
+        new Promise((resolve, reject) => {
+            element.addEventListener(eventName, () => {
+                resolve(element);
+            }, { once: true });
+    })));
+}

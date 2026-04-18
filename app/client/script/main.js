@@ -1,5 +1,5 @@
-import { isOverflowed, attemptIsRepeat, attemptIsCorrect, shuffle, attemptIsOneAway, softHypenateText, getCategoryData } from "./utils.js";
-import { getRowWordElements, createCardElement, cardFX, popup, getCardElements, createCategoryElements } from "./cards.js";
+import { shuffle, attemptIsRepeat, attemptIsCorrect, attemptIsOneAway, softHypenateText, getCategoryData } from "./utils.js";
+import { getRowWordElements, createCardElement, cardFX, popup, sortCardEls, createCategoryElements } from "./cards.js";
 import * as Discord from "./discord.js";
 
 const API_ENDPOINT = window.origin + "/api";
@@ -8,15 +8,37 @@ let userData = null;
 let selectedWords = 0;
 let categories = null;
 let categoryIds = null;
+let submitBtn = null;
+let shuffleBtn = null;
+let deselectBtn = null;
+let prevOrder = null;
+let currOrder = null;
+let orderWasUpdated = true;
 const oldAttempts = [];
 const categoryEls = [];
 const wordEls = [];
 
-async function recordAttempt (attempt) { // attempt is expected to be a Set of 4 numbers
+async function recordAttempt (attempt) { // attempt is expected to be a Set of 4 Numbers
     try {
+        const bodyData = {attempt: [...attempt]};
+        if (orderWasUpdated)
+            bodyData.order = currOrder;
         const resp = await fetch(API_ENDPOINT + "/record-attempt?id=" + userData?.id, {
             method: "POST",
-            body: JSON.stringify({attempt: [...attempt]})
+            body: JSON.stringify(bodyData)
+        });
+        return resp.ok ? true : undefined;
+    } catch (err) {
+        console.error(err);
+        return undefined;
+    }
+}
+
+async function recordOrder (wordIds) { // wordIds is expected to be an Array of 16 Numbers
+    try {
+        const resp = await fetch(API_ENDPOINT + "/record-order?id=" + userData?.id, {
+            method: "POST",
+            body: JSON.stringify({order: wordIds})
         });
         return resp.ok ? true : undefined;
     } catch (err) {
@@ -74,8 +96,27 @@ function selectWord(wordEl) {
 }
 
 function wordClickHandler (e) {
-    console.info(`clicked ${e.target?.innerHTML}`);
+    // console.info(`clicked ${e.target?.innerHTML}`);
     selectWord(e.target);
+    if (selectedWords < 4)
+        submitBtn.classList.add("disabled");
+    else
+        submitBtn.classList.remove("disabled");
+    if (selectedWords > 0)
+        deselectBtn.classList.remove("disabled");
+    else
+        deselectBtn.classList.add("disabled");
+}
+
+function shuffleHandler (e) {
+    console.debug("Shuffling...");
+    prevOrder = currOrder;
+    orderWasUpdated = true;
+    cardFX.shuffle(wordEls, shuffle(currOrder));
+}
+
+function deselectHandler (e) {
+
 }
 
 function submitHandler (e) {
@@ -91,13 +132,9 @@ function submitHandler (e) {
 function playCorrectAttemptAnimation (categoryEl, wordEls, wordContainer, categoryContainer) {
     const sortedWordEls = wordEls.toSorted((a, b) => parseInt(a.dataset.id) - parseInt(b.dataset.id));
     const topRowWordEls = getRowWordElements(categoryContainer.children.length, wordContainer);
-    return Promise.all(Array.from(sortedWordEls, (wordEl, idx) => {
-        const targetEl = topRowWordEls[idx];
-        if (topRowWordEls.includes(wordEl))
-            return cardFX.moveElement(wordEl, targetEl);
-        else
-            return cardFX.swapElements(wordEl, targetEl);
-    })).then(() => 
+    return Promise.all(Array.from(sortedWordEls, (wordEl, idx) =>
+        cardFX.swapElements(wordEl, topRowWordEls[idx])))
+    .then(() => 
         cardFX.fadeInCategory(categoryEl, categoryContainer, wordContainer));
 }
 
@@ -105,6 +142,11 @@ function getCategoryElement (attempt) { // attempt is an Array of Numbers
     const categoryEl = categoryEls.filter(categoryEl =>
         categoryEl.innerHTML == getCategoryData(attempt, categories));
     return (categoryEl.length) ? categoryEl[0] : undefined;
+}
+
+window.onunload = (e) => {
+    if (orderWasUpdated)
+        recordOrder(currOrder);
 }
 
 window.onload = (e) => {
@@ -136,16 +178,19 @@ window.onload = (e) => {
                 discordSdk = sdk;
                 userData = user;
                 return fetch(
-                        `${API_ENDPOINT}/get-attempts?id=${userData?.id}`
+                        `${API_ENDPOINT}/get-userdata?id=${userData?.id}`
                     ).then(resp => {
                         if (resp.ok) {
                             return resp.json();
                         } else {
                             console.error("Failed to contact userdata API endpoint"); // [!] add UI notification for this
                         }
-                    }).then(({attempts}) => {
+                    }).then(({ attempts, order }) => {
+                        prevOrder = order;
                         if (attempts)
                             oldAttempts.push(...Array.from(attempts, attempt => attempt.toSorted()));
+                        if (order)
+                            orderWasUpdated = false;
                     })
             })        
     ]).then((_) => {
@@ -176,6 +221,7 @@ window.onload = (e) => {
                             }
                         });
                 }
+                const wordIds = [];
                 Object.entries(categories).forEach(([_, words]) => {
                     words.forEach(({word, id}) => {
                         let wordEl = createCardElement(softHypenateText(word, 5), wordClickHandler, "word");
@@ -183,10 +229,12 @@ window.onload = (e) => {
                         if (omittedWordIds.includes(id))
                             wordEl.classList.add("hide");
                         wordEls.push(wordEl);
+                        wordIds.push(id);
                     });
                 });
-                // shuffle elements before inserting to page
-                [...wordEls.filter(e => e.classList.contains("hide")), ...shuffle([...wordEls.filter(e => !e.classList.contains("hide"))])].forEach(wordEl => wordGridEl.append(wordEl));
+                currOrder = orderWasUpdated ? shuffle(wordIds) : prevOrder;
+                sortCardEls(wordEls, currOrder);
+                wordEls.forEach(wordEl => wordGridEl.append(wordEl));
             }
 
             // main runtime
@@ -206,10 +254,23 @@ window.onload = (e) => {
                 avatarEl.height = avatarSize;
                 containerEl.prepend(avatarEl);
             }
-            // create submit button
+            // create buttons
             {
-                const submitBtn = createCardElement("submit", submitHandler, "submit");
+                submitBtn = document.createElement("div");
+                submitBtn.classList.add("pill", "disabled");
+                submitBtn.id = "submit";
+                submitBtn.onclick = submitHandler;
                 menuEl.append(submitBtn);
+                deselectBtn = document.createElement("div");
+                deselectBtn.classList.add("pill", "disabled");
+                deselectBtn.id = "deselect";
+                deselectBtn.onclick = deselectHandler;
+                menuEl.append(deselectBtn);
+                shuffleBtn = document.createElement("div");
+                shuffleBtn.classList.add("pill");
+                shuffleBtn.id = "shuffle";
+                shuffleBtn.onclick = shuffleHandler;
+                menuEl.append(shuffleBtn);
             }
         });
 }
