@@ -16,9 +16,9 @@ export async function POST(req) {
         const { type, user, token } = requestBody;
         switch (type) {
             case 2: // APPLICATION COMMAND
-            const { data } = requestBody;
-            const commandName = data?.name?.toLowerCase();
-            // [!] holy aids nested switch, clean this up later...
+                const { data } = requestBody;
+                const commandName = data?.name?.toLowerCase();
+                // [!] holy aids nested switch, clean this up later...
                 switch (data?.type) { // shouldn't be null
                     case 4: // PRIMARY ENTRY POINT
                         switch (commandName) {
@@ -66,6 +66,8 @@ export async function POST(req) {
                             break;
                             case 2: // DM or group DM, does not need bot user to be a member
                                 return commands.messageResponse("There are currently no supported commands for servers. Message me directly to use commands."); // currently no supported commands for servers.
+                            default:
+                                return commands.messageResponse("Invalid context to use this command.");
                         };
                 };
             case 1: // PING
