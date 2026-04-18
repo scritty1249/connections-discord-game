@@ -15,3 +15,7 @@ export function dateToString(dateObj) {
 export function unixTimestamp() {
     return Math.floor(Date.now() / 1000);
 }
+
+export async function promiseTimeout (timeoutMs) {
+    return await new Promise((resolve) => setTimeout(resolve, timeoutMs));
+}
