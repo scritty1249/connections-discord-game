@@ -36,7 +36,7 @@ export async function POST(req) {
                                         const { options } = data;
                                         const subCommandName = options?.[0]?.name?.toLowerCase();
                                         console.info("API command invoked from discord");
-                                        waitUntil(
+                                        waitUntil(setTimeout(() => { // [!] unga bunga solution to ensuring waitUntil fires after the response...
                                             isUserAdmin(user?.id)
                                             .then((isAdmin) => {
                                                 if (isAdmin) {
@@ -55,7 +55,7 @@ export async function POST(req) {
                                                 console.error(error);
                                                 commands.updateDeferredResponse("Something went wrong on our side.", token);
                                             })
-                                        );
+                                        }, 3000)); // 3s is max interaction response delay
                                         return commands.deferResponse(true);
                                     case "amiadmin":
                                         const isAdmin = await isUserAdmin(user?.id);
