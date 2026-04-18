@@ -13,7 +13,6 @@ export async function POST(req) {
             return new Response("invalid request signature", {status: 401}); // specified by discord api guidelines
         }
         const requestBody = JSON.parse(reqRawBody); // body should be JSON, should this should never fail...
-        console.debug(requestBody);
         const { type, user, token } = requestBody;
         switch (type) {
             case 2: // APPLICATION COMMAND
@@ -44,7 +43,6 @@ export async function POST(req) {
                                                 if (isAdmin) {
                                                     switch (subCommandName) {
                                                         case "nuke-userdata":
-                                                            console.debug("nuking userdata");
                                                             await wipeAttempts()
                                                                 .then((success) => commands.adminTools["nuke-userdata"](token, success))
                                                         break;
@@ -54,7 +52,7 @@ export async function POST(req) {
                                                 } else {
                                                     commands.updateDeferredResponse("Invalid context to use this command.", token);
                                                 }
-                                            }).then(() => console.debug("execution finished.")
+                                            }).then(() => console.debug("Queue execution finished.")
                                             ).catch((error) => {
                                                 console.error(error);
                                                 commands.updateDeferredResponse("Something went wrong on our side.", token);
@@ -67,7 +65,7 @@ export async function POST(req) {
                                 };
                             break;
                             case 2: // DM or group DM, does not need bot user to be a member
-                            break;
+                                return commands.messageResponse("There are currently no supported commands for servers. Message me directly to use commands."); // currently no supported commands for servers.
                         };
                 };
             case 1: // PING

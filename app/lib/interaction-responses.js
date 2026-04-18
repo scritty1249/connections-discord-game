@@ -19,9 +19,9 @@ export function deferResponse(ephemeral = true) {
     console.debug("Deferred response");
     return Response.json({
         type: 5,
-        data: ephemeral ? {
-            flags: 64 // message is ephemeral- only visible to invoker
-        } : {}
+        data: {
+            flags: ephemeral ? 64 : 0 // message is ephemeral- only visible to invoker
+        }
     });
 }
 
@@ -44,11 +44,12 @@ export function invalidContext() { // tried to invoke an admin tool without bein
     });
 }
 
-export function messageResponse(content) {
+export function messageResponse(content, ephemeral = true) {
     return Response.json({
         type: 4,
         data: {
             content: content,
+            flags: ephemeral ? 80 : 16 // notificaitons suppressed, 1 << 4
         }
     });
 }
