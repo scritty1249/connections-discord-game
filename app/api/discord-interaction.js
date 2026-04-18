@@ -40,15 +40,13 @@ export async function POST(req) {
                                         waitUntil(
                                             promiseTimeout(3000)// [!] unga bunga solution to ensuring waitUntil fires after the response...
                                             .then(() => isUserAdmin(user?.id))
-                                            .then((isAdmin) => {
+                                            .then(async (isAdmin) => {
                                                 if (isAdmin) {
                                                     switch (subCommandName) {
                                                         case "nuke-userdata":
                                                             console.debug("nuking userdata");
-                                                            wipeAttempts()
-                                                            .then((success) => commands.adminTools["nuke-userdata"](token, success))
-                                                            .then(() => console.debug("execution finished."))
-                                                            .catch((error) => console.error(error));
+                                                            await wipeAttempts()
+                                                                .then((success) => commands.adminTools["nuke-userdata"](token, success))
                                                         break;
                                                         default:
                                                             commands.updateDeferredResponse(`Command '${subCommandName}' not recognized!`, token);
@@ -56,7 +54,8 @@ export async function POST(req) {
                                                 } else {
                                                     commands.updateDeferredResponse("Invalid context to use this command.", token);
                                                 }
-                                            }).catch((error) => {
+                                            }).then(() => console.debug("execution finished.")
+                                            ).catch((error) => {
                                                 console.error(error);
                                                 commands.updateDeferredResponse("Something went wrong on our side.", token);
                                             })
