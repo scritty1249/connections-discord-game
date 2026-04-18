@@ -266,13 +266,13 @@ window.onload = (e) => {
                 deselectBtn.classList.add("pill", "disabled");
                 deselectBtn.id = "deselect";
                 deselectBtn.onclick = deselectHandler;
-                submitBtn.innerHTML = "deselect all";
+                deselectBtn.innerHTML = "deselect all";
                 menuEl.append(deselectBtn);
                 shuffleBtn = document.createElement("div");
                 shuffleBtn.classList.add("pill");
                 shuffleBtn.id = "shuffle";
                 shuffleBtn.onclick = shuffleHandler;
-                submitBtn.innerHTML = "shuffle";
+                shuffleBtn.innerHTML = "shuffle";
                 menuEl.append(shuffleBtn);
             }
         });
