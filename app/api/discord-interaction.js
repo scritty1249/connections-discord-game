@@ -28,26 +28,25 @@ export async function POST(req) {
                         const { context } = requestBody;
                         switch (context) {
                             case 0: // Invoked in server
-                                console.debug("Command type 0");
                             break;
                             case 1: // DM with the bot only
                                 switch (commandName) {
                                     case "api":
                                         // api subcommand interactions should include an option field
                                         const { options } = data;
-                                        console.debug(JSON.stringify(options));
+                                        const subCommandName = options?.[0]?.name?.toLowerCase();
                                         console.info("API command invoked from discord");
                                         waitUntil(
                                             isUserAdmin(user?.id)
                                             .then((isAdmin) => {
                                                 if (isAdmin) {
-                                                    switch (options?.name?.toLowerCase()) {
+                                                    switch (subCommandName) {
                                                         case "nuke-userdata":
                                                             wipeAttempts().then((success) =>
                                                                 commands.adminTools["nuke-userdata"](token, success));
                                                         break;
                                                         default:
-                                                            commands.updateDeferredResponse(`Command '${options?.name}' not recognized!`, token);
+                                                            commands.updateDeferredResponse(`Command '${subCommandName}' not recognized!`, token);
                                                     };
                                                 } else {
                                                     commands.updateDeferredResponse("Invalid context to use this command.", token);
@@ -64,7 +63,6 @@ export async function POST(req) {
                                 };
                             break;
                             case 2: // DM or group DM, does not need bot user to be a member
-                                console.debug("Command type 2");
                             break;
                         };
                 };
