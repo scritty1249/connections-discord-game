@@ -260,16 +260,19 @@ window.onload = (e) => {
                 submitBtn.classList.add("pill", "disabled");
                 submitBtn.id = "submit";
                 submitBtn.onclick = submitHandler;
+                submitBtn.innerHTML = "submit";
                 menuEl.append(submitBtn);
                 deselectBtn = document.createElement("div");
                 deselectBtn.classList.add("pill", "disabled");
                 deselectBtn.id = "deselect";
                 deselectBtn.onclick = deselectHandler;
+                submitBtn.innerHTML = "deselect all";
                 menuEl.append(deselectBtn);
                 shuffleBtn = document.createElement("div");
                 shuffleBtn.classList.add("pill");
                 shuffleBtn.id = "shuffle";
                 shuffleBtn.onclick = shuffleHandler;
+                submitBtn.innerHTML = "shuffle";
                 menuEl.append(shuffleBtn);
             }
         });
