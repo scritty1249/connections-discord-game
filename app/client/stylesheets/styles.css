@@ -61,6 +61,9 @@ body {
     display: grid;
     place-items: center;
     gap: calc(var(--spacing) * 2);
+    > div.pill {
+        display: inline-block;
+    }
 }
 
 #words {
@@ -136,6 +139,7 @@ body {
         }
         &.hide {
             opacity: 0;
+            pointer-events: none;
         }
         &.blank {
             --fg-color: var(--bg-color);
@@ -169,8 +173,10 @@ body {
 .pill {
     --color: var(--white);
     width: 20%;
-    height: 5%;
-    border-radius: 8%;
+    text-align: center;
+    padding: .5rem;
+    height: 2rem;
+    border-radius: 2.6rem;
     border: 1px solid var(--color);
     background-color: var(--black);
     color: var(--color);
