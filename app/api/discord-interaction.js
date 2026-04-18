@@ -49,7 +49,7 @@ export async function POST(req) {
                                                                 .then((success) => commands.adminTools["nuke-userdata"](token, success))
                                                         break;
                                                         default:
-                                                            commands.updateDeferredResponse(`Command '${subCommandName}' not recognized!`, token);
+                                                            await commands.updateDeferredResponse(`Command '${subCommandName}' not recognized!`, token);
                                                     };
                                                 } else {
                                                     commands.updateDeferredResponse("Invalid context to use this command.", token);
