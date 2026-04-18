@@ -44,8 +44,10 @@ export async function POST(req) {
                                                 if (isAdmin) {
                                                     switch (subCommandName) {
                                                         case "nuke-userdata":
-                                                            wipeAttempts().then((success) =>
-                                                                commands.adminTools["nuke-userdata"](token, success));
+                                                            console.debug("nuking userdata");
+                                                            wipeAttempts()
+                                                            .then((success) => commands.adminTools["nuke-userdata"](token, success))
+                                                            .then(() => console.debug("execution finished."));
                                                         break;
                                                         default:
                                                             commands.updateDeferredResponse(`Command '${subCommandName}' not recognized!`, token);
