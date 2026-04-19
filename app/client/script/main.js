@@ -261,7 +261,7 @@ window.onload = (e) => {
                     words.forEach(({word, id}) => {
                         let wordEl = createCardElement(softHypenateText(word, 5), wordClickHandler, "word");
                         wordEl.dataset.id = id;
-                        if (solvedWordIds.includes(wordEl.dataset.id)) // evaluate element attribute so we don't need to cast to String twice
+                        if (solvedWordIds.includes(id))
                             wordEl.classList.add("hide");
                         ELEMENTS.WORDS.push(wordEl);
                         wordIds.push(id);
