@@ -32,6 +32,10 @@ export const UserDB = {
         return await redis.get(this._prefix[type] + userid)
             .then((value) => value === null ? fallback : value);
     },
+    getlist: async function (userid, type, fallback = null) {
+        return await redis.lrange(this._prefix[type] + userid, 0 -1)
+            .then((value) => value === null ? fallback : value);
+    },
     append: async function (userid, type, ...values) {
         return await redis.rpush(this._prefix[type] + userid, ...values);
     },

@@ -72,7 +72,7 @@ export async function isUserAdmin(userid) {
 export async function getUserData(userid) {
     if (await UserDB.exists(userid, "order")) {
         const values = await Promise.all([
-            UserDB.get(userid, "attempts", []),
+            UserDB.getlist(userid, "attempts", []),
             UserDB.get(userid, "order")
         ]);
         return {
