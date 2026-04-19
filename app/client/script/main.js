@@ -5,24 +5,37 @@ import * as Discord from "./discord.js";
 const API_ENDPOINT = window.origin + "/api";
 let discordSdk = null;
 let userData = null;
-let selectedWords = 0;
 let categories = null;
 let categoryIds = null;
-let submitBtn = null;
-let shuffleBtn = null;
-let deselectBtn = null;
-let prevOrder = null;
-let currOrder = null;
-let orderWasUpdated = true;
-const oldAttempts = [];
-const categoryEls = [];
-const wordEls = [];
+
+const ATTEMPTS = [];
+const ELEMENTS = {
+    WORDS: [],
+    CATEGORIES: [],
+    WORD_GRID: null,
+    CATEGORY_GRID: null,
+    MENU: null,
+    selectedCount: 0,
+    get SELECTED () {
+        return [...document.getElementsByClassName("selected")];
+    }
+};
+const ORDER = {
+    PREV: null,
+    CURR: null,
+    wasUpdated: true
+};
+const BUTTONS = {
+    SHUFFLE: null,
+    SUBMIT: null,
+    DESELECT: null
+};
 
 async function recordAttempt (attempt) { // attempt is expected to be a Set of 4 Numbers
     try {
         const bodyData = {attempt: [...attempt]};
-        if (orderWasUpdated)
-            bodyData.order = currOrder;
+        if (ORDER.wasUpdated)
+            bodyData.order = ORDER.CURR;
         const resp = await fetch(API_ENDPOINT + "/record-attempt?id=" + userData?.id, {
             method: "POST",
             body: JSON.stringify(bodyData)
@@ -49,17 +62,17 @@ async function recordOrder (wordIds) { // wordIds is expected to be an Array of 
 
 // returns a Promise. Instantly resolves to false if attempt is a repeat
 async function submitAttempt () { // old attempts returned from api as an Array of 4-Number Arrays (2D).
-    const selectedWordEls = [...document.getElementsByClassName("selected")];
+    const selectedWordEls = ELEMENTS.SELECTED;
     if (selectedWordEls.length != 4) {
         console.error(`Something went wrong while submitting! ${selectedWordEls.length} words selected - 4 required`);
         return;
     }
     const wordIds = Array.from(selectedWordEls, (wordEl) => parseInt(wordEl.dataset.id)).sort();
     selectedWordEls.forEach((wordEl) => wordEl.classList.remove("selected"));
-    selectedWords = 0;
-    // attempts within oldAttempts should already be sorted
+    ELEMENTS.selectedCount = 0;
+    // attempts within ATTEMPTS should already be sorted
     let animationPromise;
-    if (attemptIsRepeat(wordIds, oldAttempts)) {
+    if (attemptIsRepeat(wordIds, ATTEMPTS)) {
         console.debug("Repeated attempt");
         animationPromise = Promise.all([
             cardFX.repeatAttempt(selectedWordEls),
@@ -83,7 +96,7 @@ async function submitAttempt () { // old attempts returned from api as an Array 
     try {
         await animationPromise;
         if (await recordAttempt(new Set(wordIds)))
-            oldAttempts.push(wordIds);
+            ATTEMPTS.push(wordIds);
     } catch (error) {
         console.error(error);
         await popup("A client error occurred.");
@@ -94,10 +107,10 @@ async function submitAttempt () { // old attempts returned from api as an Array 
 
 function selectWord(wordEl) {
     if (wordEl.classList.contains("selected")) {
-        selectedWords--;
+        ELEMENTS.selectedCount--;
         wordEl.classList.remove("selected");
-    } else if (selectedWords < 4) { // [!] this should be 3, but I can't fucking count I guess
-        selectedWords++;
+    } else if (ELEMENTS.selectedCount < 4) { // [!] this should be 3, but I can't fucking count I guess
+        ELEMENTS.selectedCount++;
         wordEl.classList.add("selected");
     }
 }
@@ -105,24 +118,24 @@ function selectWord(wordEl) {
 function wordClickHandler (e) {
     // console.info(`clicked ${e.target?.innerHTML}`);
     selectWord(e.target);
-    if (selectedWords < 4)
-        submitBtn.classList.add("disabled");
+    if (ELEMENTS.selectedCount < 4)
+        BUTTONS.SUBMIT.classList.add("disabled");
     else
-        submitBtn.classList.remove("disabled");
-    if (selectedWords > 0)
-        deselectBtn.classList.remove("disabled");
+        BUTTONS.SUBMIT.classList.remove("disabled");
+    if (ELEMENTS.selectedCount > 0)
+        BUTTONS.DESELECT.classList.remove("disabled");
     else
-        deselectBtn.classList.add("disabled");
+        BUTTONS.DESELECT.classList.add("disabled");
 }
 
 function shuffleHandler (e) {
-    const unsolvedIds = getUnsolvedWordIds(wordEls);
+    const unsolvedIds = getUnsolvedWordIds(ELEMENTS.WORDS);
     if (!unsolvedIds.length) return;
     console.debug("Shuffling...");
-    prevOrder = currOrder;
-    currOrder = [...prevOrder.slice(0, unsolvedIds.length), ...shuffle(unsolvedIds)];
-    orderWasUpdated = true;
-    cardFX.shuffle(wordEls, currOrder); // [!] inefficient, may not need to pass the entire current order- laziness
+    ORDER.PREV = ORDER.CURR;
+    ORDER.CURR = [...ORDER.PREV.slice(0, unsolvedIds.length), ...shuffle(unsolvedIds)];
+    ORDER.wasUpdated = true;
+    cardFX.shuffle(ELEMENTS.WORDS, ORDER.CURR); // [!] inefficient, may not need to pass the entire current order- laziness
 }
 
 function deselectHandler (e) {
@@ -130,17 +143,17 @@ function deselectHandler (e) {
 }
 
 function submitHandler (e) {
-    if (selectedWords >= 3) {
+    if (ELEMENTS.selectedCount >= 3) {
         console.debug("Submitting...");
         submitAttempt();
     } else {
-        console.debug(`Failed to submit. Wordcount: ${selectedWords}`);
+        console.debug(`Failed to submit. Wordcount: ${ELEMENTS.selectedCount}`);
     }
 }
 
 function playCorrectAttemptAnimation (categoryEl, wordEls, wordContainer, categoryContainer) {
     const sortedWordEls = wordEls.toSorted((a, b) => parseInt(a.dataset.id) - parseInt(b.dataset.id));
-    const topRowWordEls = wordEls.filter(wordEl => parseInt(wordEl.style.order) < 4).sort((a, b) => parseInt(a.style.order) - parseInt(b.style.order)); // [!] horrible
+    const topRowWordEls = ELEMENTS.WORDS.filter(wordEl => parseInt(wordEl.style.order) < 4).sort((a, b) => parseInt(a.style.order) - parseInt(b.style.order)); // [!] horrible
     return Promise.all(Array.from(sortedWordEls, (wordEl, idx) =>
         cardFX.swapElements(wordEl, topRowWordEls[idx])))
     .then(() => 
@@ -148,7 +161,7 @@ function playCorrectAttemptAnimation (categoryEl, wordEls, wordContainer, catego
 }
 
 function getCategoryElement (attempt) { // attempt is an Array of Numbers
-    const categoryEl = categoryEls.filter(categoryEl =>
+    const categoryEl = ELEMENTS.CATEGORIES.filter(categoryEl =>
         categoryEl.innerHTML == getCategoryData(attempt, categories));
     return (categoryEl.length) ? categoryEl[0] : undefined;
 }
@@ -159,15 +172,15 @@ function getUnsolvedWordIds (cardEls) {
 }
 
 window.onunload = (e) => {
-    if (orderWasUpdated)
-        recordOrder(currOrder);
+    if (ORDER.wasUpdated)
+        recordOrder(ORDER.CURR);
 }
 
 window.onload = (e) => {
     const containerEl = document.getElementById("content-container");
-    const wordGridEl = document.getElementById("words");
-    const menuEl = document.getElementById("buttons");
-    const categoryStackEl = document.getElementById("categories");
+    ELEMENTS.WORD_GRID = document.getElementById("words");
+    ELEMENTS.MENU = document.getElementById("buttons");
+    ELEMENTS.CATEGORY_GRID = document.getElementById("categories");
     Promise.all([
         // retreive categories
         fetch(API_ENDPOINT + "/get-gamedata")
@@ -200,35 +213,35 @@ window.onload = (e) => {
                             console.error("Failed to contact userdata API endpoint"); // [!] add UI notification for this
                         }
                     }).then(({ attempts, order }) => {
-                        prevOrder = order;
+                        ORDER.PREV = order;
                         if (attempts)
-                            oldAttempts.push(...Array.from(attempts, attempt => attempt.toSorted()));
+                            ATTEMPTS.push(...Array.from(attempts, attempt => attempt.toSorted()));
                         if (order)
-                            orderWasUpdated = false;
+                            ORDER.wasUpdated = false;
                     })
             })        
     ]).then((_) => {
-            console.debug(`Loaded previous attempts: ${oldAttempts}`);
+            console.debug(`Loaded previous attempts: ${ATTEMPTS}`);
             console.log(categories);
 
             // create card elements
             {
-                const omittedWordIds = [];
+                const solvedWordIds = [];
                 createCategoryElements(Object.keys(categories))
-                    .forEach(categoryEl => categoryEls.push(categoryEl));
+                    .forEach(categoryEl => ELEMENTS.CATEGORIES.push(categoryEl));
 
                 // init previous correct attempts (if any)
-                if (oldAttempts.length) {
-                    oldAttempts.filter(attempt => attemptIsCorrect(attempt, categoryIds))
+                if (ATTEMPTS.length) {
+                    ATTEMPTS.filter(attempt => attemptIsCorrect(attempt, categoryIds))
                         .forEach(correctAttempt => {
                             const categoryEl = getCategoryElement(correctAttempt);
                             if (categoryEl !== undefined) {
                                 // add word id to blacklist
-                                omittedWordIds.push(...correctAttempt);
+                                solvedWordIds.push(...correctAttempt);
                                 // display the category
                                 const ogTransDuration = getComputedStyle(categoryEl)?.getPropertyValue("--transition-duration");
                                 categoryEl.style.setProperty("--transition-duration", "0");
-                                categoryStackEl.appendChild(categoryEl);
+                                ELEMENTS.CATEGORY_GRID.appendChild(categoryEl);
                                 categoryEl.style.setProperty("--transition-duration", ogTransDuration);
                             } else {
                                 console.warn(`Failed to find a matching category with word IDs: ${correctAttempt}`)
@@ -240,24 +253,18 @@ window.onload = (e) => {
                     words.forEach(({word, id}) => {
                         let wordEl = createCardElement(softHypenateText(word, 5), wordClickHandler, "word");
                         wordEl.dataset.id = id;
-                        if (omittedWordIds.includes(id))
+                        if (solvedWordIds.includes(id))
                             wordEl.classList.add("hide");
-                        wordEls.push(wordEl);
+                        ELEMENTS.WORDS.push(wordEl);
                         wordIds.push(id);
                     });
                 });
-                currOrder = orderWasUpdated ? shuffle(wordIds) : prevOrder;
-                sortCardEls(wordEls, currOrder);
-                wordEls.forEach(wordEl => wordGridEl.append(wordEl));
+                ORDER.CURR = ORDER.wasUpdated ? shuffle(wordIds) : ORDER.PREV;
+                sortCardEls(ELEMENTS.WORDS, ORDER.CURR);
+                ELEMENTS.WORDS.forEach(wordEl => ELEMENTS.WORD_GRID.append(wordEl));
             }
 
             // main runtime
-            {
-                // let biggestWordEl = wordEls.reduce((biggestWordEl, wordEl) => biggestWordEl.offsetWidth > wordEl.offsetWidth ? biggestWordEl : wordEl);
-                // biggestWordEl.dataset.largest = "true";
-                // biggestWordEl.style.setProperty("--card-width", "min-content");
-                // resizeCardHandler();
-            }
             {
                 const avatarSize = 128;
                 const avatarUrl = Discord.AVATAR_URL(userData.id, userData.avatar, avatarSize);
@@ -268,26 +275,14 @@ window.onload = (e) => {
                 avatarEl.height = avatarSize;
                 containerEl.prepend(avatarEl);
             }
-            // create buttons
+            // buttons
             {
-                submitBtn = document.createElement("div");
-                submitBtn.classList.add("pill", "disabled");
-                submitBtn.id = "submit";
-                submitBtn.onclick = submitHandler;
-                submitBtn.innerHTML = "submit";
-                menuEl.append(submitBtn);
-                deselectBtn = document.createElement("div");
-                deselectBtn.classList.add("pill", "disabled");
-                deselectBtn.id = "deselect";
-                deselectBtn.onclick = deselectHandler;
-                deselectBtn.innerHTML = "deselect all";
-                menuEl.append(deselectBtn);
-                shuffleBtn = document.createElement("div");
-                shuffleBtn.classList.add("pill");
-                shuffleBtn.id = "shuffle";
-                shuffleBtn.onclick = shuffleHandler;
-                shuffleBtn.innerHTML = "shuffle";
-                menuEl.append(shuffleBtn);
+                BUTTONS.SUBMIT = document.getElementById("submit");
+                BUTTONS.SUBMIT.onclick = submitHandler;
+                BUTTONS.DESELECT = document.getElementById("deselect");
+                BUTTONS.DESELECT.onclick = deselectHandler;
+                BUTTONS.SHUFFLE = document.getElementById("shuffle");
+                BUTTONS.SHUFFLE.onclick = shuffleHandler;
             }
         });
 }
