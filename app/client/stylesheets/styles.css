@@ -57,13 +57,13 @@ body {
     position: fixed;
     left: 50%;
     bottom: 5%;
-    width: 80%;
+    width: 60%;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     place-items: center;
     gap: calc(var(--spacing) * 2);
     > div.pill {
-        display: inline-block;
+        width: 80%;
     }
 }
 
@@ -172,7 +172,6 @@ body {
 
 .pill {
     --color: var(--white);
-    width: 20%;
     text-align: center;
     align-content: center;
     padding: .5rem;
@@ -181,6 +180,7 @@ body {
     border: 1px solid var(--color);
     background-color: var(--black);
     color: var(--color);
+    text-transform: uppercase;
     &.disabled {
         --color: #8b8b8b;
         pointer-events: none;

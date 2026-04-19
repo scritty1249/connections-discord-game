@@ -88,13 +88,7 @@ export async function getUserData(userid) {
 }
 
 export async function newAttempt(userid, attempt) { // attempt here is a Set of 4 ids (Numbers)
-    let attemptArr = [...attempt];
-    // [!] might need to validate a timestamp here
-    if (await UserDB.exists(userid, "attempts")) {
-        return await UserDB.append(userid, "attempts", attemptArr);
-    } else {
-        return await UserDB.set(userid, "attempts", [attemptArr]);
-    }
+    return await UserDB.append(userid, "attempts", [...attempt]);
 }
 
 export async function newOrder(userid, order) { // order is an Array of 16 ids (Numbers)
