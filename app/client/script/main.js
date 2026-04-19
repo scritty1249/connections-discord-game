@@ -23,7 +23,9 @@ const ELEMENTS = {
 const ORDER = {
     PREV: null,
     CURR: null,
-    wasUpdated: true
+    get wasUpdated () {
+        return ORDER.PREV?.every((val, idx) => val == ORDER.CURR?.[idx]);
+    }
 };
 const BUTTONS = {
     SHUFFLE: null,
@@ -138,7 +140,6 @@ function shuffleHandler (e) {
     console.debug("Shuffling...");
     ORDER.PREV = ORDER.CURR;
     ORDER.CURR = [...ORDER.PREV.slice(0, unsolvedIds.length), ...shuffle(unsolvedIds)];
-    ORDER.wasUpdated = true;
     cardFX.shuffle(ELEMENTS.WORDS, ORDER.CURR); // [!] inefficient, may not need to pass the entire current order- laziness
 }
 
@@ -164,6 +165,11 @@ function playCorrectAttemptAnimation (categoryEl, wordEls, wordContainer, catego
     const topRowWordEls = ELEMENTS.WORDS.filter(wordEl => parseInt(wordEl.style.order) < 4 && !wordEls.includes(wordEl)).sort((a, b) => parseInt(a.style.order) - parseInt(b.style.order)); // [!] horrible
     return Promise.all(Array.from(sortedWordEls, (wordEl, idx) =>
         cardFX.swapElements(wordEl, topRowWordEls[idx])))
+    .then(() => {
+        ORDER.PREV = ORDER.CURR;
+        ORDER.CURR = Array.from(
+            ELEMENTS.WORDS.toSorted((a, b) => parseInt(a.style.order) - parseInt(b.style.order)),
+            el => parseInt(el.dataset.id))})
     .then(() => 
         cardFX.fadeInCategory(categoryEl, categoryContainer, wordContainer));
 }
@@ -224,8 +230,6 @@ window.onload = (e) => {
                         ORDER.PREV = order;
                         if (attempts)
                             ATTEMPTS.push(...Array.from(attempts, attempt => attempt.toSorted()));
-                        if (order)
-                            ORDER.wasUpdated = false;
                     })
             })        
     ]).then((_) => {
@@ -269,7 +273,7 @@ window.onload = (e) => {
                         wordIds.push(id);
                     });
                 });
-                ORDER.CURR = ORDER.wasUpdated ? shuffle(wordIds) : ORDER.PREV;
+                ORDER.CURR = !ORDER.wasUpdated ? shuffle(wordIds) : ORDER.PREV;
                 sortCardEls(ELEMENTS.WORDS, ORDER.CURR);
                 ELEMENTS.WORDS.forEach(wordEl => ELEMENTS.WORD_GRID.append(wordEl));
             }
