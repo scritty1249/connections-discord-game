@@ -15,7 +15,7 @@ export async function animateMove (originEl, targetEl, durationMs) { // FLIP
             transformOrigin: "top left",
             transform: "none"
         }], {
-            direction: "reverse",
+            direction: "reverse", // lmao idk
             duration: durationMs,
             easing: "ease",
             fill: "none"
@@ -39,7 +39,7 @@ export async function animateSwap (originEl, targetEl, durationMs) { // FLIP
                 transformOrigin: "top left",
                 transform: "none"
             }], {
-                direction: "reverse",
+                direction: "reverse", // lmao idk
                 duration: durationMs,
                 easing: "ease",
                 fill: "none"
@@ -57,7 +57,7 @@ export async function animateSwap (originEl, targetEl, durationMs) { // FLIP
                 transformOrigin: "top left",
                 transform: "none"
             }], {
-                direction: "reverse",
+                direction: "reverse", // lmao idk
                 duration: durationMs,
                 easing: "ease",
                 fill: "none"
