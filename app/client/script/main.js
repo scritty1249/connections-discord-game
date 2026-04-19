@@ -144,7 +144,10 @@ function shuffleHandler (e) {
 }
 
 function deselectHandler (e) {
-
+    const selectedWordEls = ELEMENTS.SELECTED;
+    ELEMENTS.selectedCount = 0;
+    selectedWordEls.forEach((wordEl) => wordEl.classList.remove("selected"));
+    BUTTONS.DESELECT.classList.add("disabled");
 }
 
 function submitHandler (e) {
