@@ -5,8 +5,8 @@ export async function animateMove (originEl, targetEl, durationMs) { // FLIP
     const firstPos = originEl.getBoundingClientRect();
     const lastPos = targetEl.getBoundingClientRect();
     // invert
-    const deltaX = firstPos.left - lastPos.left;
-    const deltaY = firstPos.top - lastPos.top;
+    const deltaX = lastPos.left - firstPos.left;
+    const deltaY = lastPos.top - firstPos.top;
     return originEl.animate([
         {
             transformOrigin: "top left",
@@ -17,7 +17,7 @@ export async function animateMove (originEl, targetEl, durationMs) { // FLIP
         }], {
             duration: durationMs,
             easing: "ease",
-            fill: "both"
+            fill: "none"
         }
     ).finished;
 }
@@ -40,7 +40,7 @@ export async function animateSwap (originEl, targetEl, durationMs) { // FLIP
             }], {
                 duration: durationMs,
                 easing: "ease",
-                fill: "both"
+                fill: "none"
             }
         ).finished,
         targetEl.animate([
@@ -57,7 +57,7 @@ export async function animateSwap (originEl, targetEl, durationMs) { // FLIP
             }], {
                 duration: durationMs,
                 easing: "ease",
-                fill: "both"
+                fill: "none"
             }
         ).finished,
     ]);
