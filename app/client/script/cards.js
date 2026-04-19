@@ -133,7 +133,7 @@ export function sortCardEls (cardEls, wordIds) {
         const idStr = String(wordId);
         const el = cardEls.filter(cardEl => cardEl.dataset.id == idStr)?.[0];
         if (el)
-            el.style.order = idx;
+            el.style.order = String(idx);
     })
 }
 
