@@ -70,6 +70,8 @@ async function submitAttempt () { // old attempts returned from api as an Array 
     const wordIds = Array.from(selectedWordEls, (wordEl) => parseInt(wordEl.dataset.id)).sort();
     selectedWordEls.forEach((wordEl) => wordEl.classList.remove("selected"));
     ELEMENTS.selectedCount = 0;
+    BUTTONS.DESELECT.classList.add("disabled");
+    BUTTONS.SUBMIT.classList.add("disabled");
     // attempts within ATTEMPTS should already be sorted
     let animationPromise;
     if (attemptIsRepeat(wordIds, ATTEMPTS)) {
@@ -153,7 +155,7 @@ function submitHandler (e) {
 
 function playCorrectAttemptAnimation (categoryEl, wordEls, wordContainer, categoryContainer) {
     const sortedWordEls = wordEls.filter(wordEl => parseInt(wordEl.style.order) >= 4).toSorted((a, b) => parseInt(a.dataset.id) - parseInt(b.dataset.id));
-    const topRowWordEls = ELEMENTS.WORDS.filter(wordEl => parseInt(wordEl.style.order) < 4 && !sortedWordEls.includes(wordEl)).sort((a, b) => parseInt(a.style.order) - parseInt(b.style.order)); // [!] horrible
+    const topRowWordEls = ELEMENTS.WORDS.filter(wordEl => parseInt(wordEl.style.order) < 4 && !wordEls.includes(wordEl)).sort((a, b) => parseInt(a.style.order) - parseInt(b.style.order)); // [!] horrible
     return Promise.all(Array.from(sortedWordEls, (wordEl, idx) =>
         cardFX.swapElements(wordEl, topRowWordEls[idx])))
     .then(() => 

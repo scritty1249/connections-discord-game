@@ -125,7 +125,7 @@ function playAnimation (element, ...classNames) { // [!] may be redundant now- s
 }
 
 export function getRowWordElements (rowIdx, wordContainer, columnCount = 4) {
-    return [...wordContainer.children].slice(rowIdx, rowIdx + columnCount);
+    return [...wordContainer.children].filter(wordEl, parseInt(wordEl.style.order) >= rowIdx && parseInt(wordEl.style.order) < rowIdx + columnCount);
 }
 
 export function sortCardEls (cardEls, wordIds) {
