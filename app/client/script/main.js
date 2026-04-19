@@ -134,7 +134,7 @@ function submitHandler (e) {
 
 function playCorrectAttemptAnimation (categoryEl, wordEls, wordContainer, categoryContainer) {
     const sortedWordEls = wordEls.toSorted((a, b) => parseInt(a.dataset.id) - parseInt(b.dataset.id));
-    const topRowWordEls = wordEls.filter(wordEl => wordEl.style.order < 4).sort((a, b) => a.style.order - b.style.order);
+    const topRowWordEls = wordEls.filter(wordEl => parseInt(wordEl.style.order) < 4).sort((a, b) => a.style.order - b.style.order);
     return Promise.all(Array.from(sortedWordEls, (wordEl, idx) =>
         cardFX.swapElements(wordEl, topRowWordEls[idx])))
     .then(() => 
