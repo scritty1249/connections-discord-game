@@ -24,7 +24,7 @@ const ORDER = {
     PREV: null,
     CURR: null,
     get wasUpdated () {
-        return ORDER.PREV?.every((val, idx) => val == ORDER.CURR?.[idx]);
+        return Array.isArray(ORDER.PREV) != Array.isArray(ORDER.CURR) || ORDER.PREV?.every((val, idx) => val == ORDER.CURR?.[idx]);
     }
 };
 const BUTTONS = {
@@ -234,7 +234,7 @@ window.onload = (e) => {
             })        
     ]).then((_) => {
             console.debug(`Loaded previous attempts: ${ATTEMPTS}`);
-            if (!ORDER.wasUpdated)
+            if (ORDER.wasUpdated)
                 console.debug(`Loaded previous order: ${ORDER.PREV}`);
             console.log(categories);
 
