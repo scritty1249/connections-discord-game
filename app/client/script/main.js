@@ -109,10 +109,13 @@ function wordClickHandler (e) {
 }
 
 function shuffleHandler (e) {
+    const unsolvedIds = getUnsolvedWordIds(wordEls);
+    if (!unsolvedIds.length) return;
     console.debug("Shuffling...");
     prevOrder = currOrder;
+    currOrder = [...prevOrder.slice(0, unsolvedIds.length), ...shuffle(unsolvedIds)];
     orderWasUpdated = true;
-    cardFX.shuffle(wordEls, shuffle(currOrder));
+    cardFX.shuffle(wordEls, currOrder); // [!] inefficient, may not need to pass the entire current order- laziness
 }
 
 function deselectHandler (e) {
@@ -142,6 +145,11 @@ function getCategoryElement (attempt) { // attempt is an Array of Numbers
     const categoryEl = categoryEls.filter(categoryEl =>
         categoryEl.innerHTML == getCategoryData(attempt, categories));
     return (categoryEl.length) ? categoryEl[0] : undefined;
+}
+
+// [!] inefficient method- laziness
+function getUnsolvedWordIds (cardEls) {
+    return Array.from(cardEls.filter(e => !e.classList.contains("hide")), e => parseInt(e?.dataset?.id));
 }
 
 window.onunload = (e) => {
