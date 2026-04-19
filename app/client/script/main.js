@@ -125,8 +125,9 @@ function deselectHandler (e) {
 function submitHandler (e) {
     if (selectedWords >= 3) {
         console.debug("Submitting...");
-        submitAttempt().then(res =>
-            console.debug(res));
+        submitAttempt()
+            .then(res => console.debug(res))
+            .catch(err => (console.error(err), popup("Client error occured.")));
     } else {
         console.debug(`Failed to submit. Wordcount: ${selectedWords}`);
     }
@@ -134,7 +135,7 @@ function submitHandler (e) {
 
 function playCorrectAttemptAnimation (categoryEl, wordEls, wordContainer, categoryContainer) {
     const sortedWordEls = wordEls.toSorted((a, b) => parseInt(a.dataset.id) - parseInt(b.dataset.id));
-    const topRowWordEls = wordEls.filter(wordEl => parseInt(wordEl.style.order) < 4).sort((a, b) => a.style.order - b.style.order);
+    const topRowWordEls = wordEls.filter(wordEl => parseInt(wordEl.style.order) < 4).sort((a, b) => parseInt(a.style.order) - parseInt(b.style.order)); // [!] horrible
     return Promise.all(Array.from(sortedWordEls, (wordEl, idx) =>
         cardFX.swapElements(wordEl, topRowWordEls[idx])))
     .then(() => 
