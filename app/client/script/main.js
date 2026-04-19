@@ -65,7 +65,7 @@ async function submitAttempt () { // old attempts returned from api as an Array 
     const selectedWordEls = ELEMENTS.SELECTED;
     if (selectedWordEls.length != 4) {
         console.error(`Something went wrong while submitting! ${selectedWordEls.length} words selected - 4 required`);
-        return;
+        return false;
     }
     const wordIds = Array.from(selectedWordEls, (wordEl) => parseInt(wordEl.dataset.id)).sort();
     selectedWordEls.forEach((wordEl) => wordEl.classList.remove("selected"));
@@ -97,13 +97,15 @@ async function submitAttempt () { // old attempts returned from api as an Array 
     }
     try {
         await animationPromise;
-        if (await recordAttempt(new Set(wordIds)))
+        if (await recordAttempt(new Set(wordIds))) {
             ATTEMPTS.push(wordIds);
+            return true;
+        }
     } catch (error) {
         console.error(error);
         await popup("A client error occurred.");
     }
-    return;
+    return false;
 }
 
 
@@ -147,7 +149,11 @@ function deselectHandler (e) {
 function submitHandler (e) {
     if (ELEMENTS.selectedCount >= 3) {
         console.debug("Submitting...");
-        submitAttempt();
+        submitAttempt()
+            .then((success) => {
+                if (!success)
+                    console.warn("Submission failed, attempt not recorded.");
+            });
     } else {
         console.debug(`Failed to submit. Wordcount: ${ELEMENTS.selectedCount}`);
     }
