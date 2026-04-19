@@ -230,6 +230,8 @@ window.onload = (e) => {
             })        
     ]).then((_) => {
             console.debug(`Loaded previous attempts: ${ATTEMPTS}`);
+            if (!ORDER.wasUpdated)
+                console.debug(`Loaded previous order: ${ORDER.PREV}`);
             console.log(categories);
 
             // create card elements
