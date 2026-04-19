@@ -30,9 +30,9 @@ export async function animateSwap (originEl, targetEl, durationMs) { // FLIP
             {
                 transformOrigin: "top left",
                 transform: `translate(${
-                    firstPos.left - lastPos.left
+                    lastPos.left - firstPos.left
                 }px, ${
-                    firstPos.top - lastPos.top
+                    lastPos.top - firstPos.top
                 }px)`
             }, {
                 transformOrigin: "top left",
@@ -47,9 +47,9 @@ export async function animateSwap (originEl, targetEl, durationMs) { // FLIP
             {
                 transformOrigin: "top left",
                 transform: `translate(${
-                    lastPos.left - firstPos.left
+                    firstPos.left - lastPos.left
                 }px, ${
-                    lastPos.top - firstPos.top
+                    firstPos.top - lastPos.top
                 }px)`
             }, {
                 transformOrigin: "top left",

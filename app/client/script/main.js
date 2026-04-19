@@ -152,8 +152,8 @@ function submitHandler (e) {
 }
 
 function playCorrectAttemptAnimation (categoryEl, wordEls, wordContainer, categoryContainer) {
-    const sortedWordEls = wordEls.toSorted((a, b) => parseInt(a.dataset.id) - parseInt(b.dataset.id));
-    const topRowWordEls = ELEMENTS.WORDS.filter(wordEl => parseInt(wordEl.style.order) < 4).sort((a, b) => parseInt(a.style.order) - parseInt(b.style.order)); // [!] horrible
+    const sortedWordEls = wordEls.toSorted((a, b) => parseInt(a.dataset.id) - parseInt(b.dataset.id)).filter(wordEl => parseInt(wordEl.style.order) >= 4);
+    const topRowWordEls = ELEMENTS.WORDS.filter(wordEl => parseInt(wordEl.style.order) < 4 && !sortedWordEls.includes(wordEl)).sort((a, b) => parseInt(a.style.order) - parseInt(b.style.order)); // [!] horrible
     return Promise.all(Array.from(sortedWordEls, (wordEl, idx) =>
         cardFX.swapElements(wordEl, topRowWordEls[idx])))
     .then(() => 
