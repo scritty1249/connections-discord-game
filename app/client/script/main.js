@@ -139,7 +139,7 @@ function shuffleHandler (e) {
     if (!unsolvedIds.length) return;
     console.debug("Shuffling...");
     ORDER.PREV = ORDER.CURR;
-    ORDER.CURR = [...ORDER.PREV.slice(0, unsolvedIds.length), ...shuffle(unsolvedIds)];
+    ORDER.CURR = [...ORDER.PREV.slice(0, ELEMENTS.WORDS.length - unsolvedIds.length), ...shuffle(unsolvedIds)];
     cardFX.shuffle(ELEMENTS.WORDS, ORDER.CURR); // [!] inefficient, may not need to pass the entire current order- laziness
 }
 
