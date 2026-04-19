@@ -48,7 +48,7 @@ async function recordOrder (wordIds) { // wordIds is expected to be an Array of 
 }
 
 // returns a Promise. Instantly resolves to false if attempt is a repeat
-function submitAttempt () { // old attempts returned from api as an Array of 4-Number Arrays (2D).
+async function submitAttempt () { // old attempts returned from api as an Array of 4-Number Arrays (2D).
     const selectedWordEls = [...document.getElementsByClassName("selected")];
     if (selectedWordEls.length != 4) {
         console.error(`Something went wrong while submitting! ${selectedWordEls.length} words selected - 4 required`);
@@ -58,32 +58,39 @@ function submitAttempt () { // old attempts returned from api as an Array of 4-N
     selectedWordEls.forEach((wordEl) => wordEl.classList.remove("selected"));
     selectedWords = 0;
     // attempts within oldAttempts should already be sorted
+    let animationPromise;
     if (attemptIsRepeat(wordIds, oldAttempts)) {
         console.debug("Repeated attempt");
-        return cardFX.repeatAttempt(selectedWordEls)
-            .then(() => popup("Already guessed!", 2000))
-            .then(() => false);
+        animationPromise = Promise.all([
+            cardFX.repeatAttempt(selectedWordEls),
+            popup("Already guessed!", 2000)
+        ]);
+    } else if (attemptIsCorrect(wordIds, categoryIds)) {
+        console.debug("Correct attempt");
+        animationPromise = playCorrectAttemptAnimation(
+            getCategoryElement(wordIds),
+            selectedWordEls,
+            document.getElementById("words"),
+            document.getElementById("categories")
+        );
+    } else if (attemptIsOneAway(wordIds, categoryIds)) {
+        console.debug("Close attempt");
+        animationPromise = popup("One away...", 2000);
     } else {
-        // jesus, how readable is this for others?
-        return (attemptIsCorrect(wordIds, categoryIds)
-            ? (console.debug("Correct attempt"), playCorrectAttemptAnimation(getCategoryElement(wordIds), selectedWordEls, document.getElementById("words"), document.getElementById("categories")))
-            : (
-                attemptIsOneAway(wordIds, categoryIds)
-                    ? (console.debug("Close attempt"), popup("One away...", 2000))
-                    : console.debug("Incorrect attempt"),
-                cardFX.incorrect(selectedWordEls)))
-            .then(() => recordAttempt(new Set(wordIds)))
-            .then(success => {
-                if (success) {
-                    oldAttempts.push(wordIds);
-                    return true;
-                } else {
-                    // something went wrong in backend
-                    return undefined;
-                }
-            });
+        console.debug("Incorrect attempt");
+        animationPromise = cardFX.incorrect(selectedWordEls);
     }
+    try {
+        await animationPromise;
+        if (await recordAttempt(new Set(wordIds)))
+            oldAttempts.push(wordIds);
+    } catch (error) {
+        console.error(error);
+        await popup("A client error occurred.");
+    }
+    return;
 }
+
 
 function selectWord(wordEl) {
     if (wordEl.classList.contains("selected")) {
@@ -125,9 +132,7 @@ function deselectHandler (e) {
 function submitHandler (e) {
     if (selectedWords >= 3) {
         console.debug("Submitting...");
-        submitAttempt()
-            .then(res => console.debug(res))
-            .catch(err => (console.error(err), popup("Client error occured.")));
+        submitAttempt();
     } else {
         console.debug(`Failed to submit. Wordcount: ${selectedWords}`);
     }
