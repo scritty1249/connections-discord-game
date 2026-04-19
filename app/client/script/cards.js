@@ -1,29 +1,66 @@
-// https://css-tricks.com/animating-layouts-with-the-flip-technique/
+import { waitForElementEvents } from "./utils.js";
 
-export function animateMove (originEl, targetEl, durationMs) { // FLIP
+// https://css-tricks.com/animating-layouts-with-the-flip-technique/
+export async function animateMove (originEl, targetEl, durationMs) { // FLIP
     const firstPos = originEl.getBoundingClientRect();
     const lastPos = targetEl.getBoundingClientRect();
     // invert
-    const deltaX = firstPos.left - lastPos.left;
-    const deltaY = firstPos.top - lastPos.top;
-    const deltaW = firstPos.width / lastPos.width;
-    const deltaH = firstPos.height / lastPos.height;
+    const deltaX = lastPos.left - firstPos.left;
+    const deltaY = lastPos.top - firstPos.top;
     return originEl.animate([
         {
             transformOrigin: "top left",
-            transform: `
-                translate(${deltaX}px, ${deltaY}px)
-                scale(${deltaW}, ${deltaH})
-            `
+            transform: `translate(${deltaX}px, ${deltaY}px)`
         }, {
             transformOrigin: "top left",
             transform: "none"
         }], {
             duration: durationMs,
-            easing: "ease-in-out",
-            fill: "both"
+            easing: "ease",
+            fill: "none"
         }
     ).finished;
+}
+
+export async function animateSwap (originEl, targetEl, durationMs) { // FLIP
+    const firstPos = originEl.getBoundingClientRect();
+    const lastPos = targetEl.getBoundingClientRect();
+    return await Promise.all([
+        originEl.animate([
+            {
+                transformOrigin: "top left",
+                transform: `translate(${
+                    lastPos.left - firstPos.left
+                }px, ${
+                    lastPos.top - firstPos.top
+                }px)`
+            }, {
+                transformOrigin: "top left",
+                transform: "none"
+            }], {
+                duration: durationMs,
+                easing: "ease",
+                fill: "none"
+            }
+        ).finished,
+        targetEl.animate([
+            {
+                transformOrigin: "top left",
+                transform: `translate(${
+                    firstPos.left - lastPos.left
+                }px, ${
+                    firstPos.top - lastPos.top
+                }px)`
+            }, {
+                transformOrigin: "top left",
+                transform: "none"
+            }], {
+                duration: durationMs,
+                easing: "ease",
+                fill: "none"
+            }
+        ).finished,
+    ]);
 }
 
 export function createCardElement (content, onclick, ...classList) {
@@ -72,7 +109,7 @@ export function popup (message, durationMs = 1500) {
     });
 };
 
-function playAnimation (element, ...classNames) {
+function playAnimation (element, ...classNames) { // [!] may be redundant now- see waitForElementEvents from utils.js
     return new Promise((resolve, reject) => {
         try {
             element.classList.add(...classNames);
@@ -85,6 +122,19 @@ function playAnimation (element, ...classNames) {
             reject(error);
         }
     });
+}
+
+export function getRowWordElements (rowIdx, wordContainer, columnCount = 4) {
+    return [...wordContainer.children].filter(wordEl => parseInt(wordEl.style.order) >= rowIdx && parseInt(wordEl.style.order) < rowIdx + columnCount);
+}
+
+export function sortCardEls (cardEls, wordIds) {
+    wordIds.forEach((wordId, idx) => {
+        const idStr = String(wordId);
+        const el = cardEls.filter(cardEl => cardEl.dataset.id == idStr)?.[0];
+        if (el)
+            el.style.order = String(idx);
+    })
 }
 
 export const cardFX = {
@@ -103,4 +153,41 @@ export const cardFX = {
             (cardEl) => playAnimation(cardEl, "shake-incorrect")
         ));
     },
+    moveElement: function (originEl, targetEl) {
+        return animateMove(originEl, targetEl, 2000)
+            .then(() => 
+                targetEl.replaceWith(originEl));
+    },
+    swapElements: function (originEl, targetEl) {
+        return animateSwap(originEl, targetEl, 2000)
+            .then(() => {
+                const originOrder = originEl.style.order;
+                originEl.style.order = targetEl.style.order;
+                targetEl.style.order = originOrder;
+        });
+    },
+    fadeInCategory: function (categoryEl, categoryContainer, wordContainer) {
+        const startIdx = categoryContainer.children.length * 4;
+        const wordEls = getRowWordElements(startIdx, wordContainer);
+        categoryContainer.appendChild(categoryEl);
+        return Promise.all(Array.from(wordEls, wordEl => {
+            wordEl.classList.add("hide");
+        })).then(() => {
+            
+        });
+    },
+    // plays the animation for shuffling- does not actually shuffle
+    shuffle: function (cardEls, wordIds) {
+        return new Promise((resolve, reject) => {
+            waitForElementEvents("transitionend", ...cardEls)
+                .then(() => sortCardEls(cardEls, wordIds))
+                .then(() => {
+                    const transitionPromise = waitForElementEvents("transitionend", ...cardEls)
+                    cardEls.forEach(el => el.classList.remove("blank"))
+                    return transitionPromise; })
+                .then(() => resolve());
+            cardEls.forEach(cardEl =>
+                cardEl.classList.add("blank"));
+        });
+    }
 };

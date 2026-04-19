@@ -16,7 +16,7 @@ export function verifyDiscordRequest(requestHeaders, requestBodyStr) {
     );
 }
 
-export async function fetchGameData(gameDate) {
+async function fetchGameData(gameDate) {
     const endpoint = ENDPOINT.GAME_DATA + dateToString(gameDate) + ".json"
     const request = new Request(endpoint, { credentials: "include" });
     const response = await (await fetch(request)).json();
@@ -30,13 +30,29 @@ export async function fetchGameData(gameDate) {
     return categories;
 }
 
-export async function storeGameData(gamedata) {
+async function storeGameData(gamedata) {
     const response = await GameDB.set(gamedata);
     if (response.status?.toUpperCase() !== "OK") {
         console.error(response);
         throw new Error(`Something went wrong while writing to Vercel Edge Database. Status: ${response.status}`);
     }
     return response;
+}
+
+export async function refreshGamestate() {
+    try {
+        const data = await fetchGameData(new Date());
+        console.debug(data);
+        console.info("Fetched gamedata");
+        console.debug(await storeGameData(data));
+        console.info("Saved gamedata");
+        await wipeAttempts();
+        console.log("Cleared userdata");
+        return true;
+    } catch (error) {
+        console.error(error);
+        return false;
+    }
 }
 
 export async function getGameData() {
@@ -48,22 +64,33 @@ export async function wipeAttempts() {
     return await UserDB.drop();
 }
 
-export async function getAttempts(userid) {
-    if (await UserDB.exists(userid)) {
-        return await UserDB.get(userid);
+export async function isUserAdmin(userid) {
+    const adminList = await GameDB.admins();
+    return adminList.includes(userid);
+}
+
+export async function getUserData(userid) {
+    if (await UserDB.exists(userid, "order")) {
+        const values = await Promise.all([
+            UserDB.getlist(userid, "attempts", []),
+            UserDB.get(userid, "order")
+        ]);
+        return {
+            attempts: values[0],
+            order: values[1]
+        };
     } else {
-        return [];
+        return {
+            attempts: [], // don't create a key for attempts unless needed (when they submit an attempt). We are on the FREE storage tier
+            order: null // while we could generate an order here, we can stay within quota much more easily by offloading the task to the client.
+        };
     }
 }
 
 export async function newAttempt(userid, attempt) { // attempt here is a Set of 4 ids (Numbers)
-    let attemptArr = [...attempt];
-    // [!] might need to validate a timestamp here
-    if (await UserDB.exists(userid)) {
-        const attempts = await UserDB.get(userid);
-        attempts.push(attemptArr);
-        return await UserDB.set(userid, attempts);
-    } else {
-        return await UserDB.set(userid, [attemptArr]);
-    }
+    return await UserDB.append(userid, "attempts", [...attempt]);
+}
+
+export async function newOrder(userid, order) { // order is an Array of 16 ids (Numbers)
+    return await UserDB.set(userid, "order", order);
 }

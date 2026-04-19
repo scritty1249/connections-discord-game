@@ -1,4 +1,4 @@
-import { getAttempts } from "../lib/server.js"
+import { getUserData } from "../lib/server.js"
 
 export async function GET(req) {
     const { searchParams: params } = new URL(req.url);
@@ -7,8 +7,8 @@ export async function GET(req) {
     } else {
         try {
             const id = params.get("id");
-            const prevAttempts = await getAttempts(id);
-            return Response.json({attempts: [...prevAttempts]});
+            const { attempts, order } = await getUserData(id);
+            return Response.json({attempts: attempts, order: order});
         } catch (err) {
             console.error("Vercel API error:", err);
             return Response.json({error: err.message}, {status: 500, statusText: "Internal server error"});

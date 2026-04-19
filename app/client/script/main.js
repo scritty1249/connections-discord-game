@@ -1,22 +1,57 @@
-import { isOverflowed, attemptIsRepeat, attemptIsCorrect, shuffle, attemptIsOneAway, softHypenateText, getCategoryData } from "./utils.js";
-import { animateMove, createCardElement, cardFX, popup, getCardElements, createCategoryElements } from "./cards.js";
+import { shuffle, attemptIsRepeat, attemptIsCorrect, attemptIsOneAway, softHypenateText, getCategoryData } from "./utils.js";
+import { getRowWordElements, createCardElement, cardFX, popup, sortCardEls, createCategoryElements } from "./cards.js";
 import * as Discord from "./discord.js";
 
 const API_ENDPOINT = window.origin + "/api";
 let discordSdk = null;
 let userData = null;
-let selectedWords = 0;
 let categories = null;
 let categoryIds = null;
-const oldAttempts = [];
-const categoryEls = [];
-const wordEls = [];
 
-async function recordAttempt (attempt) { // attempt is expected to be a Set of 4 numbers
+const ATTEMPTS = [];
+const ELEMENTS = {
+    WORDS: [],
+    CATEGORIES: [],
+    WORD_GRID: null,
+    CATEGORY_GRID: null,
+    MENU: null,
+    selectedCount: 0,
+    get SELECTED () {
+        return [...document.getElementsByClassName("selected")];
+    }
+};
+const ORDER = {
+    PREV: null,
+    CURR: null,
+    wasUpdated: true
+};
+const BUTTONS = {
+    SHUFFLE: null,
+    SUBMIT: null,
+    DESELECT: null
+};
+
+async function recordAttempt (attempt) { // attempt is expected to be a Set of 4 Numbers
     try {
+        const bodyData = {attempt: [...attempt]};
+        if (ORDER.wasUpdated)
+            bodyData.order = ORDER.CURR;
         const resp = await fetch(API_ENDPOINT + "/record-attempt?id=" + userData?.id, {
             method: "POST",
-            body: JSON.stringify({attempt: [...attempt]})
+            body: JSON.stringify(bodyData)
+        });
+        return resp.ok ? true : undefined;
+    } catch (err) {
+        console.error(err);
+        return undefined;
+    }
+}
+
+async function recordOrder (wordIds) { // wordIds is expected to be an Array of 16 Numbers
+    try {
+        const resp = await fetch(API_ENDPOINT + "/record-order?id=" + userData?.id, {
+            method: "POST",
+            body: JSON.stringify({order: wordIds})
         });
         return resp.ok ? true : undefined;
     } catch (err) {
@@ -26,97 +61,134 @@ async function recordAttempt (attempt) { // attempt is expected to be a Set of 4
 }
 
 // returns a Promise. Instantly resolves to false if attempt is a repeat
-function submitAttempt () { // old attempts returned from api as an Array of 4-Number Arrays (2D).
-    const selectedWordEls = [...document.getElementsByClassName("selected")];
+async function submitAttempt () { // old attempts returned from api as an Array of 4-Number Arrays (2D).
+    const selectedWordEls = ELEMENTS.SELECTED;
     if (selectedWordEls.length != 4) {
         console.error(`Something went wrong while submitting! ${selectedWordEls.length} words selected - 4 required`);
-        return;
+        return false;
     }
     const wordIds = Array.from(selectedWordEls, (wordEl) => parseInt(wordEl.dataset.id)).sort();
     selectedWordEls.forEach((wordEl) => wordEl.classList.remove("selected"));
-    selectedWords = 0;
-    // attempts within oldAttempts should already be sorted
-    if (attemptIsRepeat(wordIds, oldAttempts)) {
+    ELEMENTS.selectedCount = 0;
+    BUTTONS.DESELECT.classList.add("disabled");
+    BUTTONS.SUBMIT.classList.add("disabled");
+    // attempts within ATTEMPTS should already be sorted
+    let animationPromise;
+    if (attemptIsRepeat(wordIds, ATTEMPTS)) {
         console.debug("Repeated attempt");
-        return cardFX.repeatAttempt(selectedWordEls)
-            .then(() => popup("Already guessed!", 2000))
-            .then(() => false);
+        animationPromise = Promise.all([
+            cardFX.repeatAttempt(selectedWordEls),
+            popup("Already guessed!", 2000)
+        ]);
+    } else if (attemptIsCorrect(wordIds, categoryIds)) {
+        console.debug("Correct attempt");
+        animationPromise = playCorrectAttemptAnimation(
+            getCategoryElement(wordIds),
+            selectedWordEls,
+            document.getElementById("words"),
+            document.getElementById("categories")
+        );
+    } else if (attemptIsOneAway(wordIds, categoryIds)) {
+        console.debug("Close attempt");
+        animationPromise = popup("One away...", 2000);
     } else {
-        // jesus, how readable is this for others?
-        return (attemptIsCorrect(wordIds, categoryIds)
-            ? (console.debug("Correct attempt"), displayCategory(getCategoryElement(wordIds), selectedWordEls))
-            : (
-                attemptIsOneAway(wordIds, categoryIds)
-                    ? (console.debug("Close attempt"), popup("One away...", 2000))
-                    : console.debug("Incorrect attempt"),
-                cardFX.incorrect(selectedWordEls)))
-            .then(() => recordAttempt(new Set(wordIds)))
-            .then(success => {
-                if (success) {
-                    oldAttempts.push(wordIds);
-                    return true;
-                } else {
-                    // something went wrong in backend
-                    return undefined;
-                }
-            });
+        console.debug("Incorrect attempt");
+        animationPromise = cardFX.incorrect(selectedWordEls);
     }
+    try {
+        await animationPromise;
+        if (await recordAttempt(new Set(wordIds))) {
+            ATTEMPTS.push(wordIds);
+            return true;
+        }
+    } catch (error) {
+        console.error(error);
+        await popup("A client error occurred.");
+    }
+    return false;
 }
 
-function resizeCardHandler () {
-    const biggestCardEl = document.querySelector('#card-grid .card[data-largest="true"]');
-    if (biggestCardEl)
-        document.getElementById("card-grid").style.setProperty("--card-width", `${biggestCardEl?.offsetWidth}px`);
-    if (isOverflowed(document.getElementById("content-container"))) {
-        // [!] TODO: hide page, display screen size message
-    }
-}
 
 function selectWord(wordEl) {
     if (wordEl.classList.contains("selected")) {
-        selectedWords--;
+        ELEMENTS.selectedCount--;
         wordEl.classList.remove("selected");
-    } else if (selectedWords < 4) { // [!] this should be 3, but I can't fucking count I guess
-        selectedWords++;
+    } else if (ELEMENTS.selectedCount < 4) { // [!] this should be 3, but I can't fucking count I guess
+        ELEMENTS.selectedCount++;
         wordEl.classList.add("selected");
     }
 }
 
 function wordClickHandler (e) {
-    console.info(`clicked ${e.target?.innerHTML}`);
+    // console.info(`clicked ${e.target?.innerHTML}`);
     selectWord(e.target);
+    if (ELEMENTS.selectedCount < 4)
+        BUTTONS.SUBMIT.classList.add("disabled");
+    else
+        BUTTONS.SUBMIT.classList.remove("disabled");
+    if (ELEMENTS.selectedCount > 0)
+        BUTTONS.DESELECT.classList.remove("disabled");
+    else
+        BUTTONS.DESELECT.classList.add("disabled");
+}
+
+function shuffleHandler (e) {
+    const unsolvedIds = getUnsolvedWordIds(ELEMENTS.WORDS);
+    if (!unsolvedIds.length) return;
+    console.debug("Shuffling...");
+    ORDER.PREV = ORDER.CURR;
+    ORDER.CURR = [...ORDER.PREV.slice(0, unsolvedIds.length), ...shuffle(unsolvedIds)];
+    ORDER.wasUpdated = true;
+    cardFX.shuffle(ELEMENTS.WORDS, ORDER.CURR); // [!] inefficient, may not need to pass the entire current order- laziness
+}
+
+function deselectHandler (e) {
+
 }
 
 function submitHandler (e) {
-    if (selectedWords >= 3) {
+    if (ELEMENTS.selectedCount >= 3) {
         console.debug("Submitting...");
-        submitAttempt().then(res =>
-            console.debug(res));
+        submitAttempt()
+            .then((success) => {
+                if (!success)
+                    console.warn("Submission failed, attempt not recorded.");
+            });
     } else {
-        console.debug(`Failed to submit. Wordcount: ${selectedWords}`);
+        console.debug(`Failed to submit. Wordcount: ${ELEMENTS.selectedCount}`);
     }
 }
 
-function displayCategory (categoryEl, cardEls) { // [!] to be refactored upon completion
-    document.getElementById("categories").appendChild(categoryEl);
-    return Promise.all(Array.from(cardEls, cardEl => 
-            animateMove(cardEl, categoryEl, 2000)
-        )).then(() =>
-            cardEls.forEach(cardEl => cardEl.remove())
-        );
+function playCorrectAttemptAnimation (categoryEl, wordEls, wordContainer, categoryContainer) {
+    const sortedWordEls = wordEls.filter(wordEl => parseInt(wordEl.style.order) >= 4).toSorted((a, b) => parseInt(a.dataset.id) - parseInt(b.dataset.id));
+    const topRowWordEls = ELEMENTS.WORDS.filter(wordEl => parseInt(wordEl.style.order) < 4 && !wordEls.includes(wordEl)).sort((a, b) => parseInt(a.style.order) - parseInt(b.style.order)); // [!] horrible
+    return Promise.all(Array.from(sortedWordEls, (wordEl, idx) =>
+        cardFX.swapElements(wordEl, topRowWordEls[idx])))
+    .then(() => 
+        cardFX.fadeInCategory(categoryEl, categoryContainer, wordContainer));
 }
 
 function getCategoryElement (attempt) { // attempt is an Array of Numbers
-    const categoryEl = categoryEls.filter(categoryEl =>
+    const categoryEl = ELEMENTS.CATEGORIES.filter(categoryEl =>
         categoryEl.innerHTML == getCategoryData(attempt, categories));
     return (categoryEl.length) ? categoryEl[0] : undefined;
 }
 
+// [!] inefficient method- laziness
+function getUnsolvedWordIds (cardEls) {
+    return Array.from(cardEls.filter(e => !e.classList.contains("hide")), e => parseInt(e?.dataset?.id));
+}
+
+window.onunload = (e) => {
+    if (ORDER.wasUpdated)
+        recordOrder(ORDER.CURR);
+}
+
 window.onload = (e) => {
     const containerEl = document.getElementById("content-container");
-    const cardGridEl = document.getElementById("card-grid");
-    const menuEl = document.getElementById("buttons");
-    const categoryStackEl = document.getElementById("categories");
+    ELEMENTS.WORD_GRID = document.getElementById("words");
+    ELEMENTS.MENU = document.getElementById("buttons");
+    ELEMENTS.CATEGORY_GRID = document.getElementById("categories");
     Promise.all([
         // retreive categories
         fetch(API_ENDPOINT + "/get-gamedata")
@@ -141,66 +213,66 @@ window.onload = (e) => {
                 discordSdk = sdk;
                 userData = user;
                 return fetch(
-                        `${API_ENDPOINT}/get-attempts?id=${userData?.id}`
+                        `${API_ENDPOINT}/get-userdata?id=${userData?.id}`
                     ).then(resp => {
                         if (resp.ok) {
                             return resp.json();
                         } else {
                             console.error("Failed to contact userdata API endpoint"); // [!] add UI notification for this
                         }
-                    }).then(({attempts}) => {
+                    }).then(({ attempts, order }) => {
+                        ORDER.PREV = order;
                         if (attempts)
-                            oldAttempts.push(...Array.from(attempts, attempt => attempt.toSorted()));
+                            ATTEMPTS.push(...Array.from(attempts, attempt => attempt.toSorted()));
+                        if (order)
+                            ORDER.wasUpdated = false;
                     })
             })        
     ]).then((_) => {
-            console.debug(`Loaded previous attempts: ${oldAttempts}`);
+            console.debug(`Loaded previous attempts: ${ATTEMPTS}`);
             console.log(categories);
 
             // create card elements
             {
-                const omittedWordIds = [];
+                const solvedWordIds = [];
                 createCategoryElements(Object.keys(categories))
-                    .forEach(categoryEl => categoryEls.push(categoryEl));
+                    .forEach(categoryEl => ELEMENTS.CATEGORIES.push(categoryEl));
 
                 // init previous correct attempts (if any)
-                if (oldAttempts.length) {
-                    oldAttempts.filter(attempt => attemptIsCorrect(attempt, categoryIds))
+                if (ATTEMPTS.length) {
+                    ATTEMPTS.filter(attempt => attemptIsCorrect(attempt, categoryIds))
                         .forEach(correctAttempt => {
                             const categoryEl = getCategoryElement(correctAttempt);
                             if (categoryEl !== undefined) {
                                 // add word id to blacklist
-                                omittedWordIds.push(...correctAttempt);
+                                solvedWordIds.push(...correctAttempt);
                                 // display the category
                                 const ogTransDuration = getComputedStyle(categoryEl)?.getPropertyValue("--transition-duration");
                                 categoryEl.style.setProperty("--transition-duration", "0");
-                                categoryStackEl.appendChild(categoryEl);
+                                ELEMENTS.CATEGORY_GRID.appendChild(categoryEl);
                                 categoryEl.style.setProperty("--transition-duration", ogTransDuration);
                             } else {
                                 console.warn(`Failed to find a matching category with word IDs: ${correctAttempt}`)
                             }
                         });
                 }
+                const wordIds = [];
                 Object.entries(categories).forEach(([_, words]) => {
                     words.forEach(({word, id}) => {
-                        if (!omittedWordIds.includes(id)) {
-                            let wordEl = createCardElement(softHypenateText(word, 5), wordClickHandler, "word");
-                            wordEl.dataset.id = id;
-                            wordEls.push(wordEl);
-                        }
+                        let wordEl = createCardElement(softHypenateText(word, 5), wordClickHandler, "word");
+                        wordEl.dataset.id = id;
+                        if (solvedWordIds.includes(id))
+                            wordEl.classList.add("hide");
+                        ELEMENTS.WORDS.push(wordEl);
+                        wordIds.push(id);
                     });
                 });
-                // shuffle elements before inserting to page
-                shuffle(wordEls).forEach(wordEl => cardGridEl.append(wordEl));
+                ORDER.CURR = ORDER.wasUpdated ? shuffle(wordIds) : ORDER.PREV;
+                sortCardEls(ELEMENTS.WORDS, ORDER.CURR);
+                ELEMENTS.WORDS.forEach(wordEl => ELEMENTS.WORD_GRID.append(wordEl));
             }
 
             // main runtime
-            {
-                let biggestWordEl = wordEls.reduce((biggestWordEl, wordEl) => biggestWordEl.offsetWidth > wordEl.offsetWidth ? biggestWordEl : wordEl);
-                biggestWordEl.dataset.largest = "true";
-                biggestWordEl.style.setProperty("--card-width", "min-content");
-                resizeCardHandler();
-            }
             {
                 const avatarSize = 128;
                 const avatarUrl = Discord.AVATAR_URL(userData.id, userData.avatar, avatarSize);
@@ -211,12 +283,14 @@ window.onload = (e) => {
                 avatarEl.height = avatarSize;
                 containerEl.prepend(avatarEl);
             }
-            // create submit button
+            // buttons
             {
-                const submitBtn = createCardElement("submit", submitHandler, "submit");
-                menuEl.append(submitBtn);
+                BUTTONS.SUBMIT = document.getElementById("submit");
+                BUTTONS.SUBMIT.onclick = submitHandler;
+                BUTTONS.DESELECT = document.getElementById("deselect");
+                BUTTONS.DESELECT.onclick = deselectHandler;
+                BUTTONS.SHUFFLE = document.getElementById("shuffle");
+                BUTTONS.SHUFFLE.onclick = shuffleHandler;
             }
         });
 }
-
-window.onresize = resizeCardHandler;
