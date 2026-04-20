@@ -1,20 +1,6 @@
 import { dateToString } from "./utils.js";
 import * as ENDPOINT from "./endpoints.js";
 import { GameDB, UserDB } from "./store.js";
-import { default as nacl } from "tweetnacl";
-
-export function verifyDiscordRequest(requestHeaders, requestBodyStr) {
-    const sig = requestHeaders?.get("X-Signature-Ed25519");
-    const stamp = requestHeaders?.get("X-Signature-Timestamp");
-    const body = requestBodyStr; // raw body should be a str, not bytes
-
-    return nacl.sign.detached.verify(
-        // Buffers are Nodejs things, since vercel's Uint8Array.fromHex isn't fucking working
-        Buffer.from(stamp + body),
-        Buffer.from(sig, "hex"),
-        Buffer.from(process.env.DISCORD_PUBLIC_KEY, "hex")
-    );
-}
 
 async function fetchGameData(gameDate) {
     const endpoint = ENDPOINT.GAME_DATA + dateToString(gameDate) + ".json"
