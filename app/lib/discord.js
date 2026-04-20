@@ -92,12 +92,12 @@ export async function sendScorecard (channelId, usernames, scoreImage) {
             },
             body: form // 'Content-Type' header is set automatically
         });
-        
-        if (response.ok) {
-            const result = await response.json();
+        const okay = response.ok;
+        const result = await response.json();
+        if (okay) {
             return result;
         } else {
-            console.warn("Message error.");
+            console.warn("Message error:", result);
         }
     } catch (error) {
         console.error("Error:", error);
