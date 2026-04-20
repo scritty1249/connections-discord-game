@@ -1,28 +1,6 @@
 import { waitForElementEvents } from "./utils.js";
 
 // https://css-tricks.com/animating-layouts-with-the-flip-technique/
-export async function animateMove (originEl, targetEl, durationMs) { // FLIP
-    const firstPos = originEl.getBoundingClientRect();
-    const lastPos = targetEl.getBoundingClientRect();
-    // invert
-    const deltaX = lastPos.left - firstPos.left;
-    const deltaY = lastPos.top - firstPos.top;
-    return originEl.animate([
-        {
-            transformOrigin: "top left",
-            transform: `translate(${deltaX}px, ${deltaY}px)`
-        }, {
-            transformOrigin: "top left",
-            transform: "none"
-        }], {
-            direction: "reverse", // lmao idk
-            duration: durationMs,
-            easing: "ease",
-            fill: "none"
-        }
-    ).finished;
-}
-
 export async function animateSwap (originEl, targetEl, durationMs) { // FLIP
     const firstPos = originEl.getBoundingClientRect();
     const lastPos = targetEl.getBoundingClientRect();
@@ -78,11 +56,6 @@ export function createCardElement (content, onclick, ...classList) {
 export function createCategoryElements (categories) { // categories here is an Array of Strings, containing the category names
     return Array.from(categories.toSorted(), (category, idx) =>
         createCardElement(category, null, "category", `color-${idx + 1}`));
-}
-
-export function getCardElements (cardElements, ...ids) {
-    const idStrs = Array.from(ids, id => String(id));
-    return cardElements.filter(cardEl => idStrs.includes(cardEl.dataset.id));
 }
 
 // resolves to false if duration expires, and true if popup is dismissed by user
@@ -141,47 +114,37 @@ export function sortCardEls (cardEls, wordIds) {
 }
 
 export const cardFX = {
-    incorrect: function (cardEls) {
-        return Promise.all(Array.from(cardEls,
+    incorrect: async function (cardEls) {
+        return await Promise.all(Array.from(cardEls,
             (cardEl) => playAnimation(cardEl, "shake-incorrect", "incorrect")
         ));
     },
-    // [!] temp function, remove when animateMove() works
-    correct: function (cardEls) {
-        cardEls.forEach(cardEl => cardEl.classList.add("correct"));
-        return Promise.resolve();
-    },
-    repeatAttempt: function (cardEls) {
-        return Promise.all(Array.from(cardEls,
+    repeatAttempt: async function (cardEls) {
+        return await Promise.all(Array.from(cardEls,
             (cardEl) => playAnimation(cardEl, "shake-incorrect")
         ));
     },
-    moveElement: function (originEl, targetEl) {
-        return animateMove(originEl, targetEl, 2000)
-            .then(() => 
-                targetEl.replaceWith(originEl));
-    },
-    swapElements: function (originEl, targetEl) {
-        return animateSwap(originEl, targetEl, 2000)
+    swapElements: async function (originEl, targetEl) {
+        return await animateSwap(originEl, targetEl, 2000)
             .then(() => {
                 const originOrder = originEl.style.order;
                 originEl.style.order = targetEl.style.order;
                 targetEl.style.order = originOrder;
         });
     },
-    fadeInCategory: function (categoryEl, categoryContainer, wordContainer) {
+    fadeInCategory: async function (categoryEl, categoryContainer, wordContainer) {
         const startIdx = categoryContainer.children.length * 4;
         const wordEls = getRowWordElements(startIdx, wordContainer);
         categoryContainer.appendChild(categoryEl);
-        return Promise.all(Array.from(wordEls, wordEl => {
+        return await Promise.all(Array.from(wordEls, wordEl => {
             wordEl.classList.add("hide");
         })).then(() => {
             
         });
     },
     // plays the animation for shuffling- does not actually shuffle
-    shuffle: function (cardEls, wordIds) {
-        return new Promise((resolve, reject) => {
+    shuffle: async function (cardEls, wordIds) {
+        return await new Promise((resolve, reject) => {
             waitForElementEvents("transitionend", ...cardEls)
                 .then(() => sortCardEls(cardEls, wordIds))
                 .then(() => {
