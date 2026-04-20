@@ -165,6 +165,7 @@ export async function scoreImage(userdata, ...userdatas) { // expects {attempts,
 export async function updateChannelParticipants (channelid, userid, username, avatar) {
     const channeldata = ChannelsDB.get();
     const userdata = { name: String(username), avatar: String(avatar) };
+    console.debug("Before update:", JSON.stringify(channeldata));
     if (Object.hasOwn(channeldata, channelid)) {
         channeldata[channelid]["participants"][userid] = userdata;
     } else {
@@ -176,6 +177,7 @@ export async function updateChannelParticipants (channelid, userid, username, av
             }
         };
     }
+    console.debug("After update:", JSON.stringify(channeldata));
     return await setChannelsData(channeldata);
 }
 
