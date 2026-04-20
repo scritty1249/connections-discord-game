@@ -12,7 +12,8 @@
         "@vercel/functions": "latest",
         "@upstash/redis": "latest",
         "@discord/embedded-app-sdk": "latest",
-        "tweetnacl": "latest"
+        "tweetnacl": "latest",
+        "@napi-rs/canvas": "latest"
     },
     "devDependencies": {
         "esbuild": "latest"

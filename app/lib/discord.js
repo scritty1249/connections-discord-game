@@ -70,8 +70,11 @@ export async function sendScorecard (channelId, scoreImage) {
     // 3. Send Request
     try {
         const response = await fetch(url, {
-        method: "POST",
-        body: form // 'Content-Type' header is set automatically
+            method: "POST",
+            headers: {
+                Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`
+            },
+            body: form // 'Content-Type' header is set automatically
         });
         
         if (response.ok) {

@@ -1,4 +1,4 @@
-// [!] refactor upon function completion
+import { createCanvas, loadImage } from "@napi-rs/canvas";
 
 const CANVAS_SIZE = {
     width: 563,
@@ -53,15 +53,12 @@ export const CANVAS_POSITION = (cardNum, cardCount = 1) => {
 };
 
 export function createCanvas () {
-    const canvas = document.createElement("canvas");
-    canvas.setAttribute("width", String(CANVAS_SIZE.width));
-    canvas.setAttribute("height", String(CANVAS_SIZE.height));
+    const canvas = createCanvas(CANVAS_SIZE.width, CANVAS_SIZE.height);
 
     const ctx = canvas.getContext("2d");
     // fill canvas background
     ctx.fillStyle = COLOR.background;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
 
     return { canvas: canvas, ctx: ctx };
 }
@@ -137,16 +134,6 @@ export async function drawScoreVertical (ctx, position, attempts, userId, avatar
             currY,
             attempts ? attempts : [] // [!] (self) idiot-proofing
         ); 
-    });
-}
-
-async function loadImage (src) {
-    return await new Promise((resolve, reject) => {
-        const img = new Image()
-        img.crossOrigin = "anonymous";
-        img.src = src;
-        img.onload = () => resolve(img);
-        img.onerror = (err) => reject(err);
     });
 }
 
