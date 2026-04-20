@@ -1,7 +1,7 @@
 import { dateToString } from "./utils.js";
 import * as ENDPOINT from "./endpoints.js";
 import { GameDB, UserDB } from "./store.js";
-import { createCanvas, drawScoreHorizontal, drawScoreVertical, canvasToImage, CANVAS_POSITION } from "./draw.js";
+import { createCanvasObject, drawScoreHorizontal, drawScoreVertical, canvasToImage, CANVAS_POSITION } from "./draw.js";
 
 async function fetchGameData(gameDate) {
     const endpoint = ENDPOINT.GAME_DATA + dateToString(gameDate) + ".json"
@@ -27,7 +27,7 @@ async function storeGameData(gamedata) {
 }
 
 async function generateScoreImage(userdata, ...otherdata) { // userdata = { attempts, avatar, id }
-    const { canvas, ctx } = createCanvas();
+    const { canvas, ctx } = createCanvasObject();
     if (!otherdata.length) { // one player (horizontal card)
         const { id, attempts, avatar } = userdata;
         await drawScoreHorizontal(
