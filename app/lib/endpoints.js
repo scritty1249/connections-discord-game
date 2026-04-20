@@ -2,4 +2,5 @@ export const GAME_DATA = "https://www.nytimes.com/svc/connections/v2/"; // vX ma
 export const EDGE_WRITE = `https://api.vercel.com/v1/edge-config/${process.env.EDGE_CONFIG_ID}/items?teamId=${process.env.VERCEL_TEAM_ID}`;
 export const DISCORD_AUTH = "https://discord.com/api/oauth2/token";
 export const DISCORD_WEBHOOK_BASE = `https://discord.com/api/v10/webhooks/${process.env.DISCORD_CLIENT_ID}`;
-export const DISCORD_MESSAGE_BASE = "https://discordapp.com/api/channels";
+export const DISCORD_SEND_MESSAGE_BASE = "https://discordapp.com/api/channels";
+export const DISCORD_GET_MESSAGE_BASE = "https://discord.com/api/v9/channels";

@@ -209,14 +209,12 @@ async function queueGenerateCard () {
         keepalive: true,
         body: JSON.stringify({
             channel: discordSdk.channelId,
-            userdata: [
-                {
-                    userid: userData.id,
-                    name: userData.global_name,
-                    avatar: userData.avatar,
-                    attempts: ATTEMPTS
-                }
-            ]
+            userdata: {
+                userid: userData.id,
+                name: userData.global_name,
+                avatar: userData.avatar,
+                attempts: ATTEMPTS
+            }
         })}
     );
 }

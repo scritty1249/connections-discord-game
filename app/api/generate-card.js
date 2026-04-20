@@ -1,23 +1,39 @@
-import { scoreImage } from "../lib/server.js"
-import { sendScorecard } from "../lib/discord.js";
+import { scoreImage, getChannelsData, updateChannelParticipants, getAttempts, setChannelsData } from "../lib/server.js"
+import { sendChannelResults, getChannelMessage } from "../lib/discord.js";
 
 export async function POST(req) {
     const { userdata, channel, name }  = await req.json();
     if (
         !userdata
         || !channel
-        || !userdata.length
-        || userdata.some(d => d?.userid === undefined)
-        || userdata.some(d => d?.avatar === undefined)
-        || userdata.some(d => d?.attempts === undefined)
-        || userdata.some(d => d?.name === undefined)
+        || userdata.userid === undefined
+        || userdata.avatar === undefined
+        || userdata.attempts === undefined
+        || userdata.name === undefined
     ) {
         return new Response("Missing required payload.", {status: 400, statusText: "Missing required payload."});
     } else {
         try {
-            const imgBlob = await scoreImage(...userdata);
-            const respJson = await sendScorecard(channel, Array.from(userdata, d => d.name), imgBlob);
-            console.debug(respJson);
+            const { userid, avatar, attempts, name } = userdata;
+            await updateChannelParticipants(channel, userid, name, avatar);
+            const channelsdata = await getChannelsData();
+            const channeldata = channelsdata[channel];
+            const messageid = channeldata.message === null ? await getChannelMessage(channel, new Date()) : channeldata.message;
+            const usernames = [];
+            const userdatas = await Promise.all(Array.from(Object.keys(channeldata.participants), async (participant) => {
+                const participantattempts = participant == userid ? attempts : await getAttempts(participant);
+                usernames.push(channeldata.participants[participant].name);
+                return {
+                    attempts: participantattempts,
+                    avatar: channeldata.participants[participant].avatar,
+                    userid: participant
+                };
+            }));
+
+            const imgBlob = await scoreImage(...userdatas);
+            channeldata.message = await sendChannelResults(channel, usernames, imgBlob);
+            channelsdata[channel] = channeldata;
+            await setChannelsData(channelsdata);
             return new Response();
         } catch (err) {
             console.error("Fetch error:", err);

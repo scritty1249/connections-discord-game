@@ -5,6 +5,7 @@ import { EDGE_WRITE } from "./endpoints.js";
 
 const redis = Redis.fromEnv();
 const GAMEDATA_KEY = "gamedata";
+const CHANNELS_KEY = "channels";
 const ADM_LIST_KEY = "admins";
 
 // [!] TODO: determine if quota limits will allow for logging. If so, implement at THIS LAYER.
@@ -51,7 +52,7 @@ export const GameDB = {
     get: async function () {
         return await Edge.get(GAMEDATA_KEY);
     },
-    set: async function (gamedata) { // assumes key is already created, will fail if not.
+    set: async function (gamedata) {
         const response = await fetch(EDGE_WRITE, {
             method: "PATCH",
             headers: {
@@ -61,9 +62,34 @@ export const GameDB = {
             body: JSON.stringify({
                 items: [
                     {
-                        operation: "update",
+                        operation: "upsert",
                         key: GAMEDATA_KEY,
                         value: gamedata
+                    }
+                ]
+            })
+        });
+        return await response.json();
+    }
+};
+
+export const ChannelsDB = {
+    get: async function () {
+        return await Edge.get(MESSAGES_KEY);
+    },
+    set: async function (channelsdata) {
+        const response = await fetch(EDGE_WRITE, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${process.env.VERCEL_API_TOKEN}`
+            },
+            body: JSON.stringify({
+                items: [
+                    {
+                        operation: "upsert",
+                        key: CHANNELS_KEY,
+                        value: channelsdata
                     }
                 ]
             })

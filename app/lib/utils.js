@@ -19,3 +19,7 @@ export function unixTimestamp() {
 export async function promiseTimeout (timeoutMs) {
     return await new Promise((resolve) => setTimeout(resolve, timeoutMs));
 }
+
+export function isSameDay (date1, date2) {
+    return date1.toDateString() === date2.toDateString();
+}
