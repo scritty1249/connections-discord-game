@@ -66,15 +66,17 @@ export async function sendScorecard (channelId, usernames, scoreImage) {
             "description": "Illustration of challenge results",
             "filename": "scorecard.png"
         }],
-        components: {
-            type: 1,
-            components: {
-                type: 2,
-                label: "Play now!",
-                style: 1,
-                custom_id: "launch"
+        components: [
+            {
+                type: 1,
+                components: [{
+                    type: 2,
+                    label: "Play now!",
+                    style: 1,
+                    custom_id: "launch"
+                }]
             }
-        }
+        ]
     };
     form.append("payload_json", JSON.stringify(payload));
 
