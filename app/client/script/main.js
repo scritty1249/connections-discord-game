@@ -232,6 +232,12 @@ async function setWinScreen () {
     return await popup("You beat today's challenge!", 5000);
 }
 
+document.addEventListener("visibilitychange", (e) => {
+    if (document.visibilityState === "hidden") oncloseHandler();
+});
+document.addEventListener("pagehide", oncloseHandler);
+document.addEventListener("beforeunload", oncloseHandler);
+
 window.onload = (e) => {
     const containerEl = document.getElementById("content-container");
     ELEMENTS.WORD_GRID = document.getElementById("words");
@@ -330,8 +336,6 @@ window.onload = (e) => {
                 // avatarEl.width = avatarSize;
                 // avatarEl.height = avatarSize;
                 // containerEl.prepend(avatarEl);
-
-                discordSdk.subscribe("CLOSE", oncloseHandler);
             }
             // buttons
             {
