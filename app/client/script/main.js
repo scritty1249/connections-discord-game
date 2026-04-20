@@ -206,11 +206,13 @@ async function generateCard () {
         API_ENDPOINT + "/generate-card",
         new Blob([JSON.stringify({
             channel: discordSdk.channelId,
-            userdata: {
-                userid: userData.id,
-                avatar: userData.avatar,
-                attempts: ATTEMPTS
-            }
+            userdata: [
+                {
+                    userid: userData.id,
+                    avatar: userData.avatar,
+                    attempts: ATTEMPTS
+                }
+            ]
         })], {type: "application/json"})
     );
 }
