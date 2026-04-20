@@ -188,10 +188,11 @@ function getUnsolvedWordIds (cardEls) {
     return Array.from(cardEls.filter(e => !e.classList.contains("hide")), e => parseInt(e?.dataset?.id));
 }
 
-window.onunload = (e) => {
-    if (ORDER.wasUpdated)
+document.addEventListener("visibilitychange", (e) => {
+    if (document.visibilityState !== "hidden") return;
+    if (ORDER.wasUpdated && ORDER.CURR != null)
         recordOrder(ORDER.CURR);
-}
+})
 
 window.onload = (e) => {
     const containerEl = document.getElementById("content-container");
