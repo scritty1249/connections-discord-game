@@ -1,4 +1,4 @@
-import { createCanvas, loadImage } from "@napi-rs/canvas";
+import { createCanvas as createNapiCanvas , loadImage } from "@napi-rs/canvas";
 
 const CANVAS_SIZE = {
     width: 563,
@@ -52,8 +52,8 @@ export const CANVAS_POSITION = (cardNum, cardCount = 1) => {
         }
 };
 
-export function createCanvas () {
-    const canvas = createCanvas(CANVAS_SIZE.width, CANVAS_SIZE.height);
+export function createCanvasObject () {
+    const canvas = createNapiCanvas(CANVAS_SIZE.width, CANVAS_SIZE.height);
 
     const ctx = canvas.getContext("2d");
     // fill canvas background
