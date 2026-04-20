@@ -60,7 +60,7 @@ async function generateScoreImage(userdata, ...otherdata) { // userdata = { atte
 
 function matchAttemptsToCategory(attempts, categories) { // categories is raw data from Database
     const categoryDifficulties = {};
-    categories.forEach((category, idx) =>
+    Object.values(categories).forEach((category, idx) =>
         category.forEach((wordData) =>
             categoryDifficulties[String(wordData.id)] = idx));
     return Array.from(attempts, (attempt) =>
