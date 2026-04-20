@@ -31,7 +31,7 @@ export async function POST(req) {
             }));
 
             const imgBlob = await scoreImage(...userdatas);
-            channeldata.message = await sendChannelResults(channel, usernames, imgBlob);
+            channeldata.message = await sendChannelResults(channel, messageid, usernames, imgBlob);
             channelsdata[channel] = channeldata;
             await setChannelsData(channelsdata);
             return new Response();

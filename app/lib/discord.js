@@ -72,13 +72,13 @@ export async function getChannelMessage (channelid, currentDate) {
 }
 
 // this will attempt to update the message of the id provided. If one is not found, it will send a new message. Returns the id of the message created or updated for chaining.
-export async function sendChannelResults (messageid, usernames, scoreImage) {
-    const sendUrl = `${DISCORD_SEND_MESSAGE_BASE}/${channelId}/messages`;
+export async function sendChannelResults (channelid, messageid, usernames, scoreImage) {
+    const sendUrl = `${DISCORD_SEND_MESSAGE_BASE}/${channelid}/messages`;
     const updateUrl = `${sendUrl}/${messageid}`;
     const bodyForm = generateScorecardBody(usernames, scoreImage); // setting this as fetch body should set the content-type automatically
     try {
         const response = await fetch(updateUrl, {
-            method: "POST",
+            method: "PATCH",
             headers: {
                 Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`
             },
