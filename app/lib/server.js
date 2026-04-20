@@ -73,7 +73,6 @@ function matchAttemptsToCategory(attempts, categories) { // categories is raw da
     categoryData.forEach((category, idx) =>
         category.forEach((wordData) =>
             categoryDifficulties[String(wordData.id)] = idx + 1));
-    console.log(solvedCategories, Object.entries(categoryDifficulties)); // [!] testing
     return Array.from(attempts, (attempt) =>
         Array.from(attempt, (wordId) =>
             categoryDifficulties[String(wordId)] === undefined
