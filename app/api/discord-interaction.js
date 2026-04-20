@@ -14,10 +14,9 @@ export async function POST(req) {
             return new Response("invalid request signature", {status: 401}); // specified by discord api guidelines
         }
         const requestBody = JSON.parse(reqRawBody); // body should be JSON, should this should never fail...
-        const { type, user, token } = requestBody;
+        const { type, user, token, data } = requestBody;
         switch (type) {
             case 2: // APPLICATION COMMAND
-                const { data } = requestBody;
                 const commandName = data?.name?.toLowerCase();
                 // [!] holy aids nested switch, clean this up later...
                 switch (data?.type) { // shouldn't be null
@@ -82,7 +81,6 @@ export async function POST(req) {
                         };
                 };
             case 3: // Message component (button)
-                const { data } = requestBody;
                 switch (data?.custom_id?.toLowerCase()) {
                     case "launch": return commands.launch();
                 };
