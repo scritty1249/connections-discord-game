@@ -63,10 +63,11 @@ async function recordOrder (wordIds) { // wordIds is expected to be an Array of 
 }
 
 async function queueRecordOrder (wordIds) { // intended for use when page is navigated away from
-    navigator.sendBeacon(
-        API_ENDPOINT + "/record-order?id=" + userData?.id,
-        new Blob([JSON.stringify({order: wordIds})], {type: "application/json"})
-    )
+    return await fetch(API_ENDPOINT + "/record-order?id=" + userData?.id, {
+        method: "POST",
+        keepalive: true,
+        body: JSON.stringify({order: wordIds})
+    });
 }
 
 // returns a Promise. Instantly resolves to false if attempt is a repeat
@@ -203,9 +204,10 @@ function getUnsolvedWordIds (cardEls) {
 }
 
 async function queueGenerateCard () {
-    navigator.sendBeacon(
-        API_ENDPOINT + "/generate-card",
-        new Blob([JSON.stringify({
+    return await fetch(API_ENDPOINT + "/generate-card", {
+        method: "POST",
+        keepalive: true,
+        body: JSON.stringify({
             channel: discordSdk.channelId,
             userdata: [
                 {
@@ -215,7 +217,7 @@ async function queueGenerateCard () {
                     attempts: ATTEMPTS
                 }
             ]
-        })], {type: "application/json"})
+        })}
     );
 }
 
