@@ -53,8 +53,8 @@ export function createCardElement (content, onclick, ...classList) {
     return cardEl;
 }
 
-export function createCategoryElements (categories) { // categories here is an Array of Strings, containing the category names
-    return Array.from(categories.toSorted(), (category, idx) =>
+export function createCategoryElements (categories) { // categories here is an Array of Strings, containing the category names. Categories is assumed to be sorted by difficulty
+    return Array.from(categories, (category, idx) =>
         createCardElement(category, null, "category", `color-${idx + 1}`));
 }
 
