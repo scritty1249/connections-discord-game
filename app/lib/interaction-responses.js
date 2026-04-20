@@ -26,6 +26,7 @@ export function deferResponse(ephemeral = true) {
 }
 
 export function launch () {
+    console.debug("Application launched");
     return Response.json({
         type: 12,
         data: {
