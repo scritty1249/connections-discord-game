@@ -81,6 +81,12 @@ export async function POST(req) {
                                 return commands.messageResponse("Invalid context to use this command.");
                         };
                 };
+            case 3: // Message component (button)
+                const { data } = requestBody;
+                switch (data?.custom_id?.toLowerCase()) {
+                    case "launch": return commands.launch();
+                };
+            break;
             case 1: // PING
             default:
                 return Response.json({type: 1}); // ACK/PONG
