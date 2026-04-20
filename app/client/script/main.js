@@ -62,6 +62,13 @@ async function recordOrder (wordIds) { // wordIds is expected to be an Array of 
     }
 }
 
+async function queueRecordOrder (wordIds) { // intended for use when page is navigated away from
+    sendBeacon(
+        API_ENDPOINT + "/record-order?id=" + userData?.id,
+        new Blob([JSON.stringify({order: wordIds})], {type: "application/json"})
+    )
+}
+
 // returns a Promise. Instantly resolves to false if attempt is a repeat
 async function submitAttempt () { // old attempts returned from api as an Array of 4-Number Arrays (2D).
     const selectedWordEls = ELEMENTS.SELECTED;
@@ -191,7 +198,7 @@ function getUnsolvedWordIds (cardEls) {
 document.addEventListener("visibilitychange", (e) => {
     if (document.visibilityState !== "hidden") return;
     if (ORDER.wasUpdated && ORDER.CURR != null)
-        recordOrder(ORDER.CURR);
+        queueRecordOrder(ORDER.CURR);
 })
 
 window.onload = (e) => {
