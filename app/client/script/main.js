@@ -96,7 +96,7 @@ async function submitAttempt () { // old attempts returned from api as an Array 
             selectedWordEls,
             document.getElementById("words"),
             document.getElementById("categories")
-        ).then(() => queueRecordOrder());
+        ).then(() => { queueRecordOrder() });
     } else if (attemptIsOneAway(wordIds, categoryIds)) {
         console.debug("Close attempt");
         animationPromise = popup("One away...", 2000);
@@ -219,7 +219,7 @@ async function queueGenerateCard () {
     );
 }
 
-function heartbeatHandler () {
+function oncloseHandler () {
     if (ORDER.wasUpdated && ORDER.CURR != null) {
         queueRecordOrder(ORDER.CURR);
         queueGenerateCard(); // [!] may run in conflict with queueRecordOrder()
@@ -330,6 +330,8 @@ window.onload = (e) => {
                 // avatarEl.width = avatarSize;
                 // avatarEl.height = avatarSize;
                 // containerEl.prepend(avatarEl);
+
+                discordSdk.subscribe("CLOSE", oncloseHandler);
             }
             // buttons
             {
@@ -340,7 +342,5 @@ window.onload = (e) => {
                 BUTTONS.SHUFFLE = document.getElementById("shuffle");
                 BUTTONS.SHUFFLE.onclick = shuffleHandler;
             }
-            setInterval(heartbeatHandler, 30 * 1000);
-
         });
 }
