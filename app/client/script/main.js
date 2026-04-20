@@ -166,7 +166,7 @@ function submitHandler (e) {
                     console.warn("Submission failed, attempt not recorded."); })
             .then(() => {
                 if (ELEMENTS.CATEGORY_GRID.children.length != 4) {
-                    generateCard();
+                    generateCard(); // [!] testing
                     return;
                 }
                 return setWinScreen();

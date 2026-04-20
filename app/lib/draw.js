@@ -140,16 +140,6 @@ export async function drawScoreVertical (ctx, position, attempts, userId, avatar
     });
 }
 
-export async function canvasToImage (canvas) {
-    return await new Promise((resolve, reject) => {
-            try {
-                canvas.toBlob(resolve, "image/png");
-            } catch (error) {
-                reject(error);
-            }
-    });
-}
-
 async function loadImage (src) {
     return await new Promise((resolve, reject) => {
         const img = new Image()
