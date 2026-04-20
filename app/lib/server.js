@@ -65,7 +65,7 @@ function matchAttemptsToCategory(attempts, categories) { // categories is raw da
     attempts.forEach((attempt) => {
         for ( const [idx, cd] of categoryData.entries()) {
             if (attempt.every(wordId => cd.includes(wordId))) {
-                solvedCategories.push(idx + 1);
+                solvedCategories.push(idx);
                 return;
             }
         }
@@ -73,11 +73,12 @@ function matchAttemptsToCategory(attempts, categories) { // categories is raw da
     categoryData.forEach((category, idx) =>
         category.forEach((wordData) =>
             categoryDifficulties[String(wordData.id)] = idx + 1));
+    console.log(solvedCategories, Object.entries(categoryDifficulties)); // [!] testing
     return Array.from(attempts, (attempt) =>
         Array.from(attempt, (wordId) =>
             categoryDifficulties[String(wordId)] === undefined
             ? -1
-            : solvedCategories.includes(categoryDifficulties[String(wordId)])
+            : solvedCategories.includes(categoryDifficulties[String(wordId)] - 1)
             ? categoryDifficulties[String(wordId)]
             : 0
         ));
