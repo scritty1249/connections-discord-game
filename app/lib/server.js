@@ -65,7 +65,7 @@ function matchAttemptsToCategory(attempts, categories) { // categories is raw da
             categoryDifficulties[String(wordData.id)] = idx));
     return Array.from(attempts, (attempt) =>
         Array.from(attempt, (wordId) =>
-            categoryDifficulties[String(wordId)] ? categoryDifficulties[String(wordId)] : -1));
+            categoryDifficulties[String(wordId)] === undefined ? -1 : categoryDifficulties[String(wordId)]));
 }
 
 export async function refreshGamestate() {
