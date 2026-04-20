@@ -7,18 +7,37 @@ const CANVAS_SIZE = {
 const CARD_SIZE = {
     horizontal: {
         width: CANVAS_SIZE.width * .7,
-        height: CANVAS_SIZE.height * .85
+        height: CANVAS_SIZE.height * .85,
+        gap: 15
     },
     vertical: {
         width: (CANVAS_SIZE.width / 4) - ((CANVAS_SIZE.width / 4) / 6),
-        height: CANVAS_SIZE.height * .85
+        height: CANVAS_SIZE.height * .85,
+        gap: 10
     },
     thickness: 2
 };
-const AVATAR_SIZE = 128;
+const AVATAR_SIZE = {
+    horizontal: 128,
+    vertical: 64  
+};
+const ATTEMPT_SQUARE = {
+    horizontal: {
+        size: 50,
+        gap: 5
+    },
+    vertical: {
+        size: 25,
+        gap: 2
+    }
+};
 const COLOR = {
     background: "#151515",
-    cardBorder: "#272728"
+    cardBorder: "#272728",
+    "category-0": "#f7Da21",
+    "category-1": "#b5e352",
+    "category-2": "#00a2b3",
+    "category-3": "#a354a8"
 };
 
 export function createCanvas () {
@@ -36,7 +55,7 @@ export function createCanvas () {
 }
 
 export async function drawScoreVertical (ctx, position, attempts, userId, avatarName) {
-    const avatarUrl = `https://cdn.discordapp.com/avatars/${userId}/${avatarName}.png?size=${AVATAR_SIZE}`;
+    const avatarUrl = `https://cdn.discordapp.com/avatars/${userId}/${avatarName}.png?size=${AVATAR_SIZE.vertical}`;
     return await Promise.all([
         loadImage(avatarUrl)
     ]).then(([
@@ -56,9 +75,15 @@ export async function drawScoreVertical (ctx, position, attempts, userId, avatar
                 y: position.y + (CARD_SIZE.vertical.height / 2)
             }
         };
-        drawCardBorder(ctx, DIMS.start.x, DIMS.start.y, DIMS.end.x, DIMS.end.y);
-        drawAvatar(ctx, DIMS.center.x - (AVATAR_SIZE / 2), DIMS.start.y + 10, avatarImg, AVATAR_SIZE);
-
+        let currY = DIMS.start.y + CARD_SIZE.vertical.gap;
+        drawCardBorder(ctx, DIMS.start.x, DIMS.start.y, DIMS.end.x - DIMS.start.x, DIMS.end.y - DIMS.start.y);
+        drawAvatar(ctx, DIMS.center.x - (AVATAR_SIZE.vertical / 2), currY, avatarImg, AVATAR_SIZE.vertical);
+        currY += AVATAR_SIZE.vertical + CARD_SIZE.vertical.gap;
+        drawAttemptGridVertical(ctx,
+            DIMS.center.x - (((ATTEMPT_SQUARE.vertical.gap * 3) + (ATTEMPT_SQUARE.vertical.size * 4)) / 2),
+            currY,
+            attempts ? attempts : [] // [!] (self) idiot-proofing
+        ); 
     });
 }
 
@@ -82,7 +107,7 @@ async function loadImage (src) {
     });
 }
 
-function drawAttemptSquare (ctx, x, y, color, size = 50) {
+function drawAttemptSquare (ctx, x, y, color, size) {
     const ogFillStyle = ctx.fillStyle;
     ctx.beginPath();
     ctx.roundRect(x, y, size, size, size / 5);
@@ -110,4 +135,18 @@ function drawCardBorder (ctx, x, y, width, height) {
     ctx.stroke();
     ctx.strokeStyle = ogStrokeStyle;
     ctx.lineWidth = ogLineWidth;
+}
+
+function drawAttemptGridVertical (ctx, x, y, attemptCategories) { // attemptCategories here is an Array of attempts, where each attempt is an Array of Numbers that corrospond to a specific category (0-3).
+    const attempts = Object.assign(new Array(6).fill([-1, -1, -1, -1]), attemptCategories.slice(-6));
+    attempts.forEach((attempt, row) => {
+        const offsetY = row * (ATTEMPT_SQUARE.vertical.gap + ATTEMPT_SQUARE.vertical.size);
+        attempt.forEach((category, col) => {
+            const offsetX = col * (ATTEMPT_SQUARE.vertical.gap + ATTEMPT_SQUARE.vertical.size);
+            if (category === -1)
+                drawCardBorder(ctx, x + offsetX, y + offsetY, ATTEMPT_SQUARE.vertical.size, ATTEMPT_SQUARE.vertical.size);
+            else
+                drawAttemptSquare(ctx, x + offsetX, y + offsetY, COLOR[`category-${category}`], ATTEMPT_SQUARE.vertical.size);
+        });
+    });
 }
