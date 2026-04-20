@@ -35,10 +35,11 @@ const ATTEMPT_SQUARE = {
 const COLOR = {
     background: "#151515",
     cardBorder: "#272728",
-    "category-0": "#f7Da21",
-    "category-1": "#b5e352",
-    "category-2": "#00a2b3",
-    "category-3": "#a354a8"
+    "category-0": "#272728", // unknown/hidden answer attempt
+    "category-1": "#f7Da21",
+    "category-2": "#b5e352",
+    "category-3": "#00a2b3",
+    "category-4": "#a354a8"
 };
 
 export const CANVAS_POSITION = (cardNum, cardCount = 1) => {
@@ -167,7 +168,7 @@ function drawCardBorder (ctx, x, y, width, height) {
     ctx.lineWidth = ogLineWidth;
 }
 
-function drawAttemptGridVertical (ctx, x, y, attemptCategories) { // attemptCategories here is an Array of attempts, where each attempt is an Array of Numbers that corrospond to a specific category (0-3).
+function drawAttemptGridVertical (ctx, x, y, attemptCategories) { // attemptCategories here is an Array of attempts, where each attempt is an Array of Numbers that corrospond to a specific category (1-4). 0 Marks an unknown category and -1 marks an unused attempt.
     const attempts = Object.assign(new Array(6).fill([-1, -1, -1, -1]), attemptCategories.slice(-6));
     attempts.forEach((attempt, row) => {
         const offsetY = row * (ATTEMPT_SQUARE.vertical.gap + ATTEMPT_SQUARE.vertical.size);
@@ -181,7 +182,7 @@ function drawAttemptGridVertical (ctx, x, y, attemptCategories) { // attemptCate
     });
 }
 
-function drawAttemptGridHorizontal (ctx, x, y, attemptCategories) { // attemptCategories here is an Array of attempts, where each attempt is an Array of Numbers that corrospond to a specific category (0-3).
+function drawAttemptGridHorizontal (ctx, x, y, attemptCategories) { // attemptCategories here is an Array of attempts, where each attempt is an Array of Numbers that corrospond to a specific category (1-4).
     const attempts = Object.assign(new Array(6).fill([-1, -1, -1, -1]), attemptCategories.slice(-6));
     attempts.forEach((attempt, row) => {
         const offsetY = row * (ATTEMPT_SQUARE.horizontal.gap + ATTEMPT_SQUARE.horizontal.size);

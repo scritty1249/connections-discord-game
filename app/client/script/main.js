@@ -202,7 +202,7 @@ function getUnsolvedWordIds (cardEls) {
     return Array.from(cardEls.filter(e => !e.classList.contains("hide")), e => parseInt(e?.dataset?.id));
 }
 
-async function generateCard () {
+async function queueGenerateCard () {
     navigator.sendBeacon(
         API_ENDPOINT + "/generate-card",
         new Blob([JSON.stringify({
@@ -219,16 +219,20 @@ async function generateCard () {
     );
 }
 
+function oncloseHandler () {
+    if (ORDER.wasUpdated && ORDER.CURR != null)
+        queueRecordOrder(ORDER.CURR);
+    queueGenerateCard(); // [!] may run in conflict with queueRecordOrder()
+}
+
 async function setWinScreen () {
-    generateCard();
+    queueGenerateCard();
     ELEMENTS.MENU.classList.add("hide");
     return await popup("You beat today's challenge!", 5000);
 }
 
 document.addEventListener("visibilitychange", (e) => {
-    if (document.visibilityState !== "hidden") return;
-    if (ORDER.wasUpdated && ORDER.CURR != null)
-        queueRecordOrder(ORDER.CURR);
+    if (document.visibilityState === "hidden") oncloseHandler();
 })
 
 window.onload = (e) => {

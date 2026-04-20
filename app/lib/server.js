@@ -60,12 +60,27 @@ async function generateScoreImage(userdata, ...otherdata) { // userdata = { atte
 
 function matchAttemptsToCategory(attempts, categories) { // categories is raw data from Database
     const categoryDifficulties = {};
-    Object.values(categories).forEach((category, idx) =>
+    const solvedCategories = [];
+    const categoryData = Object.values(categories);
+    attempts.forEach((attempt) => {
+        for ( const [idx, cd] of categoryData.entries()) {
+            if (attempt.every(wordId => cd.includes(wordId))) {
+                solvedCategories.push(idx);
+                return;
+            }
+        }
+    });
+    categoryData.forEach((category, idx) =>
         category.forEach((wordData) =>
-            categoryDifficulties[String(wordData.id)] = idx));
+            categoryDifficulties[String(wordData.id)] = idx + 1));
     return Array.from(attempts, (attempt) =>
         Array.from(attempt, (wordId) =>
-            categoryDifficulties[String(wordId)] === undefined ? -1 : categoryDifficulties[String(wordId)]));
+            categoryDifficulties[String(wordId)] === undefined
+            ? -1
+            : solvedCategories.includes(categoryDifficulties[String(wordId)])
+            ? categoryDifficulties[String(wordId)]
+            : 0
+        ));
 }
 
 export async function refreshGamestate() {
