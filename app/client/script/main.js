@@ -96,7 +96,7 @@ async function submitAttempt () { // old attempts returned from api as an Array 
             selectedWordEls,
             document.getElementById("words"),
             document.getElementById("categories")
-        );
+        ).then(() => queueRecordOrder());
     } else if (attemptIsOneAway(wordIds, categoryIds)) {
         console.debug("Close attempt");
         animationPromise = popup("One away...", 2000);
