@@ -6,6 +6,17 @@
     --white: #efefe6;
 }
 
+* {
+    /* IE and Edge */
+    -ms-overflow-style: none;
+    /* Firefox */
+    scrollbar-width: none;
+
+    /* Chrome, Safari and Opera */
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
 
 body {
     background-color: var(--black);
