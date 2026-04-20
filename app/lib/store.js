@@ -75,7 +75,7 @@ export const GameDB = {
 
 export const ChannelsDB = {
     get: async function () {
-        return await Edge.get(MESSAGES_KEY);
+        return await Edge.get(CHANNELS_KEY);
     },
     set: async function (channelsdata) {
         const response = await fetch(EDGE_WRITE, {

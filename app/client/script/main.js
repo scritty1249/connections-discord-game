@@ -145,10 +145,12 @@ function wordClickHandler (e) {
 function shuffleHandler (e) {
     const unsolvedIds = getUnsolvedWordIds(ELEMENTS.WORDS);
     if (!unsolvedIds.length) return;
+    BUTTONS.SHUFFLE.classList.add("disabled");
     console.debug("Shuffling...");
     ORDER.PREV = ORDER.CURR;
     ORDER.CURR = [...ORDER.PREV.slice(0, ELEMENTS.WORDS.length - unsolvedIds.length), ...shuffle(unsolvedIds)];
-    cardFX.shuffle(ELEMENTS.WORDS, ORDER.CURR); // [!] inefficient, may not need to pass the entire current order- laziness
+    cardFX.shuffle(ELEMENTS.WORDS, ORDER.CURR) // [!] inefficient, may not need to pass the entire current order- laziness
+        .finally(() => BUTTONS.SHUFFLE.classList.remove("disabled"));
 }
 
 function deselectHandler (e) {
