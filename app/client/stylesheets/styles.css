@@ -76,6 +76,9 @@ body {
     > div.pill {
         width: 80%;
     }
+    &.hide {
+        display: none;
+    }
 }
 
 #words {

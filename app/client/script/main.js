@@ -1,5 +1,5 @@
 import { shuffle, attemptIsRepeat, attemptIsCorrect, attemptIsOneAway, softHypenateText, getCategoryData } from "./utils.js";
-import { getRowWordElements, createCardElement, cardFX, popup, sortCardEls, createCategoryElements } from "./cards.js";
+import { createCardElement, cardFX, popup, sortCardEls, createCategoryElements } from "./cards.js";
 import * as Discord from "./discord.js";
 
 const API_ENDPOINT = window.origin + "/api";
@@ -163,7 +163,10 @@ function submitHandler (e) {
         submitAttempt()
             .then((success) => {
                 if (!success)
-                    console.warn("Submission failed, attempt not recorded.");
+                    console.warn("Submission failed, attempt not recorded."); })
+            .then(() => {
+                if (ELEMENTS.CATEGORY_GRID.children.length != 4) return;
+                return setWinScreen();
             });
     } else {
         console.debug(`Failed to submit. Wordcount: ${ELEMENTS.selectedCount}`);
@@ -193,6 +196,11 @@ function getCategoryElement (attempt) { // attempt is an Array of Numbers
 // [!] inefficient method- laziness
 function getUnsolvedWordIds (cardEls) {
     return Array.from(cardEls.filter(e => !e.classList.contains("hide")), e => parseInt(e?.dataset?.id));
+}
+
+async function setWinScreen () {
+    ELEMENTS.MENU.classList.add("hide");
+    return await popup("You beat today's challenge!", 5000);
 }
 
 document.addEventListener("visibilitychange", (e) => {

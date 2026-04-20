@@ -1,4 +1,5 @@
-import { verifyDiscordRequest, isUserAdmin, wipeAttempts, refreshGamestate } from "../lib/server.js";
+import { isUserAdmin, wipeAttempts, refreshGamestate } from "../lib/server.js";
+import { verify } from "../lib/discord.js";
 import * as commands from "../lib/interaction-responses.js";
 import { promiseTimeout } from "../lib/utils.js";
 import { waitUntil } from "@vercel/functions";
@@ -7,7 +8,7 @@ export async function POST(req) {
     try {
         const reqRawBody = await req.text();
         const reqHeaders = req.headers;
-        const isVerified = verifyDiscordRequest(reqHeaders, reqRawBody);
+        const isVerified = verify(reqHeaders, reqRawBody);
         if (!isVerified) {
             console.info("Recieved an invalid interaction request"); // discord will purposefully send invalid requests to test the endpoint periodically
             return new Response("invalid request signature", {status: 401}); // specified by discord api guidelines
