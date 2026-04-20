@@ -1,6 +1,7 @@
 import { dateToString } from "./utils.js";
 import * as ENDPOINT from "./endpoints.js";
 import { GameDB, UserDB } from "./store.js";
+import { createCanvas, drawScoreHorizontal, drawScoreVertical, canvasToImage, CANVAS_POSITION } from "./draw.js";
 
 async function fetchGameData(gameDate) {
     const endpoint = ENDPOINT.GAME_DATA + dateToString(gameDate) + ".json"
@@ -23,6 +24,48 @@ async function storeGameData(gamedata) {
         throw new Error(`Something went wrong while writing to Vercel Edge Database. Status: ${response.status}`);
     }
     return response;
+}
+
+async function generateScoreImage(userdata, ...otherdata) { // userdata = { attempts, avatar, id }
+    const { canvas, ctx } = createCanvas();
+    if (!otherdata.length) { // one player (horizontal card)
+        const { id, attempts, avatar } = userdata;
+        await drawScoreHorizontal(
+            ctx,
+            CANVAS_POSITION(1),
+            attempts,
+            id,
+            avatar
+        );
+    } else { // multiple players (vertical cards)
+        const datas = [userdata, ...otherdata.slice(0, Math.min(otherdata.length, 3))];
+        const draws = Promise.all(Array.from(datas,
+            ({ id, attempts, avatar }, idx) =>
+            drawScoreVertical(
+                ctx,
+                CANVAS_POSITION(idx + 1, datas.length),
+                attempts,
+                id,
+                avatar
+            )
+        ));
+        try {
+            await draws;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    return await canvasToImage(canvas);
+}
+
+function matchAttemptsToCategory(attempts, categories) { // categories is raw data from Database
+    const categoryDifficulties = {};
+    categories.forEach((category, idx) =>
+        category.forEach((wordData) =>
+            categoryDifficulties[String(wordData.id)] = idx));
+    return Array.from(attempts, (attempt) =>
+        Array.from(attempt, (wordId) =>
+            categoryDifficulties[String(wordId)] ? categoryDifficulties[String(wordId)] : -1));
 }
 
 export async function refreshGamestate() {
@@ -80,3 +123,12 @@ export async function newAttempt(userid, attempt) { // attempt here is a Set of 
 export async function newOrder(userid, order) { // order is an Array of 16 ids (Numbers)
     return await UserDB.set(userid, "order", order);
 }
+
+export async function scoreImage(userdata, ...userdatas) { // expects {attempts, userid, avatar}
+    const datas = [userdata, ...userdatas];
+    const gamedata = await getGameData();
+    const newData = Array.from(datas, ({attempts, userid, avatar}) => 
+        ({attempts: matchAttemptsToCategory(attempts, gamedata), id: userid, avatar: avatar}));
+    return await generateScoreImage(...newData);
+}
+
