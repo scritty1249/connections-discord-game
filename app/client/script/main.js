@@ -165,7 +165,10 @@ function submitHandler (e) {
                 if (!success)
                     console.warn("Submission failed, attempt not recorded."); })
             .then(() => {
-                if (ELEMENTS.CATEGORY_GRID.children.length != 4) return;
+                if (ELEMENTS.CATEGORY_GRID.children.length != 4) {
+                    generateCard();
+                    return;
+                }
                 return setWinScreen();
             });
     } else {
@@ -198,7 +201,22 @@ function getUnsolvedWordIds (cardEls) {
     return Array.from(cardEls.filter(e => !e.classList.contains("hide")), e => parseInt(e?.dataset?.id));
 }
 
+async function generateCard () {
+    navigator.sendBeacon(
+        API_ENDPOINT + "/generate-card",
+        new Blob([JSON.stringify({
+            channel: discordSdk.channelId,
+            userdata: {
+                userid: userData.id,
+                avatar: userData.avatar,
+                attempts: ATTEMPTS
+            }
+        })], {type: "application/json"})
+    );
+}
+
 async function setWinScreen () {
+    generateCard();
     ELEMENTS.MENU.classList.add("hide");
     return await popup("You beat today's challenge!", 5000);
 }

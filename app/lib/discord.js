@@ -48,3 +48,40 @@ export async function message (channelId, content, components = []) {
         })
         .then((res) => res.ok ? res.json() : null);
 }
+
+export async function sendScorecard (channelId, scoreImage) {
+    const url = `${DISCORD_MESSAGE_BASE}/${channelId}/messages`;
+    const form = new FormData();
+
+    // 1. Prepare JSON Payload
+    const payload = {
+        content: "Test",
+        attachments: [{
+            "id": 0,
+            "description": "Illustration of challenge results",
+            "filename": "scorecard.png"
+        }]
+    };
+    form.append("payload_json", JSON.stringify(payload));
+
+    // 2. Append File
+    form.append("files[0]", scoreImage, "scorecard.png");
+
+    // 3. Send Request
+    try {
+        const response = await fetch(url, {
+        method: "POST",
+        body: form // 'Content-Type' header is set automatically
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            console.log("Success:", result);
+            return result;
+        } else {
+            console.warn("Message error.");
+        }
+    } catch (error) {
+        console.error("Error:", error);
+    }
+}
