@@ -219,10 +219,11 @@ async function queueGenerateCard () {
     );
 }
 
-function oncloseHandler () {
-    if (ORDER.wasUpdated && ORDER.CURR != null)
+function heartbeatHandler () {
+    if (ORDER.wasUpdated && ORDER.CURR != null) {
         queueRecordOrder(ORDER.CURR);
-    queueGenerateCard(); // [!] may run in conflict with queueRecordOrder()
+        queueGenerateCard(); // [!] may run in conflict with queueRecordOrder()
+    }
 }
 
 async function setWinScreen () {
@@ -230,10 +231,6 @@ async function setWinScreen () {
     ELEMENTS.MENU.classList.add("hide");
     return await popup("You beat today's challenge!", 5000);
 }
-
-document.addEventListener("visibilitychange", (e) => {
-    if (document.visibilityState === "hidden") oncloseHandler();
-})
 
 window.onload = (e) => {
     const containerEl = document.getElementById("content-container");
@@ -325,14 +322,14 @@ window.onload = (e) => {
 
             // main runtime
             {
-                const avatarSize = 128;
-                const avatarUrl = Discord.AVATAR_URL(userData.id, userData.avatar, avatarSize);
-                const avatarEl = document.createElement("img");
-                avatarEl.classList.add("icon");
-                avatarEl.src = avatarUrl;
-                avatarEl.width = avatarSize;
-                avatarEl.height = avatarSize;
-                containerEl.prepend(avatarEl);
+                // const avatarSize = 128;
+                // const avatarUrl = Discord.AVATAR_URL(userData.id, userData.avatar, avatarSize);
+                // const avatarEl = document.createElement("img");
+                // avatarEl.classList.add("icon");
+                // avatarEl.src = avatarUrl;
+                // avatarEl.width = avatarSize;
+                // avatarEl.height = avatarSize;
+                // containerEl.prepend(avatarEl);
             }
             // buttons
             {
@@ -343,5 +340,7 @@ window.onload = (e) => {
                 BUTTONS.SHUFFLE = document.getElementById("shuffle");
                 BUTTONS.SHUFFLE.onclick = shuffleHandler;
             }
+            setInterval(heartbeatHandler, 30 * 1000);
+
         });
 }

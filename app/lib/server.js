@@ -65,7 +65,7 @@ function matchAttemptsToCategory(attempts, categories) { // categories is raw da
     attempts.forEach((attempt) => {
         for ( const [idx, cd] of categoryData.entries()) {
             if (attempt.every(wordId => cd.includes(wordId))) {
-                solvedCategories.push(idx);
+                solvedCategories.push(idx + 1);
                 return;
             }
         }
