@@ -63,7 +63,7 @@ async function recordOrder (wordIds) { // wordIds is expected to be an Array of 
 }
 
 async function queueRecordOrder (wordIds) { // intended for use when page is navigated away from
-    sendBeacon(
+    navigator.sendBeacon(
         API_ENDPOINT + "/record-order?id=" + userData?.id,
         new Blob([JSON.stringify({order: wordIds})], {type: "application/json"})
     )
