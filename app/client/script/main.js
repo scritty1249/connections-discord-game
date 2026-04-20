@@ -209,7 +209,7 @@ async function generateCard () {
             userdata: [
                 {
                     userid: userData.id,
-                    name: userData.username,
+                    name: userData.global_name,
                     avatar: userData.avatar,
                     attempts: ATTEMPTS
                 }
