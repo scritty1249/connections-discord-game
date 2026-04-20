@@ -64,7 +64,7 @@ function matchAttemptsToCategory(attempts, categories) { // categories is raw da
     const categoryData = Object.values(categories);
     attempts.forEach((attempt) => {
         for ( const [idx, cd] of categoryData.entries()) {
-            if (attempt.every(wordId => cd.includes(wordId))) {
+            if (attempt.every(wordId => Array.from(cd, ({id}) => id).includes(wordId))) {
                 solvedCategories.push(idx);
                 return;
             }
