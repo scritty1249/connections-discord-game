@@ -49,13 +49,18 @@ export async function message (channelId, content, components = []) {
         .then((res) => res.ok ? res.json() : null);
 }
 
-export async function sendScorecard (channelId, scoreImage) {
+export async function sendScorecard (channelId, usernames, scoreImage) {
     const url = `${DISCORD_MESSAGE_BASE}/${channelId}/messages`;
     const form = new FormData();
+    const names = usernames.length == 1
+        ? usernames[0]
+        : usernames.length == 2
+        ? `${usernames[0]} and ${usernames[0]}`
+        : usernames.slice(0, -2).join(", ") + " and " + usernames.at(-1);
 
     // 1. Prepare JSON Payload
     const payload = {
-        content: "Test",
+        content: `${names} ${usernames.length > 1 ? "were" : "was"} playing`,
         attachments: [{
             "id": 0,
             "description": "Illustration of challenge results",
@@ -79,7 +84,6 @@ export async function sendScorecard (channelId, scoreImage) {
         
         if (response.ok) {
             const result = await response.json();
-            console.log("Success:", result);
             return result;
         } else {
             console.warn("Message error.");
