@@ -52,7 +52,7 @@ export const UserDB = {
     },
     // Channel related data
     channelExists: async function (channelid) {
-        return Object.keys(await this.getChannels()).includes(channelid);
+        return Object.keys(await this.getChannels()).includes(String(channelid));
     },
     getChannels: async function () {
         return await redis.json.get(this._prefix.channel, "$");
