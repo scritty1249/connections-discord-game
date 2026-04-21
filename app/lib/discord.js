@@ -86,6 +86,8 @@ export async function sendChannelResults (channelid, messageid, usernames, score
         });
         if (response.ok)
             return (await response.json()).id;
+        else
+            console.warn("Scorecard message update rejected:", await response.json());
     } catch (error) {
         console.warn("Error sending message update to discord:", error);
     }
