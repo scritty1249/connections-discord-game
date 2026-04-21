@@ -48,7 +48,7 @@ export const UserDB = {
         return await redis.json.arrappend(this._prefix.user + userid, "$.attempts", attempt);
     },
     getUser: async function (userid) { // json makes this a single call, so not wasteful to get everything here all the time...
-        return await redis.json.get(this._prefix.user + userid, "$")?.[0];
+        return await redis.json.get(this._prefix.user + userid, "$");
     },
     // Channel related data
     channelExists: async function (channelid) {
