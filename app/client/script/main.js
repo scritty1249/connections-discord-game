@@ -226,9 +226,10 @@ async function queueGenerateCard () {
 }
 
 function oncloseHandler () {
-    if (ORDER.wasUpdated && ORDER.CURR != null)
+    if (ORDER.wasUpdated && ORDER.CURR != null) {
         queueRecordOrder(ORDER.CURR);
-    if (newAttemptMade)
+        queueGenerateCard();
+    } else if (newAttemptMade)
         queueGenerateCard();
 }
 
