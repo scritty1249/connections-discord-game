@@ -78,7 +78,7 @@ export const UserDB = {
         });
     },
     setChannelMessage: async function (channelid, messageid) {
-        return await redis.json.set(this._prefix.channel, `$['${channelid}'].message`, JSON.stringify(messageid)); // upstash redis json tries to serialize this as an Integer to save space, but snowflake IDs exceed the maximum bitsize as an int- causing them to end in "00" instead of their normal values.
+        return await redis.json.set(this._prefix.channel, `$['${channelid}'].message`, messageid ? JSON.stringify(messageid) : null); // upstash redis json tries to serialize this as an Integer to save space, but snowflake IDs exceed the maximum bitsize as an int- causing them to end in "00" instead of their normal values.
     }
 };
 
