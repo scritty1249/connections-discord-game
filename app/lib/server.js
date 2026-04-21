@@ -138,7 +138,7 @@ export async function getUserData(userid) {
 
 export async function getAttempts(userid) {
     const userdata = await UserDB.getUser(userid);
-    return userdata === null ? [] : userdata.attempts;
+    return userdata === undefined ? [] : userdata.attempts;
 }
 
 export async function newAttempt(userid, attempt) { // attempt here is a Set of 4 ids (Numbers)
