@@ -125,33 +125,25 @@ export async function isUserAdmin(userid) {
 }
 
 export async function getUserData(userid) {
-    if (await UserDB.exists(userid, "order")) {
-        const values = await Promise.all([
-            getAttempts(userid),
-            UserDB.get(userid, "order")
-        ]);
-        return {
-            attempts: values[0],
-            order: values[1]
-        };
-    } else {
-        return {
+    const userdata = await UserDB.getUser(userid);
+    return userdata === null
+        ? {
             attempts: [], // don't create a key for attempts unless needed (when they submit an attempt). We are on the FREE storage tier
             order: null // while we could generate an order here, we can stay within quota much more easily by offloading the task to the client.
-        };
-    }
+        } : userdata;
 }
 
 export async function getAttempts(userid) {
-    return await UserDB.getlist(userid, "attempts", []);
+    const userdata = await UserDB.getUser(userid);
+    return userdata === null ? [] : userdata.attempts;
 }
 
 export async function newAttempt(userid, attempt) { // attempt here is a Set of 4 ids (Numbers)
-    return await UserDB.append(userid, "attempts", [...attempt]);
+    return await UserDB.newAttempt(userid, [...attempt]);
 }
 
 export async function newOrder(userid, order) { // order is an Array of 16 ids (Numbers)
-    return await UserDB.set(userid, "order", order);
+    return await UserDB.setOrder(userid, order);
 }
 
 export async function scoreImage(userdata, ...userdatas) { // expects {attempts, userid, avatar}

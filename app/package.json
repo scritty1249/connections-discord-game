@@ -16,6 +16,6 @@
         "@napi-rs/canvas": "latest"
     },
     "devDependencies": {
-        "esbuild": "latest"
+        "esbuild": ">=0.25.0"
     }
 }

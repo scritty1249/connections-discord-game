@@ -5,43 +5,80 @@ import { EDGE_WRITE } from "./endpoints.js";
 
 const redis = Redis.fromEnv();
 const GAMEDATA_KEY = "gamedata";
-const CHANNELS_KEY = "channels";
 const ADM_LIST_KEY = "admins";
 
 // [!] TODO: determine if quota limits will allow for logging. If so, implement at THIS LAYER.
 export const UserDB = {
     _prefix: {
-        attempts: "A_",
-        order: "O_"
+        user: "U_",
+        channel: "CHANNELS"
     },
     drop: async function () { // deletes ALL ENTRIES.
         try {
             await redis.flushdb();
-            return true;
+            return await this._init();
         } catch (error) {
             console.error("UserDB Flush failed!", error);
             return false;
         }
     },
-    exists: async function (userid, type) {
-        return await redis.exists(this._prefix[type] + userid);
+    _exists: async function (key) {
+        return await redis.exists(key);
     },
-    set: async function (userid, type, value) { // creates and updates
-        return await redis.set(this._prefix[type] + userid, value);
+    _init: async function () {
+        try {
+            await redis.json.set(channel, "$", {});
+            return true;
+        } catch (error) {
+            console.error("UserDB Initalization failed!", error);
+            return false;
+        }
     },
-    get: async function (userid, type, fallback = null) {
-        return await redis.get(this._prefix[type] + userid)
-            .then((value) => value === null ? fallback : value);
+    // Userdata related functions
+    newUser: async function (userid, order, attempt = null) {
+        return await redis.json.set(this._prefix.user + userid, "$", {
+            attempts: attempt === null ? [] : [attempt],
+            order: order
+        });
     },
-    getlist: async function (userid, type, fallback = null, start = 0, end = -1) {
-        return await redis.lrange(this._prefix[type] + userid, start, end)
-            .then((value) => value === null ? fallback : value);
+    setOrder: async function (userid, order) {
+        return await redis.json.set(this._prefix.user + userid, "$.order", order);
     },
-    append: async function (userid, type, ...values) {
-        return await redis.rpush(this._prefix[type] + userid, ...values);
+    newAttempt: async function (userid, attempt) {
+        return await redis.json.arrappend(this._prefix.user + userid, "$.attempts", attempt);
     },
-    prepend: async function (userid, type, ...values) {
-        return await redis.lpush(this._prefix[type] + userid, ...values);
+    getUser: async function (userid) { // json makes this a single call, so not wasteful to get everything here all the time...
+        return await redis.json.get(this._prefix.user + userid, "$");
+    },
+    userExists: async function (userid) {
+        return await this._exists(this._prefix.user + userid);
+    },
+    // Channel related data
+    getChannels: async function () {
+        return await redis.json.get(this._prefix.channel, "$");
+    },
+    getChannel: async function (channelid) {
+        return await redis.json.get(this._prefix.channel, `$.${channelid}`);
+    },
+    newChannel: async function (channelid, userid, username, useravatar) {
+        return await redis.json.set(this._prefix.channel, `$.${channelid}`, {
+            message: null,
+            participants: {
+                [userid]: {
+                    name: username,
+                    avatar: useravatar
+                }
+            }
+        });
+    },
+    setChannelUser: async function (channelid, userid, username, useravatar) {
+        return await redis.json.set(this._prefix.channel, `$.${channelid}.participants.${userid}`, {
+            name: username,
+            avatar: useravatar
+        });
+    },
+    setChannelMessage: async function (channelid, messageid) {
+        return await redis.json.set(this._prefix.channel, `$.${channelid}.message`, messageid);
     }
 };
 
@@ -65,31 +102,6 @@ export const GameDB = {
                         operation: "upsert",
                         key: GAMEDATA_KEY,
                         value: gamedata
-                    }
-                ]
-            })
-        });
-        return await response.json();
-    }
-};
-
-export const ChannelsDB = {
-    get: async function () {
-        return await Edge.get(CHANNELS_KEY);
-    },
-    set: async function (channelsdata) {
-        const response = await fetch(EDGE_WRITE, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${process.env.VERCEL_API_TOKEN}`
-            },
-            body: JSON.stringify({
-                items: [
-                    {
-                        operation: "upsert",
-                        key: CHANNELS_KEY,
-                        value: channelsdata
                     }
                 ]
             })
