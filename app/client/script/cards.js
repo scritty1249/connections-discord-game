@@ -125,7 +125,7 @@ export const cardFX = {
         ));
     },
     swapElements: async function (originEl, targetEl) {
-        return await animateSwap(originEl, targetEl, 2000)
+        return await animateSwap(originEl, targetEl, 1000)
             .then(() => {
                 const originOrder = originEl.style.order;
                 originEl.style.order = targetEl.style.order;
