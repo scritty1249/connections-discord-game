@@ -27,7 +27,7 @@ export const UserDB = {
     },
     _init: async function () {
         try {
-            await redis.json.set(channel, "$", {});
+            await redis.json.set(this._prefix.channel, "$", {});
             return true;
         } catch (error) {
             console.error("UserDB Initalization failed!", error);
