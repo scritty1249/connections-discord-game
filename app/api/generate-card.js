@@ -29,7 +29,9 @@ export async function POST(req) {
             }));
 
             const imgBlob = await scoreImage(...userdatas);
-            setChannelMessage(channel, await sendChannelResults(channel, messageid, usernames, imgBlob));
+            const newMessageid = await sendChannelResults(channel, messageid, usernames, imgBlob);
+            if (newMessageid != messageid)
+                setChannelMessage(channel, newMessageid);
             return new Response();
         } catch (err) {
             console.error("Fetch error:", err);
