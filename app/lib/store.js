@@ -42,20 +42,20 @@ export const UserDB = {
         });
     },
     setOrder: async function (userid, order) {
-        return await redis.json.set(this._prefix.user + userid, "$.order", order);
+        return await redis.json.set(this._prefix.user + userid, "$.order", order)?.[0];
     },
     newAttempt: async function (userid, attempt) {
-        return await redis.json.arrappend(this._prefix.user + userid, "$.attempts", attempt);
+        return await redis.json.arrappend(this._prefix.user + userid, "$.attempts", attempt)?.[0];
     },
     getUser: async function (userid) { // json makes this a single call, so not wasteful to get everything here all the time...
-        return await redis.json.get(this._prefix.user + userid, "$");
+        return await redis.json.get(this._prefix.user + userid, "$")?.[0];
     },
     // Channel related data
     channelExists: async function (channelid) {
         return Object.keys(await this.getChannels()).includes(String(channelid));
     },
     getChannels: async function () {
-        return await redis.json.get(this._prefix.channel, "$");
+        return await redis.json.get(this._prefix.channel, "$")?.[0];
     },
     getChannel: async function (channelid) {
         return await redis.json.get(this._prefix.channel, `$.${channelid}`)?.[0];
