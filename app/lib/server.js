@@ -161,8 +161,11 @@ export async function scoreImage(userdata, ...userdatas) { // expects {attempts,
 export async function updateChannelParticipants (channelid, userid, username, avatar) {
     const userdata = { name: String(username), avatar: String(avatar) };
     const exists = await UserDB.channelExists(channelid);
-    console.debug(channelid, exists);
-    console.debug(await UserDB.getChannels());
+    {
+        const c = await UserDB.getChannels();
+        console.debug(channelid, exists);
+        console.debug(c, typeof c, Array.isArray(c));
+    }
     if (!exists) {
         await UserDB.newChannel(channelid, userid, username, avatar);
     } else {
