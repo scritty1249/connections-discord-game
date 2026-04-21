@@ -90,10 +90,12 @@ export async function refreshGamestate() {
         console.info("Fetched gamedata");
         console.debug(await storeGameData(data));
         console.info("Saved gamedata");
-        await wipeAttempts();
-        console.log("Cleared userdata");
-        console.log("Cleared channels cache");
-        return true;
+        if (await wipeAttempts()) {
+            console.log("Cleared userdata");
+            console.log("Cleared channels cache");
+            return true;
+        }
+        return false;
     } catch (error) {
         console.error(error);
         return false;
