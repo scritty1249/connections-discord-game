@@ -35,7 +35,7 @@ export const UserDB = {
         }
     },
     // Userdata related functions
-    newUser: async function (userid, order, attempt = null) {
+    newUser: async function (userid, order = null, attempt = null) {
         return await redis.json.set(this._prefix.user + userid, "$", {
             attempts: attempt === null ? [] : [attempt],
             order: order
@@ -49,9 +49,6 @@ export const UserDB = {
     },
     getUser: async function (userid) { // json makes this a single call, so not wasteful to get everything here all the time...
         return await redis.json.get(this._prefix.user + userid, "$");
-    },
-    userExists: async function (userid) {
-        return await this._exists(this._prefix.user + userid);
     },
     // Channel related data
     getChannels: async function () {

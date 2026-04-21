@@ -126,11 +126,14 @@ export async function isUserAdmin(userid) {
 
 export async function getUserData(userid) {
     const userdata = await UserDB.getUser(userid);
-    return userdata === null
-        ? {
+    if (userdata === null) {
+        await UserDB.newUser(userid);
+        return {
             attempts: [], // don't create a key for attempts unless needed (when they submit an attempt). We are on the FREE storage tier
             order: null // while we could generate an order here, we can stay within quota much more easily by offloading the task to the client.
-        } : userdata;
+        };
+    }
+    return userdata;
 }
 
 export async function getAttempts(userid) {

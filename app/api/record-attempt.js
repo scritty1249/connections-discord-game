@@ -9,8 +9,10 @@ export async function POST(req) {
         try {
             const id = params.get("id");
             await newAttempt(id, new Set(attempt));
-            if (order)
+            if (order) {
+                console.info("Order attached to payload");
                 await newOrder(id, order);
+            }
             return new Response();
         } catch (err) {
             console.error("Vercel API error:", err);
