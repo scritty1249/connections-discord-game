@@ -164,7 +164,7 @@ export async function updateChannelParticipants (channelid, userid, username, av
     {
         const c = await UserDB.getChannels();
         console.debug(channelid, exists);
-        console.debug(c, typeof c, Array.isArray(c));
+        console.debug(c, typeof c, Array.isArray(c), c?.[0]);
     }
     if (!exists) {
         await UserDB.newChannel(channelid, userid, username, avatar);
