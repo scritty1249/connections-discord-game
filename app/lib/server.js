@@ -1,6 +1,6 @@
 import { dateToString } from "./utils.js";
 import * as ENDPOINT from "./endpoints.js";
-import { GameDB, UserDB, ChannelsDB } from "./store.js";
+import { GameDB, UserDB } from "./store.js";
 import { createCanvasObject, drawScoreHorizontal, drawScoreVertical, canvasToImage, CANVAS_POSITION } from "./draw.js";
 
 async function fetchGameData(gameDate) {
@@ -92,7 +92,6 @@ export async function refreshGamestate() {
         console.info("Saved gamedata");
         await wipeAttempts();
         console.log("Cleared userdata");
-        await wipeChannels();
         console.log("Cleared channels cache");
         return true;
     } catch (error) {
@@ -105,18 +104,17 @@ export async function getGameData() {
     return await GameDB.get();
 }
 
-export async function getChannelsData() {
-    return await ChannelsDB.get();
+export async function getChannelData(channelid) {
+    return await UserDB.getChannel(channelid);
+}
+
+export async function setChannelMessage(channelid, messageid) {
+    return await UserDB.setChannelMessage(channelid, messageid);
 }
 
 export async function wipeAttempts() {
     // deletes attempts for all users
     return await UserDB.drop();
-}
-
-export async function wipeChannels() {
-    // deletes all previous records of messages sent by the bot, across all channels
-    return await setChannelsData({});
 }
 
 export async function isUserAdmin(userid) {
@@ -155,25 +153,11 @@ export async function scoreImage(userdata, ...userdatas) { // expects {attempts,
 }
 
 export async function updateChannelParticipants (channelid, userid, username, avatar) {
-    const channeldata = ChannelsDB.get();
     const userdata = { name: String(username), avatar: String(avatar) };
-    console.debug("Before update:", JSON.stringify(channeldata));
-    if (Object.hasOwn(channeldata, channelid)) {
-        channeldata[channelid]["participants"][userid] = userdata;
+    if (UserDB.getChannel(channelid) === null) {
+        await UserDB.newChannel(channelid, userid, username, avatar);
     } else {
         // create new channel entry if one does not already exist
-        channeldata[channelid] = {
-            message: null, // set to null on init to flag for searching, and undefined later if a message actually can't be found
-            participants: {
-                [userid]: userdata
-            }
-        };
+        await UserDB.setChannelUser(channelid, userid, username, avatar);
     }
-    console.debug("After update:", JSON.stringify(channeldata));
-    return await setChannelsData(channeldata);
-}
-
-// [!] starting to feel redundant...
-export async function setChannelsData (channelsdata) { // [!] overwrites the entire channel object- (overwrites all channels!)
-    return await ChannelsDB.set(channelsdata);
 }

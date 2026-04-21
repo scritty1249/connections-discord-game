@@ -1,4 +1,4 @@
-import { scoreImage, getChannelsData, updateChannelParticipants, getAttempts, setChannelsData } from "../lib/server.js"
+import { scoreImage, getChannelData, updateChannelParticipants, getAttempts, setChannelMessage } from "../lib/server.js"
 import { sendChannelResults, getChannelMessage } from "../lib/discord.js";
 
 export async function POST(req) {
@@ -16,8 +16,7 @@ export async function POST(req) {
         try {
             const { userid, avatar, attempts, name } = userdata;
             await updateChannelParticipants(channel, userid, name, avatar);
-            const channelsdata = await getChannelsData();
-            const channeldata = channelsdata[channel];
+            const channeldata = await getChannelData(channel);
             const messageid = channeldata.message === null ? await getChannelMessage(channel, new Date()) : channeldata.message;
             const usernames = [];
             const userdatas = await Promise.all(Array.from(Object.keys(channeldata.participants), async (participant) => {
@@ -31,9 +30,7 @@ export async function POST(req) {
             }));
 
             const imgBlob = await scoreImage(...userdatas);
-            channeldata.message = await sendChannelResults(channel, messageid, usernames, imgBlob);
-            channelsdata[channel] = channeldata;
-            await setChannelsData(channelsdata);
+            setChannelMessage(channel, await sendChannelResults(channel, messageid, usernames, imgBlob));
             return new Response();
         } catch (err) {
             console.error("Fetch error:", err);
