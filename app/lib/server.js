@@ -126,6 +126,7 @@ export async function isUserAdmin(userid) {
 
 export async function getUserData(userid) {
     const userdata = await UserDB.getUser(userid);
+    console.debug(userdata, userdata?.[0]);
     if (userdata === undefined) {
         await UserDB.newUser(userid);
         return {
