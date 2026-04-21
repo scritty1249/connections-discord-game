@@ -126,7 +126,7 @@ export async function isUserAdmin(userid) {
 
 export async function getUserData(userid) {
     const userdata = await UserDB.getUser(userid);
-    if (userdata === null) {
+    if (userdata === undefined) {
         await UserDB.newUser(userid);
         return {
             attempts: [], // don't create a key for attempts unless needed (when they submit an attempt). We are on the FREE storage tier
@@ -160,13 +160,11 @@ export async function scoreImage(userdata, ...userdatas) { // expects {attempts,
 // returns updated channel data for chaining
 export async function updateChannelParticipants (channelid, userid, username, avatar) {
     const userdata = { name: String(username), avatar: String(avatar) };
-    const exists = await UserDB.channelExists(channelid);
-    if (!exists) {
+    if (!await UserDB.channelExists(channelid)) {
         await UserDB.newChannel(channelid, userid, username, avatar);
     } else {
         // create new channel entry if one does not already exist
         await UserDB.setChannelUser(channelid, userid, username, avatar);
     }
-    console.debug(await UserDB.getChannels());
     return await UserDB.getChannel(channelid);
 }

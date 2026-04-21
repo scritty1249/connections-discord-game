@@ -18,7 +18,6 @@ export async function POST(req) {
             const channeldata = await updateChannelParticipants(channel, userid, name, avatar);
             const messageid = channeldata.message === null ? await getChannelMessage(channel, new Date()) : channeldata.message;
             const usernames = [];
-            console.debug(channeldata);
             const userdatas = await Promise.all(Array.from(Object.keys(channeldata.participants), async (participant) => {
                 const participantattempts = participant == String(userid) ? attempts : await getAttempts(participant);
                 usernames.push(channeldata.participants[participant].name);
