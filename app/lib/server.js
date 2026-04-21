@@ -162,11 +162,13 @@ export async function updateChannelParticipants (channelid, userid, username, av
     const userdata = { name: String(username), avatar: String(avatar) };
     const exists = await UserDB.channelExists(channelid);
     console.debug(channelid, exists);
+    console.debug(await UserDB.getChannels());
     if (!exists) {
         await UserDB.newChannel(channelid, userid, username, avatar);
     } else {
         // create new channel entry if one does not already exist
         await UserDB.setChannelUser(channelid, userid, username, avatar);
     }
+    console.debug(await UserDB.getChannels());
     return await UserDB.getChannel(channelid);
 }
