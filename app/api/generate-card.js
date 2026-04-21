@@ -15,8 +15,7 @@ export async function POST(req) {
     } else {
         try {
             const { userid, avatar, attempts, name } = userdata;
-            await updateChannelParticipants(channel, userid, name, avatar);
-            const channeldata = await getChannelData(channel);
+            const channeldata = await await updateChannelParticipants(channel, userid, name, avatar);
             const messageid = channeldata.message === null ? await getChannelMessage(channel, new Date()) : channeldata.message;
             const usernames = [];
             const userdatas = await Promise.all(Array.from(Object.keys(channeldata.participants), async (participant) => {

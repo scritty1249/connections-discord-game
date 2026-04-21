@@ -157,6 +157,7 @@ export async function scoreImage(userdata, ...userdatas) { // expects {attempts,
     return await generateScoreImage(...newData);
 }
 
+// returns updated channel data for chaining
 export async function updateChannelParticipants (channelid, userid, username, avatar) {
     const userdata = { name: String(username), avatar: String(avatar) };
     const exists = await UserDB.channelExists(channelid);
@@ -167,4 +168,5 @@ export async function updateChannelParticipants (channelid, userid, username, av
         // create new channel entry if one does not already exist
         await UserDB.setChannelUser(channelid, userid, username, avatar);
     }
+    return await UserDB.getChannel(channelid);
 }
