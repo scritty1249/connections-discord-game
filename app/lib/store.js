@@ -58,9 +58,7 @@ export const UserDB = {
         return await redis.json.get(this._prefix.channel, "$");
     },
     getChannel: async function (channelid) {
-        const result = await redis.json.get(this._prefix.channel, `$.${channelid}`);
-        console.debug(result, result?.[0]);
-        return result;
+        return await redis.json.get(this._prefix.channel, `$.${channelid}`)?.[0];
     },
     newChannel: async function (channelid, userid, username, useravatar) {
         return await redis.json.set(this._prefix.channel, `$.${channelid}`, {
