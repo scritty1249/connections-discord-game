@@ -27,8 +27,6 @@ export async function POST(req) {
                     case 1: // chat command, usually a slash command
                         const { context } = requestBody;
                         switch (context) {
-                            case 0: // Invoked in server
-                            break;
                             case 1: // DM with the bot only
                                 switch (commandName) {
                                     case "api":
@@ -74,6 +72,7 @@ export async function POST(req) {
                                         return commands.messageResponse(isAdmin ? "Yes" : "No");
                                 };
                             break;
+                            case 0: // Invoked in server
                             case 2: // DM or group DM, does not need bot user to be a member
                                 return commands.messageResponse("There are currently no supported commands for servers. Message me directly to use commands."); // currently no supported commands for servers.
                             default:
