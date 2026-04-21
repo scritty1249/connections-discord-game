@@ -106,7 +106,7 @@ function generateScorecardBody (usernames, scoreImage) {
     const names = usernames.length == 1
         ? usernames[0]
         : usernames.length == 2
-        ? `${usernames[0]} and ${usernames[0]}`
+        ? `${usernames[0]} and ${usernames[1]}`
         : usernames.slice(0, -2).join(", ") + " and " + usernames.at(-1);
 
     const payload = {
