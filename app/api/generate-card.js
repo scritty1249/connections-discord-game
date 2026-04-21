@@ -16,10 +16,7 @@ export async function POST(req) {
         try {
             const { userid, avatar, attempts, name } = userdata;
             const channeldata = await updateChannelParticipants(channel, userid, name, avatar);
-            console.debug(channeldata)
-            console.debug(channeldata.message)
             const messageid = channeldata.message === null ? await getChannelMessage(channel, new Date()) : channeldata.message;
-            console.debug(messageid);
             const usernames = [];
             const userdatas = await Promise.all(Array.from(Object.keys(channeldata.participants), async (participant) => {
                 const participantattempts = participant == String(userid) ? attempts : await getAttempts(participant);
@@ -34,7 +31,7 @@ export async function POST(req) {
             const imgBlob = await scoreImage(...userdatas);
             const newMessageid = await sendChannelResults(channel, messageid, usernames, imgBlob);
             if (newMessageid != messageid)
-                setChannelMessage(channel, newMessageid);
+                await setChannelMessage(channel, newMessageid);
             return new Response();
         } catch (err) {
             console.error("Fetch error:", err);
