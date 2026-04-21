@@ -98,7 +98,9 @@ export async function sendChannelResults (channelid, messageid, usernames, score
         },
         body: bodyForm // 'Content-Type' header is set automatically
     });
-    return (await response.json())?.id;
+    const resBody = await response.json();
+    console.debug(resBody)
+    return resBody?.id;
 }
 
 function generateScorecardBody (usernames, scoreImage) {

@@ -30,7 +30,7 @@ export async function POST(req) {
 
             const imgBlob = await scoreImage(...userdatas);
             const newMessageid = await sendChannelResults(channel, messageid, usernames, imgBlob);
-            if (newMessageid != messageid)
+            if (newMessageid && newMessageid != messageid)
                 await setChannelMessage(channel, newMessageid);
             return new Response();
         } catch (err) {
