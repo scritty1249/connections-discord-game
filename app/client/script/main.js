@@ -7,6 +7,7 @@ let discordSdk = null;
 let userData = null;
 let categories = null;
 let categoryIds = null;
+let newAttemptMade = false;
 
 const ATTEMPTS = [];
 const ELEMENTS = {
@@ -166,7 +167,10 @@ function submitHandler (e) {
         submitAttempt()
             .then((success) => {
                 if (!success)
-                    console.warn("Submission failed, attempt not recorded."); })
+                    console.warn("Submission failed, attempt not recorded.");
+                else
+                    newAttemptMade = true;
+            })
             .then(() => {
                 if (ELEMENTS.CATEGORY_GRID.children.length != 4) {
                     // generateCard(); // [!] testing
@@ -222,10 +226,10 @@ async function queueGenerateCard () {
 }
 
 function oncloseHandler () {
-    if (ORDER.wasUpdated && ORDER.CURR != null) {
+    if (ORDER.wasUpdated && ORDER.CURR != null)
         queueRecordOrder(ORDER.CURR);
-        queueGenerateCard(); // [!] may run in conflict with queueRecordOrder()
-    }
+    if (newAttemptMade)
+        queueGenerateCard();
 }
 
 async function setWinScreen () {
@@ -278,6 +282,7 @@ window.onload = (e) => {
                         }
                     }).then(({ attempts, order }) => {
                         ORDER.PREV = order;
+                        newAttemptMade = !Boolean(attempts);
                         if (attempts)
                             ATTEMPTS.push(...Array.from(attempts, attempt => attempt.toSorted()));
                     })
