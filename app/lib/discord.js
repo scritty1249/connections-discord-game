@@ -105,9 +105,9 @@ function generateScorecardBody (usernames, scoreImage) {
     const form = new FormData();
     const names = usernames.length == 1
         ? usernames[0]
-        : usernames.length == 2
+        : (usernames.length == 2
         ? `${usernames[0]} and ${usernames[1]}`
-        : usernames.slice(0, -2).join(", ") + " and " + usernames.at(-1);
+        : usernames.slice(0, -2).join(", ") + " and " + usernames.at(-1));
 
     const payload = {
         content: `${names} ${usernames.length > 1 ? "were" : "was"} playing`,
