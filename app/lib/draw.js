@@ -175,7 +175,6 @@ function drawCardBorder (ctx, x, y, width, height) {
     ctx.stroke();
     ctx.strokeStyle = ogStrokeStyle;
     ctx.lineWidth = ogLineWidth;
-    console.debug(GlobalFonts.families);
 }
 
 function drawText (ctx, text, x, y, color, fontsize, align = "center") {
@@ -192,6 +191,7 @@ function drawText (ctx, text, x, y, color, fontsize, align = "center") {
     ctx.fillStyle = ogFIll;
     ctx.textAlign = ogAlign;
     ctx.textBaseline = ogBaseline;
+    console.debug(GlobalFonts.families);
 }
 
 function drawStatsHorizontal (ctx, x, y, stats) {
