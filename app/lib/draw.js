@@ -182,9 +182,8 @@ function drawText (ctx, text, x, y, color, fontsize, align = "center") {
     const ogFIll = ctx.fillStyle;
     const ogAlign = ctx.textAlign;
     const ogBaseline = ctx.textBaseline;
-    console.debug(ogFont);
-    ctx.font = `${fontsize}px HelveticaNeueMedium`;
-    ctx.fillStyle = color;
+    ctx.font = `${fontsize}px sans-serif`;
+    ctx.fillStyle = "white";
     ctx.textAlign = align;
     ctx.textBaseline = "top";
     ctx.fillText(text, x, y);
