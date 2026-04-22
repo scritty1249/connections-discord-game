@@ -23,3 +23,7 @@ export async function promiseTimeout (timeoutMs) {
 export function isSameDay (date1, date2) {
     return date1.toDateString() === date2.toDateString();
 }
+
+export function formatNumberString (number) {
+    return number.toLocaleString('en-US'); // because no other kind matters! lol
+}

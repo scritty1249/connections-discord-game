@@ -8,19 +8,21 @@ const CARD_SIZE = {
     horizontal: {
         width: CANVAS_SIZE.width * .7,
         height: CANVAS_SIZE.height * .85,
-        gap: 15
+        gap: 15,
+        font: 18
     },
     vertical: {
         width: 121,
         height: CANVAS_SIZE.height * .85,
-        gap: 10
+        gap: 10,
+        font: 12
     },
     padding: 20,
     thickness: 2
 };
 const AVATAR_SIZE = {
     horizontal: 128,
-    vertical: 64  
+    vertical: 56  
 };
 const ATTEMPT_SQUARE = {
     horizontal: {
@@ -28,7 +30,7 @@ const ATTEMPT_SQUARE = {
         gap: 5
     },
     vertical: {
-        size: 25,
+        size: 22,
         gap: 2
     }
 };
@@ -41,6 +43,8 @@ const COLOR = {
     "category-3": "#00a2b3",
     "category-4": "#a354a8"
 };
+
+const AVATAR_URL = (userid, avatarName) => `https://cdn.discordapp.com/avatars/${userid}/${avatarName}.png?size=128`;
 
 export const CANVAS_POSITION = (cardNum, cardCount = 1) => {
     return (cardCount == 1)
@@ -74,10 +78,9 @@ export async function canvasToImage (canvas) {
     });
 }
 
-export async function drawScoreHorizontal (ctx, position, attempts, userId, avatarName) {
-    const avatarUrl = `https://cdn.discordapp.com/avatars/${userId}/${avatarName}.png?size=${AVATAR_SIZE.horizontal}`;
+export async function drawScoreHorizontal (ctx, position, attempts, userId, avatarName, stats) {
     return await Promise.all([
-        loadImage(avatarUrl)
+        loadImage(AVATAR_URL(userId, avatarName))
     ]).then(([
         avatarImg
     ]) => {
@@ -95,8 +98,12 @@ export async function drawScoreHorizontal (ctx, position, attempts, userId, avat
                 y: position.y + (CARD_SIZE.horizontal.height / 2)
             }
         };
+        let currY = DIMS.center.y - (AVATAR_SIZE.horizontal / 2);
         drawCardBorder(ctx, DIMS.start.x, DIMS.start.y, DIMS.end.x - DIMS.start.x, DIMS.end.y - DIMS.start.y);
-        drawAvatar(ctx, DIMS.start.x + (CARD_SIZE.horizontal.width / 4) - (AVATAR_SIZE.horizontal / 2), DIMS.center.y - (AVATAR_SIZE.horizontal / 2), avatarImg, AVATAR_SIZE.horizontal);
+        drawAvatar(ctx, DIMS.start.x + (CARD_SIZE.horizontal.width / 4) - (AVATAR_SIZE.horizontal / 2), currY, avatarImg, AVATAR_SIZE.horizontal);
+        currY += (AVATAR_SIZE.horizontal / 2) + ATTEMPT_SQUARE.horizontal.gap;
+        drawStatsHorizontal(ctx, DIMS.start.x + (CARD_SIZE.horizontal.width / 8), currY, stats);
+
         drawAttemptGridHorizontal(ctx,
             DIMS.center.x,
             DIMS.center.y - (((ATTEMPT_SQUARE.horizontal.gap * 5) + (ATTEMPT_SQUARE.horizontal.size * 6)) / 2),
@@ -105,10 +112,9 @@ export async function drawScoreHorizontal (ctx, position, attempts, userId, avat
     });
 }
 
-export async function drawScoreVertical (ctx, position, attempts, userId, avatarName) {
-    const avatarUrl = `https://cdn.discordapp.com/avatars/${userId}/${avatarName}.png?size=${AVATAR_SIZE.vertical}`;
+export async function drawScoreVertical (ctx, position, attempts, userId, avatarName, stats) {
     return await Promise.all([
-        loadImage(avatarUrl)
+        loadImage(loadImage(AVATAR_URL(userId, avatarName)))
     ]).then(([
         avatarImg
     ]) => {
@@ -128,8 +134,11 @@ export async function drawScoreVertical (ctx, position, attempts, userId, avatar
         };
         let currY = DIMS.start.y + CARD_SIZE.vertical.gap;
         drawCardBorder(ctx, DIMS.start.x, DIMS.start.y, DIMS.end.x - DIMS.start.x, DIMS.end.y - DIMS.start.y);
-        drawAvatar(ctx, DIMS.center.x - (AVATAR_SIZE.vertical / 2), currY, avatarImg, AVATAR_SIZE.vertical);
-        currY += AVATAR_SIZE.vertical + CARD_SIZE.vertical.gap;
+        drawAvatar(ctx, DIMS.start.x + CARD_SIZE.vertical.gap, currY, avatarImg, AVATAR_SIZE.vertical);
+
+        drawStatsVertical(ctx, DIMS.end.x - CARD_SIZE.vertical.gap, currY, stats);
+
+        currY = DIMS.start.y + (CARD_SIZE.vertical.height / 2.5);
         drawAttemptGridVertical(ctx,
             DIMS.center.x - (((ATTEMPT_SQUARE.vertical.gap * 3) + (ATTEMPT_SQUARE.vertical.size * 4)) / 2),
             currY,
@@ -166,6 +175,43 @@ function drawCardBorder (ctx, x, y, width, height) {
     ctx.stroke();
     ctx.strokeStyle = ogStrokeStyle;
     ctx.lineWidth = ogLineWidth;
+}
+
+function drawText (ctx, text, x, y, color, fontsize, align = "center") {
+    const ogFont = ctx.font;
+    const ogFIll = ctx.fillStyle;
+    const ogAlign = ctx.textAlign;
+    const ogBaseline = ctx.textBaseline;
+    ctx.font = `bold ${fontsize}px Helvetica Neue`;
+    ctx.fillStyle = color;
+    ctx.textAlign = align;
+    ctx.textBaseline = "top";
+    ctx.fillText(text, x, y);
+    ctx.font = ogFont;
+    ctx.fillStyle = ogFIll;
+    ctx.textAlign = ogAlign;
+    ctx.textBaseline = ogBaseline;
+}
+
+function drawStatsHorizontal (ctx, x, y, stats) {
+    const altX = x + (CARD_SIZE.horizontal.width / 4);
+    const altY = y + (CARD_SIZE.horizontal.font * 2);
+    drawText(ctx, stats["1"], x, y, COLOR["category-1"], CARD_SIZE.horizontal.font);
+    drawText(ctx, stats["2"], altX, y, COLOR["category-2"], CARD_SIZE.horizontal.font);
+    drawText(ctx, stats["3"], x, altY, COLOR["category-3"], CARD_SIZE.horizontal.font);
+    drawText(ctx, stats["4"], altX, altY, COLOR["category-4"], CARD_SIZE.horizontal.font);
+    drawText(ctx, stats.total, x + ((altX - x) / 2), altY + (CARD_SIZE.horizontal.font * 2), COLOR["category-0"], CARD_SIZE.horizontal.font);
+}
+
+function drawStatsVertical (ctx, x, y, stats) {
+    let i = 0;
+    const incr = () => y + ((CARD_SIZE.vertical.font * 1.25) * i++);
+    drawText(ctx, stats["1"], x, incr(), COLOR["category-1"], CARD_SIZE.vertical.font, "right");
+    drawText(ctx, stats["2"], x, incr(), COLOR["category-2"], CARD_SIZE.vertical.font, "right");
+    drawText(ctx, stats["3"], x, incr(), COLOR["category-3"], CARD_SIZE.vertical.font, "right");
+    drawText(ctx, stats["4"], x, incr(), COLOR["category-4"], CARD_SIZE.vertical.font, "right");
+    incr();
+    drawText(ctx, stats.total, x, incr() , COLOR["category-0"], CARD_SIZE.vertical.font, "right");
 }
 
 function drawAttemptGridVertical (ctx, x, y, attemptCategories) { // attemptCategories here is an Array of attempts, where each attempt is an Array of Numbers that corrospond to a specific category (1-4). 0 Marks an unknown category and -1 marks an unused attempt.

@@ -28,6 +28,7 @@ async function storeGameData(gamedata) {
 
 async function generateScoreImage(userdata, ...otherdata) { // userdata = { attempts, avatar, id }
     const { canvas, ctx } = createCanvasObject();
+    const categoryData = await getGameData();
     if (!otherdata.length) { // one player (horizontal card)
         const { id, attempts, avatar } = userdata;
         await drawScoreHorizontal(
@@ -35,7 +36,8 @@ async function generateScoreImage(userdata, ...otherdata) { // userdata = { atte
             CANVAS_POSITION(1),
             attempts,
             id,
-            avatar
+            avatar,
+            getCategoryStats(attempts, categoryData)
         );
     } else { // multiple players (vertical cards)
         const datas = [userdata, ...otherdata.slice(0, Math.min(otherdata.length, 3))];
@@ -46,13 +48,14 @@ async function generateScoreImage(userdata, ...otherdata) { // userdata = { atte
                 CANVAS_POSITION(idx + 1, datas.length),
                 attempts,
                 id,
-                avatar
+                avatar,
+                getCategoryStats(attempts, categoryData)
             )
         ));
         try {
             await draws;
         } catch (error) {
-            console.error(error);
+            console.error("Failed while generating image:", error);
         }
     }
     return await canvasToImage(canvas);
@@ -167,4 +170,26 @@ export async function updateChannelParticipants (channelid, userid, username, av
         await UserDB.setChannelUser(channelid, userid, username, avatar);
     }
     return await UserDB.getChannel(channelid);
+}
+
+export async function getCategoryStats (attempts, categories) {
+    const categoryWordIds = Array.from(Object.values(categories), category => Array.from(category, category.id));
+    const stats = {
+        "1": "",
+        "2": "",
+        "3": "",
+        "4": "",
+        total: `(${attempts.length})`
+    };
+    attempts.forEach((attempt, idx) => {
+        let difficulty = 1;
+        for (const categoryWords of categoryWordIds) {
+            if (categoryWords.every(wordId => attempt.includes(wordId))) {
+                stats[String(difficulty)] = idx + 1;
+                return;
+            }
+            difficulty++;
+        }            
+    });
+    return stats;
 }
