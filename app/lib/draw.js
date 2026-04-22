@@ -1,6 +1,5 @@
 import { Canvas, loadImage, FontLibrary } from "skia-canvas";
-import path from "path";
-FontLibrary.use("Helvetica Neue", [path.join(process.cwd(), "public", "fonts", "HelveticaNeue", "HelveticaNeueMedium.otf")]);
+FontLibrary.use("Helvetica Neue", ["/fonts/HelveticaNeue/HelveticaNeueMedium.otf"]);
 
 const CANVAS_SIZE = {
     width: 563,
