@@ -13,8 +13,7 @@
         "@upstash/redis": "latest",
         "@discord/embedded-app-sdk": "latest",
         "tweetnacl": "latest",
-        "skia-canvas": "latest",
-        "@canvas-fonts/helveticaneue": "latest"
+        "skia-canvas": "latest"
     },
     "devDependencies": {
         "esbuild": ">=0.25.0"
