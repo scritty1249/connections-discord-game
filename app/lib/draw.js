@@ -103,6 +103,7 @@ export async function drawScoreHorizontal (ctx, position, attempts, userId, avat
         drawCardBorder(ctx, DIMS.start.x, DIMS.start.y, DIMS.end.x - DIMS.start.x, DIMS.end.y - DIMS.start.y);
         drawAvatar(ctx, DIMS.start.x + (CARD_SIZE.horizontal.width / 4) - (AVATAR_SIZE.horizontal / 2), currY, avatarImg, AVATAR_SIZE.horizontal);
         currY += (AVATAR_SIZE.horizontal / 2) + ATTEMPT_SQUARE.horizontal.gap;
+        console.debug(stats);
         drawStatsHorizontal(ctx, DIMS.start.x + (CARD_SIZE.horizontal.width / 8), currY, stats);
 
         drawAttemptGridHorizontal(ctx,
@@ -136,7 +137,6 @@ export async function drawScoreVertical (ctx, position, attempts, userId, avatar
         let currY = DIMS.start.y + CARD_SIZE.vertical.gap;
         drawCardBorder(ctx, DIMS.start.x, DIMS.start.y, DIMS.end.x - DIMS.start.x, DIMS.end.y - DIMS.start.y);
         drawAvatar(ctx, DIMS.start.x + CARD_SIZE.vertical.gap, currY, avatarImg, AVATAR_SIZE.vertical);
-
         drawStatsVertical(ctx, DIMS.end.x - CARD_SIZE.vertical.gap, currY, stats);
 
         currY = DIMS.start.y + (CARD_SIZE.vertical.height / 2.5);
@@ -202,6 +202,7 @@ function drawStatsHorizontal (ctx, x, y, stats) {
     drawText(ctx, stats["3"], x, altY, COLOR["category-3"], CARD_SIZE.horizontal.font);
     drawText(ctx, stats["4"], altX, altY, COLOR["category-4"], CARD_SIZE.horizontal.font);
     drawText(ctx, stats.total, x + ((altX - x) / 2), altY + (CARD_SIZE.horizontal.font * 2), COLOR["category-0"], CARD_SIZE.horizontal.font);
+    console.debug("test");
 }
 
 function drawStatsVertical (ctx, x, y, stats) {
