@@ -1,5 +1,6 @@
-import { Canvas, loadImage, FontLibrary } from "skia-canvas";
-FontLibrary.use("Helvetica Neue", ["/fonts/HelveticaNeue/HelveticaNeueMedium.otf"]);
+import { createCanvas as createNapiCanvas, loadImage, GlobalFonts } from "@napi-rs/canvas";
+import { join } from "path";
+GlobalFonts.registerFromPath(join(process.cwd(), "public", "fonts", "HelveticaNeue", "HelveticaNeueMedium.otf"), "Helvetica Neue Medium");
 
 const CANVAS_SIZE = {
     width: 563,
@@ -59,7 +60,7 @@ export const CANVAS_POSITION = (cardNum, cardCount = 1) => {
 };
 
 export function createCanvasObject () {
-    const canvas = new Canvas(CANVAS_SIZE.width, CANVAS_SIZE.height);
+    const canvas = createNapiCanvas(CANVAS_SIZE.width, CANVAS_SIZE.height);
 
     const ctx = canvas.getContext("2d");
     // fill canvas background
@@ -72,8 +73,7 @@ export function createCanvasObject () {
 export async function canvasToImage (canvas) {
     return await new Promise((resolve, reject) => {
             try {
-                const imgBuffer = canvas.toBufferSync("png");
-                resolve(new Blob([imgBuffer], {type:"image/png"}));
+                canvas.toBlob(resolve, "image/png");
             } catch (error) {
                 reject(error);
             }
@@ -183,7 +183,7 @@ function drawText (ctx, text, x, y, color, fontsize, align = "center") {
     const ogFIll = ctx.fillStyle;
     const ogAlign = ctx.textAlign;
     const ogBaseline = ctx.textBaseline;
-    ctx.font = `${fontsize}px Helvetica Neue`;
+    ctx.font = `${fontsize}px Helvetica Neue Medium`;
     ctx.fillStyle = color;
     ctx.textAlign = align;
     ctx.textBaseline = "top";
@@ -192,6 +192,7 @@ function drawText (ctx, text, x, y, color, fontsize, align = "center") {
     ctx.fillStyle = ogFIll;
     ctx.textAlign = ogAlign;
     ctx.textBaseline = ogBaseline;
+    console.debug(GlobalFonts.families);
 }
 
 function drawStatsHorizontal (ctx, x, y, stats) {

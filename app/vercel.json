@@ -11,5 +11,10 @@
             "path": "/api/refresh-gamestate",
             "schedule": "0 0 * * *"
         }
-    ]
+    ],
+    "functions": {
+        "api/*.js": {
+            "includeFiles": "public/**"
+        }
+    }
 }
