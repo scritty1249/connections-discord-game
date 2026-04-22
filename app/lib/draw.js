@@ -1,5 +1,5 @@
 import { createCanvas as createNapiCanvas, loadImage, GlobalFonts } from "@napi-rs/canvas";
-GlobalFonts.registerFont("../punlic/fonts/HelveticaNeue/HelveticaNeueMedium.otf", { family: "HelveticaNeueMedium" });
+GlobalFonts.registerFromPath("../punlic/fonts/HelveticaNeue/HelveticaNeueMedium.otf", "HelveticaNeueMedium");
 
 const CANVAS_SIZE = {
     width: 563,
