@@ -99,11 +99,10 @@ export async function drawScoreHorizontal (ctx, position, attempts, userId, avat
                 y: position.y + (CARD_SIZE.horizontal.height / 2)
             }
         };
-        let currY = DIMS.center.y - (AVATAR_SIZE.horizontal / 2);
+        let currY = DIMS.start.y + ((CARD_SIZE.horizontal.width / 5) - (AVATAR_SIZE.horizontal / 2));
         drawCardBorder(ctx, DIMS.start.x, DIMS.start.y, DIMS.end.x - DIMS.start.x, DIMS.end.y - DIMS.start.y);
         drawAvatar(ctx, DIMS.start.x + (CARD_SIZE.horizontal.width / 4) - (AVATAR_SIZE.horizontal / 2), currY, avatarImg, AVATAR_SIZE.horizontal);
-        currY += (AVATAR_SIZE.horizontal / 2) + ATTEMPT_SQUARE.horizontal.gap;
-        console.debug(stats);
+        currY += AVATAR_SIZE.horizontal + ATTEMPT_SQUARE.horizontal.gap * 3;
         drawStatsHorizontal(ctx, DIMS.start.x + (CARD_SIZE.horizontal.width / 8), currY, stats);
 
         drawAttemptGridHorizontal(ctx,
@@ -202,7 +201,6 @@ function drawStatsHorizontal (ctx, x, y, stats) {
     drawText(ctx, stats["3"], x, altY, COLOR["category-3"], CARD_SIZE.horizontal.font);
     drawText(ctx, stats["4"], altX, altY, COLOR["category-4"], CARD_SIZE.horizontal.font);
     drawText(ctx, stats.total, x + ((altX - x) / 2), altY + (CARD_SIZE.horizontal.font * 2), COLOR["category-0"], CARD_SIZE.horizontal.font);
-    console.debug("test");
 }
 
 function drawStatsVertical (ctx, x, y, stats) {
