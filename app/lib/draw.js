@@ -73,7 +73,8 @@ export function createCanvasObject () {
 export async function canvasToImage (canvas) {
     return await new Promise((resolve, reject) => {
             try {
-                canvas.toBlob(resolve, "image/png");
+                const imgBuffer = canvas.toBufferSync("png");
+                resolve(new Blob([imgBuffer], {type:"image/png"}));
             } catch (error) {
                 reject(error);
             }
