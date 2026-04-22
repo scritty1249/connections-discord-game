@@ -1,5 +1,5 @@
 import { createCanvas as createNapiCanvas, loadImage, GlobalFonts } from "@napi-rs/canvas";
-GlobalFonts.registerFromPath("../punlic/fonts/HelveticaNeue/HelveticaNeueMedium.otf", "HelveticaNeueMedium");
+GlobalFonts.registerFromPath("../public/fonts/HelveticaNeue/HelveticaNeueMedium.otf", "HelveticaNeueMedium");
 
 const CANVAS_SIZE = {
     width: 563,
@@ -182,7 +182,7 @@ function drawText (ctx, text, x, y, color, fontsize, align = "center") {
     const ogFIll = ctx.fillStyle;
     const ogAlign = ctx.textAlign;
     const ogBaseline = ctx.textBaseline;
-    ctx.font = `${fontsize}px sans-serif`;
+    ctx.font = `${fontsize}px HelveticaNeueMedium`;
     ctx.fillStyle = "white";
     ctx.textAlign = align;
     ctx.textBaseline = "top";
