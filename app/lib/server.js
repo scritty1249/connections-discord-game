@@ -172,7 +172,7 @@ export async function updateChannelParticipants (channelid, userid, username, av
     return await UserDB.getChannel(channelid);
 }
 
-export async function getCategoryStats (attempts, categories) {
+export function getCategoryStats (attempts, categories) {
     const categoryWordIds = Array.from(Object.values(categories), category => Array.from(category, category.id));
     const stats = {
         "1": "",
