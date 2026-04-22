@@ -175,6 +175,7 @@ function drawCardBorder (ctx, x, y, width, height) {
     ctx.stroke();
     ctx.strokeStyle = ogStrokeStyle;
     ctx.lineWidth = ogLineWidth;
+    console.debug(GlobalFonts.families);
 }
 
 function drawText (ctx, text, x, y, color, fontsize, align = "center") {
