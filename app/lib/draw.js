@@ -114,7 +114,7 @@ export async function drawScoreHorizontal (ctx, position, attempts, userId, avat
 
 export async function drawScoreVertical (ctx, position, attempts, userId, avatarName, stats) {
     return await Promise.all([
-        loadImage(loadImage(AVATAR_URL(userId, avatarName)))
+        loadImage(AVATAR_URL(userId, avatarName))
     ]).then(([
         avatarImg
     ]) => {
