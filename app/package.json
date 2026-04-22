@@ -13,7 +13,7 @@
         "@upstash/redis": "latest",
         "@discord/embedded-app-sdk": "latest",
         "tweetnacl": "latest",
-        "@napi-rs/canvas": "latest",
+        "skia-canvas": "latest",
         "@canvas-fonts/helveticaneue": "latest"
     },
     "devDependencies": {
