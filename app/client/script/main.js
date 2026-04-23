@@ -5,10 +5,9 @@ import * as Discord from "./discord.js";
 const API_ENDPOINT = window.origin + "/api";
 let discordSdk = null;
 let userData = null;
-let categories = null;
-let categoryIds = null;
 let newAttemptMade = false;
 
+const GAMEDATA = {categories: null, challenge: 0, ids: null};
 const ATTEMPTS = [];
 const ELEMENTS = {
     WORDS: [],
@@ -91,7 +90,7 @@ async function submitAttempt () { // old attempts returned from api as an Array 
             cardFX.repeatAttempt(selectedWordEls),
             popup("Already guessed!", 2000)
         ]);
-    } else if (attemptIsCorrect(wordIds, categoryIds)) {
+    } else if (attemptIsCorrect(wordIds, GAMEDATA.ids)) {
         console.debug("Correct attempt");
         animationPromise = playCorrectAttemptAnimation(
             getCategoryElement(wordIds),
@@ -99,7 +98,7 @@ async function submitAttempt () { // old attempts returned from api as an Array 
             document.getElementById("words"),
             document.getElementById("categories")
         ).then(() => { queueRecordOrder(ORDER.CURR) });
-    } else if (attemptIsOneAway(wordIds, categoryIds)) {
+    } else if (attemptIsOneAway(wordIds, GAMEDATA.ids)) {
         console.debug("Close attempt");
         animationPromise = popup("One away...", 2000);
     } else {
@@ -200,7 +199,7 @@ function playCorrectAttemptAnimation (categoryEl, wordEls, wordContainer, catego
 
 function getCategoryElement (attempt) { // attempt is an Array of Numbers
     const categoryEl = ELEMENTS.CATEGORIES.filter(categoryEl =>
-        categoryEl.innerHTML == getCategoryData(attempt, categories));
+        categoryEl.innerHTML == getCategoryData(attempt, GAMEDATA.categories));
     return (categoryEl.length) ? categoryEl[0] : undefined;
 }
 
@@ -261,9 +260,10 @@ window.onload = (e) => {
                 }
             }).then(data => {
                 if (data) {
-                    categories = data;
-                    categoryIds = Array.from(Object.values(categories), wordData =>
+                    ({ categories: GAMEDATA.categories, challengeNum: GAMEDATA.challenge }) = data;
+                    GAMEDATA.ids = Array.from(Object.values(GAMEDATA.categories), (wordData) =>
                         Array.from(wordData, ({id}) => id).sort());
+                    console.info("Loaded gamedata:", GAMEDATA);
                 }
             }),
         // connect to discord actvity sdk
@@ -292,17 +292,16 @@ window.onload = (e) => {
             console.debug(`Loaded previous attempts: ${ATTEMPTS}`);
             if (ORDER.wasUpdated)
                 console.debug(`Loaded previous order: ${ORDER.PREV}`);
-            console.log(categories);
 
             // create card elements
             {
                 const solvedWordIds = [];
-                createCategoryElements(Object.keys(categories))
+                createCategoryElements(Object.keys(GAMEDATA.categories))
                     .forEach(categoryEl => ELEMENTS.CATEGORIES.push(categoryEl));
 
                 // init previous correct attempts (if any)
                 if (ATTEMPTS.length) {
-                    ATTEMPTS.filter(attempt => attemptIsCorrect(attempt, categoryIds))
+                    ATTEMPTS.filter(attempt => attemptIsCorrect(attempt, GAMEDATA.ids))
                         .forEach(correctAttempt => {
                             const categoryEl = getCategoryElement(correctAttempt);
                             if (categoryEl !== undefined) {
@@ -319,7 +318,7 @@ window.onload = (e) => {
                         });
                 }
                 const wordIds = [];
-                Object.entries(categories).forEach(([_, words]) => {
+                Object.entries(GAMEDATA.categories).forEach(([_, words]) => {
                     words.forEach(({word, id}) => {
                         let wordEl = createCardElement(softHypenateText(word, 5), wordClickHandler, "word");
                         wordEl.dataset.id = id;

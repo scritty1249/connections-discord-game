@@ -35,6 +35,7 @@ body {
 #content-container {
     margin: 0 auto;
     box-sizing: border-box;
+    align-content: center; 
     width: 80%;
     height: auto;
     font-family: "HelveticaNeue-Bold", "Helvetica Neue Bold", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
@@ -52,7 +53,6 @@ body {
 
 #card-grid {
     --category-reveal-transition-duration: 1s;
-    margin-top: 10%;
     margin-bottom: 15%; /* don't overlap with submit button */
     display: grid;
     > div {

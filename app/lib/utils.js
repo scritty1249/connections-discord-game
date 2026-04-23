@@ -27,3 +27,11 @@ export function isSameDay (date1, date2) {
 export function formatNumberString (number) {
     return number.toLocaleString('en-US'); // because no other kind matters! lol
 }
+
+export function getChallengeNumber (currentDate) {
+    if (! dateObj instanceof Date)
+        throw new Error(`Parameter must be a Date object, not [${typeof dateObj}].`);
+    const CONNECTIONS_START_DATE = new Date("2023-06-12");
+    const diffMs = Math.abs(currentDate - CONNECTIONS_START_DATE);
+    return Math.floor(diffMs / (1000 * 60 * 60 * 24)); // 1000ms * 60s * 60m * 24h
+}

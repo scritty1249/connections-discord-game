@@ -1,4 +1,4 @@
-import { dateToString, formatNumberString } from "./utils.js";
+import { dateToString, formatNumberString, getChallengeNumber } from "./utils.js";
 import * as ENDPOINT from "./endpoints.js";
 import { GameDB, UserDB } from "./store.js";
 import { createCanvasObject, drawScoreHorizontal, drawScoreVertical, canvasToImage, CANVAS_POSITION } from "./draw.js";
@@ -12,9 +12,12 @@ async function fetchGameData(gameDate) {
         throw new Error(`Something went wrong while requesting game data from NYT servers. Status: ${response.status}`);
     }
     const data = response.categories;
-    const categories = {};
-    data.forEach(({title, cards}) => categories[title] = Array.from(cards, c => ({word: c.content, id: c.position}) )); // card "position" is actually id (internally). The "positions" stay the same even after shuffing
-    return categories;
+    const gamedata = {
+        challengeNum: getChallengeNumber(gameDate),
+        categories: {}
+    };
+    data.forEach(({title, cards}) => gamedata.categories[title] = Array.from(cards, c => ({word: c.content, id: c.position}) )); // card "position" is actually id (internally). The "positions" stay the same even after shuffing
+    return gamedata;
 }
 
 async function storeGameData(gamedata) {
@@ -26,9 +29,9 @@ async function storeGameData(gamedata) {
     return response;
 }
 
-async function generateScoreImage(userdata, ...otherdata) { // userdata = { attempts, avatar, id }
-    const { canvas, ctx } = createCanvasObject();
-    if (!otherdata.length) { // one player (horizontal card)
+async function generateScoreImage(challengeNumber, ...userdatas) { // userdata = { attempts, avatar, id }
+    const { canvas, ctx } = createCanvasObject(challengeNumber);
+    if (userdatas.length === 1) { // one player (horizontal card)
         const { id, attempts, avatar, stats } = userdata;
         await drawScoreHorizontal(
             ctx,
@@ -39,12 +42,11 @@ async function generateScoreImage(userdata, ...otherdata) { // userdata = { atte
             stats
         );
     } else { // multiple players (vertical cards)
-        const datas = [userdata, ...otherdata.slice(0, Math.min(otherdata.length, 3))];
-        const draws = Promise.all(Array.from(datas,
+        const draws = Promise.all(Array.from(userdatas,
             ({ id, attempts, avatar, stats }, idx) =>
             drawScoreVertical(
                 ctx,
-                CANVAS_POSITION(idx + 1, datas.length),
+                CANVAS_POSITION(idx + 1, userdatas.length),
                 attempts,
                 id,
                 avatar,
@@ -153,11 +155,11 @@ export async function newOrder(userid, order) { // order is an Array of 16 ids (
 
 export async function scoreImage(userdata, ...userdatas) { // expects {attempts, userid, avatar}
     const datas = [userdata, ...userdatas];
-    const gamedata = await getGameData();
-    const categoryWordIds = Array.from(Object.values(gamedata), category => Array.from(category, (word) => word.id));
+    const { categories, challengeNum } = await getGameData();
+    const categoryWordIds = Array.from(Object.values(categories), category => Array.from(category, (word) => word.id));
     const newData = Array.from(datas, ({attempts, userid, avatar}) => 
-        ({stats: getCategoryStats(attempts, categoryWordIds), attempts: matchAttemptsToCategory(attempts, gamedata), id: userid, avatar: avatar}));
-    return await generateScoreImage(...newData);
+        ({stats: getCategoryStats(attempts, categoryWordIds), attempts: matchAttemptsToCategory(attempts, categories), id: userid, avatar: avatar}));
+    return await generateScoreImage(challengeNum, ...newData);
 }
 
 // returns updated channel data for chaining

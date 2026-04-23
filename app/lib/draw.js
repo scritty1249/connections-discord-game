@@ -3,10 +3,11 @@ process.env.FONTCONFIG_PATH = join(process.cwd(), "app", "public", "fonts"); // 
 import { Canvas, loadImage, FontLibrary } from "skia-canvas";
 import { join } from "path";
 
-let fontFamilyReady = false;
 try {
-    FontLibrary.use("Helvetica Neue", [join(process.cwd(), "app", "public", "fonts", "HelveticaNeue", "HelveticaNeueMedium.otf")]);
-    fontFamilyReady = true;
+    FontLibrary.use("Helvetica Neue Thin", [join(process.cwd(), "app", "public", "fonts", "HelveticaNeue", "HelveticaNeueThin.otf")]);
+    FontLibrary.use("Helvetica Neue Light", [join(process.cwd(), "app", "public", "fonts", "HelveticaNeue", "HelveticaNeueLight.otf")]);
+    FontLibrary.use("Helvetica Neue Medium", [join(process.cwd(), "app", "public", "fonts", "HelveticaNeue", "HelveticaNeueMedium.otf")]);
+    FontLibrary.use("Helvetica Neue Heavy", [join(process.cwd(), "app", "public", "fonts", "HelveticaNeue", "HelveticaNeueHeavy.otf")]);
 } catch (error) {
     console.error("Failed to initialize font family:", error);
     console.debug("Fonts:", FontLibrary.families);
@@ -19,31 +20,30 @@ const CANVAS_SIZE = {
 const CARD_SIZE = {
     horizontal: {
         width: CANVAS_SIZE.width * .7,
-        height: CANVAS_SIZE.height * .85,
-        gap: 15,
+        gap: 12,
         font: 18
     },
     vertical: {
         width: 121,
-        height: CANVAS_SIZE.height * .85,
         gap: 10,
         font: 12
     },
+    height: CANVAS_SIZE.height * .75,
     padding: 20,
     thickness: 2
 };
 const AVATAR_SIZE = {
-    horizontal: 128,
-    vertical: 56  
+    horizontal: 100,
+    vertical: 48  
 };
 const ATTEMPT_SQUARE = {
     horizontal: {
-        size: 35,
-        gap: 5
+        size: 30,
+        gap: 3
     },
     vertical: {
-        size: 22,
-        gap: 2
+        size: 20,
+        gap: 1
     }
 };
 const COLOR = {
@@ -60,24 +60,23 @@ const COLOR = {
 const AVATAR_URL = (userid, avatarName) => `https://cdn.discordapp.com/avatars/${userid}/${avatarName}.png?size=128`;
 
 export const CANVAS_POSITION = (cardNum, cardCount = 1) => {
-    return (cardCount == 1)
-        ? {
-            x: (CANVAS_SIZE.width - CARD_SIZE.horizontal.width) / 2,
-            y: (CANVAS_SIZE.height - CARD_SIZE.horizontal.height) / 2
-        } : {
-            x: ((CARD_SIZE.padding * (cardNum - 1)) + (CARD_SIZE.vertical.width * (cardNum - 1))) + ((CANVAS_SIZE.width / 2) - (((CARD_SIZE.padding * (cardCount - 1)) + (CARD_SIZE.vertical.width * cardCount)) / 2)),
-            y: (CANVAS_SIZE.height - CARD_SIZE.vertical.height) / 2
-        }
+    return {
+        x: (cardCount == 1)
+            ? (CANVAS_SIZE.width - CARD_SIZE.horizontal.width) / 2
+            : ((CARD_SIZE.padding * (cardNum - 1)) + (CARD_SIZE.vertical.width * (cardNum - 1))) + ((CANVAS_SIZE.width / 2) - (((CARD_SIZE.padding * (cardCount - 1)) + (CARD_SIZE.vertical.width * cardCount)) / 2)),
+        y: ((CANVAS_SIZE.height - CARD_SIZE.height) / 2) + 10
+    };
 };
 
-export function createCanvasObject () {
+export function createCanvasObject (challengeNumber) {
     const canvas = new Canvas(CANVAS_SIZE.width, CANVAS_SIZE.height);
 
     const ctx = canvas.getContext("2d");
     // fill canvas background
     ctx.fillStyle = COLOR.background;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-
+    if (challengeNumber || challengeNumber === 0)
+        drawText(ctx, `Connections No. ${challengeNumber}`, CANVAS_SIZE.width / 2, 20, COLOR.white, 14, "center", "Helvetica Neue Light");
     return { canvas: canvas, ctx: ctx };
 }
 
@@ -105,11 +104,11 @@ export async function drawScoreHorizontal (ctx, position, attempts, userId, avat
             },
             end: {
                 x: position.x + CARD_SIZE.horizontal.width,
-                y: position.y + CARD_SIZE.horizontal.height
+                y: position.y + CARD_SIZE.height
             },
             center: {
                 x: position.x + (CARD_SIZE.horizontal.width / 2),
-                y: position.y + (CARD_SIZE.horizontal.height / 2)
+                y: position.y + (CARD_SIZE.height / 2)
             }
         };
         let currY = DIMS.start.y + ((CARD_SIZE.horizontal.width / 5) - (AVATAR_SIZE.horizontal / 2));
@@ -139,11 +138,11 @@ export async function drawScoreVertical (ctx, position, attempts, userId, avatar
             },
             end: {
                 x: position.x + CARD_SIZE.vertical.width,
-                y: position.y + CARD_SIZE.vertical.height
+                y: position.y + CARD_SIZE.height
             },
             center: {
                 x: position.x + (CARD_SIZE.vertical.width / 2),
-                y: position.y + (CARD_SIZE.vertical.height / 2)
+                y: position.y + (CARD_SIZE.height / 2)
             }
         };
         let currY = DIMS.start.y + CARD_SIZE.vertical.gap;
@@ -151,7 +150,7 @@ export async function drawScoreVertical (ctx, position, attempts, userId, avatar
         drawAvatar(ctx, DIMS.start.x + CARD_SIZE.vertical.gap, currY, avatarImg, AVATAR_SIZE.vertical);
         drawStatsVertical(ctx, DIMS.end.x - CARD_SIZE.vertical.gap, currY, stats);
 
-        currY = DIMS.start.y + (CARD_SIZE.vertical.height / 2.5);
+        currY = DIMS.start.y + (CARD_SIZE.height / 2.5);
         drawAttemptGridVertical(ctx,
             DIMS.center.x - (((ATTEMPT_SQUARE.vertical.gap * 3) + (ATTEMPT_SQUARE.vertical.size * 4)) / 2),
             currY,
@@ -190,16 +189,16 @@ function drawCardBorder (ctx, x, y, width, height) {
     ctx.lineWidth = ogLineWidth;
 }
 
-function drawText (ctx, text, x, y, color, fontsize, align = "center") {
-    if (!fontFamilyReady) {
-        console.warn("Font family not ready. Passing drawText...");
+function drawText (ctx, text, x, y, color, fontsize, align = "center", fontfamily = "Helvetica Neue Medium") {
+    if (!FontLibrary.families.includes(fontfamily)) {
+        console.warn(`Failed to draw text: Font family ${fontfamily} not found.`); // no idiot proofing/fallback fonts. Dev should know what they want, or don't draw at all.
         return;
     }
     const ogFont = ctx.font;
     const ogFIll = ctx.fillStyle;
     const ogAlign = ctx.textAlign;
     const ogBaseline = ctx.textBaseline;
-    ctx.font = `${fontsize}px Helvetica Neue`;
+    ctx.font = `${fontsize}px ${fontfamily}`;
     ctx.fillStyle = color;
     ctx.textAlign = align;
     ctx.textBaseline = "top";
@@ -212,7 +211,7 @@ function drawText (ctx, text, x, y, color, fontsize, align = "center") {
 
 function drawStatsHorizontal (ctx, x, y, stats) {
     const altX = x + (CARD_SIZE.horizontal.width / 4);
-    const altY = y + (CARD_SIZE.horizontal.font * 2);
+    const altY = y + (CARD_SIZE.horizontal.font * 1.5);
     drawText(ctx, stats["1"], x, y, COLOR["category-1"], CARD_SIZE.horizontal.font);
     drawText(ctx, stats["2"], altX, y, COLOR["category-2"], CARD_SIZE.horizontal.font);
     drawText(ctx, stats["3"], x, altY, COLOR["category-3"], CARD_SIZE.horizontal.font);
@@ -227,7 +226,7 @@ function drawStatsVertical (ctx, x, y, stats) {
     drawText(ctx, stats["2"], x, incr(), COLOR["category-2"], CARD_SIZE.vertical.font, "right");
     drawText(ctx, stats["3"], x, incr(), COLOR["category-3"], CARD_SIZE.vertical.font, "right");
     drawText(ctx, stats["4"], x, incr(), COLOR["category-4"], CARD_SIZE.vertical.font, "right");
-    incr();
+    i += .5;
     drawText(ctx, stats.total, x, incr() , COLOR["white"], CARD_SIZE.vertical.font, "right");
 }
 
