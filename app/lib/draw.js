@@ -3,7 +3,7 @@ import { join } from "path";
 
 let fontFamilyReady = false;
 try {
-    FontLibrary.use("Helvetica Neue", [join(process.cwd(), "public", "fonts", "HelveticaNeue", "HelveticaNeueMedium.otf")]);
+    FontLibrary.use("Helvetica Neue", [join(process.cwd(), "fonts", "HelveticaNeue", "HelveticaNeueMedium.otf")]);
     fontFamilyReady = true;
 } catch (error) {
     console.error("Failed to initialize font family:", error);
