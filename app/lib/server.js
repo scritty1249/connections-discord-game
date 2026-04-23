@@ -32,7 +32,7 @@ async function storeGameData(gamedata) {
 async function generateScoreImage(challengeNumber, ...userdatas) { // userdata = { attempts, avatar, id }
     const { canvas, ctx } = createCanvasObject(challengeNumber);
     if (userdatas.length === 1) { // one player (horizontal card)
-        const { id, attempts, avatar, stats } = userdata;
+        const { id, attempts, avatar, stats } = userdatas[0];
         await drawScoreHorizontal(
             ctx,
             CANVAS_POSITION(1),
