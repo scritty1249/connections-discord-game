@@ -29,8 +29,8 @@ export function formatNumberString (number) {
 }
 
 export function getChallengeNumber (currentDate) {
-    if (! dateObj instanceof Date)
-        throw new Error(`Parameter must be a Date object, not [${typeof dateObj}].`);
+    if (! currentDate instanceof Date)
+        throw new Error(`Parameter must be a Date object, not [${typeof currentDate}].`);
     const CONNECTIONS_START_DATE = new Date("2023-06-12");
     const diffMs = Math.abs(currentDate - CONNECTIONS_START_DATE);
     return Math.floor(diffMs / (1000 * 60 * 60 * 24)); // 1000ms * 60s * 60m * 24h
