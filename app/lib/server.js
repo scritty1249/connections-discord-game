@@ -154,7 +154,7 @@ export async function newOrder(userid, order) { // order is an Array of 16 ids (
 export async function scoreImage(userdata, ...userdatas) { // expects {attempts, userid, avatar}
     const datas = [userdata, ...userdatas];
     const gamedata = await getGameData();
-    const categoryWordIds = Array.from(Object.values(gamedata), category => Array.from(category, category.id));
+    const categoryWordIds = Array.from(Object.values(gamedata), category => Array.from(category, (word) => word.id));
     const newData = Array.from(datas, ({attempts, userid, avatar}) => 
         ({stats: getCategoryStats(attempts, categoryWordIds), attempts: matchAttemptsToCategory(attempts, gamedata), id: userid, avatar: avatar}));
     return await generateScoreImage(...newData);
