@@ -47,6 +47,7 @@ const ATTEMPT_SQUARE = {
     }
 };
 const COLOR = {
+    white: "#fdfdfd",
     background: "#151515",
     cardBorder: "#272728",
     "category-0": "#272728", // unknown/hidden answer attempt
@@ -216,7 +217,7 @@ function drawStatsHorizontal (ctx, x, y, stats) {
     drawText(ctx, stats["2"], altX, y, COLOR["category-2"], CARD_SIZE.horizontal.font);
     drawText(ctx, stats["3"], x, altY, COLOR["category-3"], CARD_SIZE.horizontal.font);
     drawText(ctx, stats["4"], altX, altY, COLOR["category-4"], CARD_SIZE.horizontal.font);
-    drawText(ctx, stats.total, x + ((altX - x) / 2), altY + (CARD_SIZE.horizontal.font * 2), COLOR["category-0"], CARD_SIZE.horizontal.font);
+    drawText(ctx, stats.total, x + ((altX - x) / 2), altY + (CARD_SIZE.horizontal.font * 2), COLOR["white"], CARD_SIZE.horizontal.font);
 }
 
 function drawStatsVertical (ctx, x, y, stats) {
@@ -227,7 +228,7 @@ function drawStatsVertical (ctx, x, y, stats) {
     drawText(ctx, stats["3"], x, incr(), COLOR["category-3"], CARD_SIZE.vertical.font, "right");
     drawText(ctx, stats["4"], x, incr(), COLOR["category-4"], CARD_SIZE.vertical.font, "right");
     incr();
-    drawText(ctx, stats.total, x, incr() , COLOR["category-0"], CARD_SIZE.vertical.font, "right");
+    drawText(ctx, stats.total, x, incr() , COLOR["white"], CARD_SIZE.vertical.font, "right");
 }
 
 function drawAttemptGridVertical (ctx, x, y, attemptCategories) { // attemptCategories here is an Array of attempts, where each attempt is an Array of Numbers that corrospond to a specific category (1-4). 0 Marks an unknown category and -1 marks an unused attempt.
