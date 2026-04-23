@@ -1,4 +1,4 @@
-import { dateToString } from "./utils.js";
+import { dateToString, formatNumberString } from "./utils.js";
 import * as ENDPOINT from "./endpoints.js";
 import { GameDB, UserDB } from "./store.js";
 import { createCanvasObject, drawScoreHorizontal, drawScoreVertical, canvasToImage, CANVAS_POSITION } from "./draw.js";
@@ -185,7 +185,7 @@ export function getCategoryStats (attempts, categories) {
         let difficulty = 1;
         for (const categoryWords of categoryWordIds) {
             if (categoryWords.every(wordId => attempt.includes(wordId))) {
-                stats[String(difficulty)] = idx + 1;
+                stats[String(difficulty)] = formatNumberString(idx + 1);
                 return;
             }
             difficulty++;
