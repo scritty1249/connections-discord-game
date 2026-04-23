@@ -1,6 +1,6 @@
 import { createCanvas as createNapiCanvas, loadImage, GlobalFonts } from "@napi-rs/canvas";
 import { join } from "path";
-GlobalFonts.registerFromPath(join(process.cwd(), "public", "fonts", "HelveticaNeue", "HelveticaNeueMedium.otf"), "Helvetica Neue Medium");
+GlobalFonts.registerFromPath(join(process.cwd(), "fonts", "HelveticaNeue", "HelveticaNeueMedium.otf"), "Helvetica Neue Medium");
 
 const CANVAS_SIZE = {
     width: 563,
