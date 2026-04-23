@@ -1,3 +1,5 @@
+process.env.FONTCONFIG_PATH = "/etc/fonts"; // fake path to silence fontconfig error messages 
+
 import { Canvas, loadImage, FontLibrary } from "skia-canvas";
 import { join } from "path";
 
