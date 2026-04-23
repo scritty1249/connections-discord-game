@@ -14,7 +14,7 @@
     ],
     "functions": {
         "api/*.js": {
-            "includeFiles": "fonts/**"
+            "includeFiles": "public/fonts/**/*.otf"
         }
     }
 }
