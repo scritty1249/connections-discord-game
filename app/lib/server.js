@@ -174,6 +174,8 @@ export async function updateChannelParticipants (channelid, userid, username, av
 
 export function getCategoryStats (attempts, categories) {
     const categoryWordIds = Array.from(Object.values(categories), category => Array.from(category, category.id));
+    console.debug(attempts);
+    console.debug(categoryWordIds);
     const stats = {
         "1": "",
         "2": "",
@@ -181,6 +183,7 @@ export function getCategoryStats (attempts, categories) {
         "4": "",
         total: `(${attempts.length})`
     };
+    console.debug(stats);
     attempts.forEach((attempt, idx) => {
         let difficulty = 1;
         for (const categoryWords of categoryWordIds) {
@@ -191,5 +194,6 @@ export function getCategoryStats (attempts, categories) {
             difficulty++;
         }            
     });
+    console.debug(stats);
     return stats;
 }
