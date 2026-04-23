@@ -13,8 +13,8 @@
         }
     ],
     "functions": {
-        "api/*.js": {
-            "includeFiles": "public/fonts/**/*.otf"
+        "app/api/*.js": {
+            "includeFiles": "app/public/fonts/**/*.otf"
         }
     }
 }
