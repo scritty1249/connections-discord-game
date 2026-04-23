@@ -180,6 +180,7 @@ export function getCategoryStats (attempts, categoryWordIds) { // categoryWordId
         "4": "",
         total: `(${attempts.length})`
     };
+    console.debug(categoryWordIds, attempts, stats);
     attempts.forEach((attempt, idx) => {
         let difficulty = 1;
         for (const categoryWords of categoryWordIds) {
@@ -190,5 +191,6 @@ export function getCategoryStats (attempts, categoryWordIds) { // categoryWordId
             difficulty++;
         }            
     });
+    console.debug(stats);
     return stats;
 }
