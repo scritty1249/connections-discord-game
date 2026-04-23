@@ -260,7 +260,7 @@ window.onload = (e) => {
                 }
             }).then(data => {
                 if (data) {
-                    ({ categories: GAMEDATA.categories, challengeNum: GAMEDATA.challenge }) = data;
+                    ({ categories: GAMEDATA.categories, challengeNum: GAMEDATA.challenge } = data);
                     GAMEDATA.ids = Array.from(Object.values(GAMEDATA.categories), (wordData) =>
                         Array.from(wordData, ({id}) => id).sort());
                     console.info("Loaded gamedata:", GAMEDATA);
