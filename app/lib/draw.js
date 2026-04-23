@@ -1,4 +1,4 @@
-process.env.FONTCONFIG_PATH = "/etc/fonts"; // fake path to silence fontconfig error messages 
+process.env.FONTCONFIG_PATH = join(process.cwd(), "app", "public", "fonts"); // path to dummy config to silence fontconfig error messages 
 
 import { Canvas, loadImage, FontLibrary } from "skia-canvas";
 import { join } from "path";
@@ -9,7 +9,6 @@ try {
     fontFamilyReady = true;
 } catch (error) {
     console.error("Failed to initialize font family:", error);
-} finally {
     console.debug("Fonts:", FontLibrary.families);
 }
 
