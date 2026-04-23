@@ -28,28 +28,27 @@ async function storeGameData(gamedata) {
 
 async function generateScoreImage(userdata, ...otherdata) { // userdata = { attempts, avatar, id }
     const { canvas, ctx } = createCanvasObject();
-    const categoryData = await getGameData();
     if (!otherdata.length) { // one player (horizontal card)
-        const { id, attempts, avatar } = userdata;
+        const { id, attempts, avatar, stats } = userdata;
         await drawScoreHorizontal(
             ctx,
             CANVAS_POSITION(1),
             attempts,
             id,
             avatar,
-            getCategoryStats(attempts, categoryData)
+            stats
         );
     } else { // multiple players (vertical cards)
         const datas = [userdata, ...otherdata.slice(0, Math.min(otherdata.length, 3))];
         const draws = Promise.all(Array.from(datas,
-            ({ id, attempts, avatar }, idx) =>
+            ({ id, attempts, avatar, stats }, idx) =>
             drawScoreVertical(
                 ctx,
                 CANVAS_POSITION(idx + 1, datas.length),
                 attempts,
                 id,
                 avatar,
-                getCategoryStats(attempts, categoryData)
+                stats
             )
         ));
         try {
@@ -155,8 +154,9 @@ export async function newOrder(userid, order) { // order is an Array of 16 ids (
 export async function scoreImage(userdata, ...userdatas) { // expects {attempts, userid, avatar}
     const datas = [userdata, ...userdatas];
     const gamedata = await getGameData();
+    const categoryWordIds = Array.from(Object.values(gamedata), category => Array.from(category, category.id));
     const newData = Array.from(datas, ({attempts, userid, avatar}) => 
-        ({attempts: matchAttemptsToCategory(attempts, gamedata), id: userid, avatar: avatar}));
+        ({stats: getCategoryStats(attempts, categoryWordIds), attempts: matchAttemptsToCategory(attempts, gamedata), id: userid, avatar: avatar}));
     return await generateScoreImage(...newData);
 }
 
@@ -172,10 +172,7 @@ export async function updateChannelParticipants (channelid, userid, username, av
     return await UserDB.getChannel(channelid);
 }
 
-export function getCategoryStats (attempts, categories) {
-    const categoryWordIds = Array.from(Object.values(categories), category => Array.from(category, category.id));
-    console.debug(attempts);
-    console.debug(categoryWordIds);
+export function getCategoryStats (attempts, categoryWordIds) { // categoryWordIds is an Array of Arrays, with the index of each nested Array corrosponding to category difficulty and each Number within matching the ID of a word for that category.
     const stats = {
         "1": "",
         "2": "",
@@ -183,7 +180,6 @@ export function getCategoryStats (attempts, categories) {
         "4": "",
         total: `(${attempts.length})`
     };
-    console.debug(stats);
     attempts.forEach((attempt, idx) => {
         let difficulty = 1;
         for (const categoryWords of categoryWordIds) {
@@ -194,6 +190,5 @@ export function getCategoryStats (attempts, categories) {
             difficulty++;
         }            
     });
-    console.debug(stats);
     return stats;
 }
