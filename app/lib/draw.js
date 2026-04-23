@@ -1,6 +1,13 @@
-import { createCanvas as createNapiCanvas, loadImage, GlobalFonts } from "@napi-rs/canvas";
+import { Canvas, loadImage, FontLibrary } from "skia-canvas";
 import { join } from "path";
-GlobalFonts.registerFromPath(join(process.cwd(), "fonts", "HelveticaNeue", "HelveticaNeueMedium.otf"), "Helvetica Neue Medium");
+
+let fontFamilyReady = false;
+try {
+    FontLibrary.use("Helvetica Neue", [join(process.cwd(), "public", "fonts", "HelveticaNeue", "HelveticaNeueMedium.otf")]);
+    fontFamilyReady = true;
+} catch (error) {
+    console.error("Failed to initialize font family:", error);
+}
 
 const CANVAS_SIZE = {
     width: 563,
@@ -60,7 +67,7 @@ export const CANVAS_POSITION = (cardNum, cardCount = 1) => {
 };
 
 export function createCanvasObject () {
-    const canvas = createNapiCanvas(CANVAS_SIZE.width, CANVAS_SIZE.height);
+    const canvas = new Canvas(CANVAS_SIZE.width, CANVAS_SIZE.height);
 
     const ctx = canvas.getContext("2d");
     // fill canvas background
@@ -73,7 +80,8 @@ export function createCanvasObject () {
 export async function canvasToImage (canvas) {
     return await new Promise((resolve, reject) => {
             try {
-                canvas.toBlob(resolve, "image/png");
+                const imgBuffer = canvas.toBufferSync("png");
+                resolve(new Blob([imgBuffer], {type:"image/png"}));
             } catch (error) {
                 reject(error);
             }
@@ -179,11 +187,15 @@ function drawCardBorder (ctx, x, y, width, height) {
 }
 
 function drawText (ctx, text, x, y, color, fontsize, align = "center") {
+    if (!fontFamilyReady) {
+        console.warn("Font family not ready. Passing drawText...");
+        return;
+    }
     const ogFont = ctx.font;
     const ogFIll = ctx.fillStyle;
     const ogAlign = ctx.textAlign;
     const ogBaseline = ctx.textBaseline;
-    ctx.font = `${fontsize}px Helvetica Neue Medium`;
+    ctx.font = `${fontsize}px Helvetica Neue`;
     ctx.fillStyle = color;
     ctx.textAlign = align;
     ctx.textBaseline = "top";
@@ -192,7 +204,6 @@ function drawText (ctx, text, x, y, color, fontsize, align = "center") {
     ctx.fillStyle = ogFIll;
     ctx.textAlign = ogAlign;
     ctx.textBaseline = ogBaseline;
-    console.debug(GlobalFonts.families);
 }
 
 function drawStatsHorizontal (ctx, x, y, stats) {
