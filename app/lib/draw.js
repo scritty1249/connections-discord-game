@@ -7,6 +7,8 @@ try {
     fontFamilyReady = true;
 } catch (error) {
     console.error("Failed to initialize font family:", error);
+} finally {
+    console.debug("Fonts:", FontLibrary.families);
 }
 
 const CANVAS_SIZE = {
