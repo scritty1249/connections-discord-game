@@ -111,7 +111,7 @@ body {
 #content-container {
     position: relative;
     z-index: 0;
-    margin: 0 auto;
+    margin: 20% auto 15% auto;
     box-sizing: border-box;
     align-content: center; 
     width: 80%;
@@ -131,7 +131,6 @@ body {
 
 #card-grid {
     --category-reveal-transition-duration: 1s;
-    margin-bottom: 15%; /* don't overlap with submit button */
     display: grid;
     > div {
         grid-area: 1 / 1;

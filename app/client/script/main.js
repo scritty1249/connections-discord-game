@@ -239,12 +239,6 @@ async function setWinScreen (first = true) {
         return await popup("You beat today's challenge!", 5000);
 }
 
-document.addEventListener("visibilitychange", (e) => {
-    if (document.visibilityState === "hidden") oncloseHandler();
-});
-document.addEventListener("pagehide", oncloseHandler);
-document.addEventListener("beforeunload", oncloseHandler);
-
 let loadingProgress = 0;
 const LOADING_BAR = document.getElementById("loading-bar");
 const moveProgress = (prog) => (loadingProgress += prog, LOADING_BAR.style.setProperty("--progress", loadingProgress));
@@ -326,29 +320,39 @@ window.onload = (e) => {
                 }
                 if (ELEMENTS.CATEGORY_GRID.children.length === 4) setWinScreen(false);
                 else {
-                    const wordIds = [];
-                    Object.entries(GAMEDATA.categories).forEach(([_, words]) => {
-                        words.forEach(({word, id}) => {
-                            let wordEl = createCardElement(softHypenateText(word, 5), wordClickHandler, "word");
-                            wordEl.dataset.id = id;
-                            if (solvedWordIds.includes(id))
-                                wordEl.classList.add("hide");
-                            ELEMENTS.WORDS.push(wordEl);
-                            wordIds.push(id);
+                    {
+                        const wordIds = [];
+                        Object.entries(GAMEDATA.categories).forEach(([_, words]) => {
+                            words.forEach(({word, id}) => {
+                                let wordEl = createCardElement(softHypenateText(word, 5), wordClickHandler, "word");
+                                wordEl.dataset.id = id;
+                                if (solvedWordIds.includes(id))
+                                    wordEl.classList.add("hide");
+                                ELEMENTS.WORDS.push(wordEl);
+                                wordIds.push(id);
+                            });
                         });
-                    });
-                    ORDER.CURR = !ORDER.wasUpdated ? shuffle(wordIds) : ORDER.PREV;
-                    sortCardEls(ELEMENTS.WORDS, ORDER.CURR);
-                    ELEMENTS.WORDS.forEach(wordEl => ELEMENTS.WORD_GRID.append(wordEl));
-                }
-                // buttons
-                {
-                    BUTTONS.SUBMIT = document.getElementById("submit");
-                    BUTTONS.SUBMIT.onclick = submitHandler;
-                    BUTTONS.DESELECT = document.getElementById("deselect");
-                    BUTTONS.DESELECT.onclick = deselectHandler;
-                    BUTTONS.SHUFFLE = document.getElementById("shuffle");
-                    BUTTONS.SHUFFLE.onclick = shuffleHandler;
+                        ORDER.CURR = !ORDER.wasUpdated ? shuffle(wordIds) : ORDER.PREV;
+                        sortCardEls(ELEMENTS.WORDS, ORDER.CURR);
+                        ELEMENTS.WORDS.forEach(wordEl => ELEMENTS.WORD_GRID.append(wordEl));
+                    }
+                    // buttons
+                    {
+                        BUTTONS.SUBMIT = document.getElementById("submit");
+                        BUTTONS.SUBMIT.onclick = submitHandler;
+                        BUTTONS.DESELECT = document.getElementById("deselect");
+                        BUTTONS.DESELECT.onclick = deselectHandler;
+                        BUTTONS.SHUFFLE = document.getElementById("shuffle");
+                        BUTTONS.SHUFFLE.onclick = shuffleHandler;
+                    }
+                    // add game event messages to backend
+                    {
+                        document.addEventListener("visibilitychange", (e) => {
+                            if (document.visibilityState === "hidden") oncloseHandler();
+                        });
+                        document.addEventListener("pagehide", oncloseHandler);
+                        document.addEventListener("beforeunload", oncloseHandler);
+                    }
                 }
             }
             moveProgress(.2);
