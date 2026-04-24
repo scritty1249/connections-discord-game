@@ -232,10 +232,11 @@ function oncloseHandler () {
         queueGenerateCard();
 }
 
-async function setWinScreen () {
+async function setWinScreen (first = true) {
     queueGenerateCard();
     ELEMENTS.MENU.classList.add("hide");
-    return await popup("You beat today's challenge!", 5000);
+    if (first)
+        return await popup("You beat today's challenge!", 5000);
 }
 
 document.addEventListener("visibilitychange", (e) => {
@@ -244,8 +245,11 @@ document.addEventListener("visibilitychange", (e) => {
 document.addEventListener("pagehide", oncloseHandler);
 document.addEventListener("beforeunload", oncloseHandler);
 
+let loadingProgress = 0;
+const LOADING_BAR = document.getElementById("loading-bar");
+const moveProgress = (prog) => (loadingProgress += prog, LOADING_BAR.style.setProperty("--progress", loadingProgress));
+
 window.onload = (e) => {
-    const containerEl = document.getElementById("content-container");
     ELEMENTS.WORD_GRID = document.getElementById("words");
     ELEMENTS.MENU = document.getElementById("buttons");
     ELEMENTS.CATEGORY_GRID = document.getElementById("categories");
@@ -253,6 +257,7 @@ window.onload = (e) => {
         // retreive categories
         fetch(API_ENDPOINT + "/get-gamedata")
             .then(resp => {
+                moveProgress(.2);
                 if (resp.ok) {
                     return resp.json();
                 } else {
@@ -268,14 +273,17 @@ window.onload = (e) => {
             }),
         // connect to discord actvity sdk
         Discord.getClient(API_ENDPOINT + "/discord-auth")
-            .then(client_id =>
-                Discord.initSdk(client_id, API_ENDPOINT + "/discord-auth"))
+            .then(client_id => (
+                moveProgress(.2),
+                Discord.initSdk(client_id, API_ENDPOINT + "/discord-auth")))
             .then(({discordSdk: sdk, user})=> {
+                moveProgress(.2);
                 discordSdk = sdk;
                 userData = user;
                 return fetch(
                         `${API_ENDPOINT}/get-userdata?id=${userData?.id}`
                     ).then(resp => {
+                        moveProgress(.2);
                         if (resp.ok) {
                             return resp.json();
                         } else {
@@ -287,12 +295,11 @@ window.onload = (e) => {
                         if (attempts)
                             ATTEMPTS.push(...Array.from(attempts, attempt => attempt.toSorted()));
                     })
-            })        
+            })
     ]).then((_) => {
             console.debug(`Loaded previous attempts: ${ATTEMPTS}`);
             if (ORDER.wasUpdated)
                 console.debug(`Loaded previous order: ${ORDER.PREV}`);
-
             // create card elements
             {
                 const solvedWordIds = [];
@@ -317,41 +324,41 @@ window.onload = (e) => {
                             }
                         });
                 }
-                const wordIds = [];
-                Object.entries(GAMEDATA.categories).forEach(([_, words]) => {
-                    words.forEach(({word, id}) => {
-                        let wordEl = createCardElement(softHypenateText(word, 5), wordClickHandler, "word");
-                        wordEl.dataset.id = id;
-                        if (solvedWordIds.includes(id))
-                            wordEl.classList.add("hide");
-                        ELEMENTS.WORDS.push(wordEl);
-                        wordIds.push(id);
+                if (ELEMENTS.CATEGORY_GRID.children.length === 4) setWinScreen(false);
+                else {
+                    const wordIds = [];
+                    Object.entries(GAMEDATA.categories).forEach(([_, words]) => {
+                        words.forEach(({word, id}) => {
+                            let wordEl = createCardElement(softHypenateText(word, 5), wordClickHandler, "word");
+                            wordEl.dataset.id = id;
+                            if (solvedWordIds.includes(id))
+                                wordEl.classList.add("hide");
+                            ELEMENTS.WORDS.push(wordEl);
+                            wordIds.push(id);
+                        });
                     });
-                });
-                ORDER.CURR = !ORDER.wasUpdated ? shuffle(wordIds) : ORDER.PREV;
-                sortCardEls(ELEMENTS.WORDS, ORDER.CURR);
-                ELEMENTS.WORDS.forEach(wordEl => ELEMENTS.WORD_GRID.append(wordEl));
+                    ORDER.CURR = !ORDER.wasUpdated ? shuffle(wordIds) : ORDER.PREV;
+                    sortCardEls(ELEMENTS.WORDS, ORDER.CURR);
+                    ELEMENTS.WORDS.forEach(wordEl => ELEMENTS.WORD_GRID.append(wordEl));
+                }
+                // buttons
+                {
+                    BUTTONS.SUBMIT = document.getElementById("submit");
+                    BUTTONS.SUBMIT.onclick = submitHandler;
+                    BUTTONS.DESELECT = document.getElementById("deselect");
+                    BUTTONS.DESELECT.onclick = deselectHandler;
+                    BUTTONS.SHUFFLE = document.getElementById("shuffle");
+                    BUTTONS.SHUFFLE.onclick = shuffleHandler;
+                }
             }
-
-            // main runtime
+            moveProgress(.2);
+            console.info("Finished loading");
+            // display main page
             {
-                // const avatarSize = 128;
-                // const avatarUrl = Discord.AVATAR_URL(userData.id, userData.avatar, avatarSize);
-                // const avatarEl = document.createElement("img");
-                // avatarEl.classList.add("icon");
-                // avatarEl.src = avatarUrl;
-                // avatarEl.width = avatarSize;
-                // avatarEl.height = avatarSize;
-                // containerEl.prepend(avatarEl);
-            }
-            // buttons
-            {
-                BUTTONS.SUBMIT = document.getElementById("submit");
-                BUTTONS.SUBMIT.onclick = submitHandler;
-                BUTTONS.DESELECT = document.getElementById("deselect");
-                BUTTONS.DESELECT.onclick = deselectHandler;
-                BUTTONS.SHUFFLE = document.getElementById("shuffle");
-                BUTTONS.SHUFFLE.onclick = shuffleHandler;
+                const containerEl = document.getElementById("content-container");
+                const loadingEl = document.getElementById("loading");
+                containerEl.classList.remove("hide");
+                loadingEl.classList.add("hide");
             }
         });
 }
