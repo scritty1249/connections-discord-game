@@ -13,7 +13,7 @@ try {
     console.debug("Fonts:", FontLibrary.families);
 }
 
-const CANVAS_SIZE = {
+export const CANVAS_SIZE = {
     width: 563,
     height: 308
 };
@@ -21,36 +21,37 @@ const CARD_SIZE = {
     horizontal: {
         width: CANVAS_SIZE.width * .7,
         gap: 12,
-        font: 18
+        font: 14
     },
     vertical: {
         width: 121,
-        gap: 10,
-        font: 12
+        gap: 5,
+        font: 10
     },
     height: CANVAS_SIZE.height * .75,
     padding: 20,
     thickness: 2
 };
 const AVATAR_SIZE = {
-    horizontal: 100,
-    vertical: 48  
+    horizontal: 128,
+    vertical: 56  
 };
 const ATTEMPT_SQUARE = {
     horizontal: {
-        size: 30,
+        size: 32,
         gap: 3
     },
     vertical: {
-        size: 20,
+        size: 22,
         gap: 1
     }
 };
-const COLOR = {
+export const COLOR = {
     white: "#fdfdfd",
+    grey: "#6c6c6c",
     background: "#151515",
-    cardBorder: "#272728",
-    "category-0": "#272728", // unknown/hidden answer attempt
+    cardBorder: "#282828",
+    "category-0": "#282828", // unknown/hidden answer attempt
     "category-1": "#f7Da21",
     "category-2": "#b5e352",
     "category-3": "#00a2b3",
@@ -111,11 +112,9 @@ export async function drawScoreHorizontal (ctx, position, attempts, userId, avat
                 y: position.y + (CARD_SIZE.height / 2)
             }
         };
-        let currY = DIMS.start.y + ((CARD_SIZE.horizontal.width / 5) - (AVATAR_SIZE.horizontal / 2));
         drawCardBorder(ctx, DIMS.start.x, DIMS.start.y, DIMS.end.x - DIMS.start.x, DIMS.end.y - DIMS.start.y);
-        drawAvatar(ctx, DIMS.start.x + (CARD_SIZE.horizontal.width / 4) - (AVATAR_SIZE.horizontal / 2), currY, avatarImg, AVATAR_SIZE.horizontal);
-        currY += AVATAR_SIZE.horizontal + ATTEMPT_SQUARE.horizontal.gap * 3;
-        drawStatsHorizontal(ctx, DIMS.start.x + (CARD_SIZE.horizontal.width / 8), currY, stats);
+        drawAvatar(ctx, DIMS.start.x + CARD_SIZE.horizontal.gap, DIMS.center.y - (AVATAR_SIZE.horizontal / 2), avatarImg, AVATAR_SIZE.horizontal);
+        drawStatsHorizontal(ctx, DIMS.start.x + CARD_SIZE.horizontal.gap + (AVATAR_SIZE.horizontal / 2), DIMS.center.y, stats);
 
         drawAttemptGridHorizontal(ctx,
             DIMS.center.x,
@@ -148,9 +147,9 @@ export async function drawScoreVertical (ctx, position, attempts, userId, avatar
         let currY = DIMS.start.y + CARD_SIZE.vertical.gap;
         drawCardBorder(ctx, DIMS.start.x, DIMS.start.y, DIMS.end.x - DIMS.start.x, DIMS.end.y - DIMS.start.y);
         drawAvatar(ctx, DIMS.start.x + CARD_SIZE.vertical.gap, currY, avatarImg, AVATAR_SIZE.vertical);
-        drawStatsVertical(ctx, DIMS.end.x - CARD_SIZE.vertical.gap, currY, stats);
+        drawStatsVertical(ctx, DIMS.start.x + CARD_SIZE.vertical.gap, currY + (CARD_SIZE.vertical.font * .75), stats);
 
-        currY = DIMS.start.y + (CARD_SIZE.height / 2.5);
+        currY = DIMS.end.y - (CARD_SIZE.vertical.gap * 1.5) - (((ATTEMPT_SQUARE.vertical.gap * 5) + (ATTEMPT_SQUARE.vertical.size * 6)));
         drawAttemptGridVertical(ctx,
             DIMS.center.x - (((ATTEMPT_SQUARE.vertical.gap * 3) + (ATTEMPT_SQUARE.vertical.size * 4)) / 2),
             currY,
@@ -210,24 +209,51 @@ function drawText (ctx, text, x, y, color, fontsize, align = "center", fontfamil
 }
 
 function drawStatsHorizontal (ctx, x, y, stats) {
-    const altX = x + (CARD_SIZE.horizontal.width / 4);
-    const altY = y + (CARD_SIZE.horizontal.font * 1.5);
-    drawText(ctx, stats["1"], x, y, COLOR["category-1"], CARD_SIZE.horizontal.font);
-    drawText(ctx, stats["2"], altX, y, COLOR["category-2"], CARD_SIZE.horizontal.font);
-    drawText(ctx, stats["3"], x, altY, COLOR["category-3"], CARD_SIZE.horizontal.font);
-    drawText(ctx, stats["4"], altX, altY, COLOR["category-4"], CARD_SIZE.horizontal.font);
-    drawText(ctx, stats.total, x + ((altX - x) / 2), altY + (CARD_SIZE.horizontal.font * 2), COLOR["white"], CARD_SIZE.horizontal.font);
+    const distance = CARD_SIZE.horizontal.gap + (AVATAR_SIZE.horizontal / 2);
+    drawStat(ctx, stats.total, ...alongCurve(x + 4, y, distance, 317), COLOR.grey, CARD_SIZE.horizontal.font);
+    drawStat(ctx, stats["1"], ...alongCurve(x, y, distance, 340), COLOR["category-1"],CARD_SIZE.horizontal.font);
+    drawStat(ctx, stats["2"], ...alongCurve(x + 5, y, distance, 0), COLOR["category-2"], CARD_SIZE.horizontal.font);
+    drawStat(ctx, stats["3"], ...alongCurve(x, y, distance, 20), COLOR["category-3"], CARD_SIZE.horizontal.font);
+    drawStat(ctx, stats["4"], ...alongCurve(x + 4, y, distance, 43), COLOR["category-4"], CARD_SIZE.horizontal.font);
 }
 
 function drawStatsVertical (ctx, x, y, stats) {
     let i = 0;
-    const incr = () => y + ((CARD_SIZE.vertical.font * 1.25) * i++);
-    drawText(ctx, stats["1"], x, incr(), COLOR["category-1"], CARD_SIZE.vertical.font, "right");
-    drawText(ctx, stats["2"], x, incr(), COLOR["category-2"], CARD_SIZE.vertical.font, "right");
-    drawText(ctx, stats["3"], x, incr(), COLOR["category-3"], CARD_SIZE.vertical.font, "right");
-    drawText(ctx, stats["4"], x, incr(), COLOR["category-4"], CARD_SIZE.vertical.font, "right");
-    i += .5;
-    drawText(ctx, stats.total, x, incr() , COLOR["white"], CARD_SIZE.vertical.font, "right");
+    const incr = () => y + ((CARD_SIZE.vertical.font * 1.75) * i++);
+    const altX = x + AVATAR_SIZE.vertical + (CARD_SIZE.vertical.gap * 3);
+    drawStat(ctx, stats["1"], altX, incr(), COLOR["category-1"], CARD_SIZE.vertical.font);
+    drawStat(ctx, stats["2"], altX, incr(), COLOR["category-2"], CARD_SIZE.vertical.font);
+    drawStat(ctx, stats["3"], altX, incr(), COLOR["category-3"], CARD_SIZE.vertical.font);
+    drawStat(ctx, stats["4"], altX, incr(), COLOR["category-4"], CARD_SIZE.vertical.font);
+    drawStat(ctx, stats.total, x + ((AVATAR_SIZE.vertical / 2) - (CARD_SIZE.vertical.font * 3) / 2), y + (AVATAR_SIZE.vertical + (CARD_SIZE.vertical.gap * 1)) , COLOR.grey, CARD_SIZE.vertical.font);
+}
+
+function drawStat (ctx, stat, x, y, color, fontsize, fontfamily = "Helvetica Neue Medium") {
+    const squareWidth = fontsize * 3;
+    const squareHeight = fontsize * 1.5;
+    { // draw the square
+        const ogFillStyle = ctx.fillStyle;
+        ctx.beginPath();
+        ctx.roundRect(x, y - (squareHeight / 2), squareWidth, squareHeight, squareHeight / 5);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.fillStyle = ogFillStyle;
+    }
+    { // draw the text
+        const ogFont = ctx.font;
+        const ogFIll = ctx.fillStyle;
+        const ogAlign = ctx.textAlign;
+        const ogBaseline = ctx.textBaseline;
+        ctx.font = `${fontsize}px ${fontfamily}`;
+        ctx.fillStyle = COLOR.background;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "top";
+        ctx.fillText(stat, x + (squareWidth / 2), y - (fontsize / 2), squareWidth);
+        ctx.font = ogFont;
+        ctx.fillStyle = ogFIll;
+        ctx.textAlign = ogAlign;
+        ctx.textBaseline = ogBaseline;
+    }
 }
 
 function drawAttemptGridVertical (ctx, x, y, attemptCategories) { // attemptCategories here is an Array of attempts, where each attempt is an Array of Numbers that corrospond to a specific category (1-4). 0 Marks an unknown category and -1 marks an unused attempt.
@@ -256,4 +282,13 @@ function drawAttemptGridHorizontal (ctx, x, y, attemptCategories) { // attemptCa
                 drawAttemptSquare(ctx, x + offsetX, y + offsetY, COLOR[`category-${category}`], ATTEMPT_SQUARE.horizontal.size);
         });
     });
+}
+
+
+function alongCurve (x, y, distance, degrees) {
+    const radians = degrees * (Math.PI / 180);
+    return [
+        x + distance * Math.cos(radians),
+        y + distance * Math.sin(radians)
+    ];
 }

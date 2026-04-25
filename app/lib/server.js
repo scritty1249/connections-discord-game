@@ -180,7 +180,7 @@ export function getCategoryStats (attempts, categoryWordIds) { // categoryWordId
         "2": "",
         "3": "",
         "4": "",
-        total: formatNumberString(attempts.length)
+        total: `(${formatNumberString(attempts.length)})`
     };
     console.debug(categoryWordIds, attempts, stats);
     attempts.forEach((attempt, idx) => {
