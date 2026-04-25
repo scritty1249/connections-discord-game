@@ -117,7 +117,7 @@ export async function drawScoreHorizontal (ctx, position, attempts, userId, avat
         drawStatsHorizontal(ctx, DIMS.start.x + CARD_SIZE.horizontal.gap + (AVATAR_SIZE.horizontal / 2), DIMS.center.y, stats);
 
         drawAttemptGridHorizontal(ctx,
-            DIMS.center.x,
+            DIMS.end.x - (CARD_SIZE.horizontal.gap * 2) - ((ATTEMPT_SQUARE.horizontal.gap * 3) + (ATTEMPT_SQUARE.horizontal.size * 4)),
             DIMS.center.y - (((ATTEMPT_SQUARE.horizontal.gap * 5) + (ATTEMPT_SQUARE.horizontal.size * 6)) / 2),
             attempts ? attempts : [] // [!] (self) idiot-proofing
         ); 
