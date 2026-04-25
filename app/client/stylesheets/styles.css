@@ -74,7 +74,7 @@ body {
         transform: translateX(-50%);
         position: fixed;
         left: 50%;
-        bottom: 5%;
+        bottom: 1%;
         width: 60%;
         z-index: 5;
     }
@@ -99,6 +99,7 @@ body {
     }
     .fancy {
         font-family: OldLondon, sans-serif;
+        font-size: larger;
     }
     .posh {
         font-family: KarnakDeco, Arial, sans-serif;
@@ -107,6 +108,7 @@ body {
         font-size: x-small;
         &:last-of-type {
             color: var(--light-grey);
+            margin-top: .9rem;
         }
     }
 }
