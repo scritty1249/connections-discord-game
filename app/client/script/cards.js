@@ -130,7 +130,6 @@ export const cardFX = {
         for ( const cardEl of cardEls ) {
             await playAnimation(cardEl, "jump");
         }
-        return;
     },
     repeatAttempt: async function (cardEls) {
         return await Promise.all(Array.from(cardEls,

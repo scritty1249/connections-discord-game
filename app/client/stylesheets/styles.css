@@ -339,7 +339,7 @@ body {
 }
 
 .jump {
-    animation: jump 1s ease-in-out;
+    animation: jump 1s ease-out;
 }
 
 @keyframes shake-incorrect {
@@ -361,5 +361,5 @@ body {
 
 @keyframes jump {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(calc(var(--spacing) * 1.5)); }
+    50% { transform: translateY(calc(-1 * var(--spacing) * 1.5)); }
 }
