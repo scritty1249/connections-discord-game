@@ -229,6 +229,7 @@ function drawStatsVertical (ctx, x, y, stats) {
 }
 
 function drawStat (ctx, stat, x, y, color, fontsize, fontfamily = "Helvetica Neue Medium") {
+    if (stat === null || stat === undefined) return; // assume that blank string means intentionally drawing an empty box
     const squareWidth = fontsize * 3;
     const squareHeight = fontsize * 1.5;
     { // draw the square

@@ -176,11 +176,11 @@ export async function updateChannelParticipants (channelid, userid, username, av
 
 export function getCategoryStats (attempts, categoryWordIds) { // categoryWordIds is an Array of Arrays, with the index of each nested Array corrosponding to category difficulty and each Number within matching the ID of a word for that category.
     const stats = {
-        "1": "",
-        "2": "",
-        "3": "",
-        "4": "",
-        total: formatNumberString(attempts.length)
+        "1": null,
+        "2": null,
+        "3": null,
+        "4": null,
+        total: attempts.length ? formatNumberString(attempts.length) : null
     };
     console.debug(categoryWordIds, attempts, stats);
     attempts.forEach((attempt, idx) => {
