@@ -237,8 +237,9 @@ async function queueGenerateCard () {
 function oncloseHandler () {
     if (ORDER.wasUpdated && ORDER.CURR != null) {
         queueRecordOrder(ORDER.CURR);
-        queueGenerateCard();
-    } else if (newAttemptMade)
+        if (discordSdk.guildId !== null)
+            queueGenerateCard();
+    } else if (newAttemptMade && discordSdk.guildId !== null)
         queueGenerateCard();
 }
 
