@@ -84,38 +84,43 @@ async function submitAttempt () { // old attempts returned from api as an Array 
     BUTTONS.DESELECT.classList.add("disabled");
     BUTTONS.SUBMIT.classList.add("disabled");
     // attempts within ATTEMPTS should already be sorted
-    let animationPromise;
+    let animationPromise = cardFX.submit(selectedWordEls);
     if (attemptIsRepeat(wordIds, ATTEMPTS)) {
         console.debug("Repeated attempt");
-        animationPromise = Promise.all([
+        animationPromise = animationPromise
+        .then(() => Promise.all([
             cardFX.repeatAttempt(selectedWordEls),
             popup("Already guessed!", 2000)
-        ]);
+        ]));
     } else if (attemptIsCorrect(wordIds, GAMEDATA.ids)) {
         console.debug("Correct attempt");
-        animationPromise = playCorrectAttemptAnimation(
-            getCategoryElement(wordIds),
-            selectedWordEls,
-            document.getElementById("words"),
-            document.getElementById("categories")
-        ).then(() => { queueRecordOrder(ORDER.CURR) });
+        animationPromise = animationPromise
+            .then(() => playCorrectAttemptAnimation(
+                getCategoryElement(wordIds),
+                selectedWordEls,
+                document.getElementById("words"),
+                document.getElementById("categories")
+            )).then(() => { queueRecordOrder(ORDER.CURR) });
     } else if (attemptIsOneAway(wordIds, GAMEDATA.ids)) {
         console.debug("Close attempt");
-        animationPromise = popup("One away...", 2000);
+        animationPromise = animationPromise
+            .then(() => popup("One away...", 2000));
     } else {
         console.debug("Incorrect attempt");
-        animationPromise = cardFX.incorrect(selectedWordEls);
+        animationPromise = animationPromise
+            .then(() => cardFX.incorrect(selectedWordEls));
     }
     try {
-        await animationPromise;
         if (await recordAttempt(new Set(wordIds))) {
             ATTEMPTS.push(wordIds);
+            await animationPromise;
             return true;
         }
     } catch (error) {
         console.error(error);
         await popup("A client error occurred.");
     }
+    await animationPromise;
     return false;
 }
 

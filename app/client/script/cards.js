@@ -126,6 +126,12 @@ export const cardFX = {
             (cardEl) => playAnimation(cardEl, "shake-incorrect", "incorrect")
         ));
     },
+    submit: async function (cardEls) {
+        for ( const cardEl of cardEls ) {
+            await playAnimation(cardEl, "jump");
+        }
+        return;
+    },
     repeatAttempt: async function (cardEls) {
         return await Promise.all(Array.from(cardEls,
             (cardEl) => playAnimation(cardEl, "shake-incorrect")
