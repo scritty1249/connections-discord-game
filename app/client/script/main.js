@@ -170,7 +170,7 @@ function submitHandler (e) {
                     console.warn("Submission failed, attempt not recorded.");
                 else {
                     newAttemptMade = true;
-                    ELEMENTS.ATTEMPT_COUNTER.innerHTML = (ATTEMPTS.length + 1).toLocaleString("en-US");
+                    updateAttemptCounter();
                 }
             })
             .then(() => {
@@ -209,6 +209,10 @@ function getCategoryElement (attempt) { // attempt is an Array of Numbers
 // [!] inefficient method- laziness
 function getUnsolvedWordIds (cardEls) {
     return Array.from(cardEls.filter(e => !e.classList.contains("hide")), e => parseInt(e?.dataset?.id));
+}
+
+function updateAttemptCounter () {
+    ELEMENTS.ATTEMPT_COUNTER.innerHTML = (ATTEMPTS.length + 1).toLocaleString("en-US");
 }
 
 async function queueGenerateCard () {
@@ -310,6 +314,7 @@ window.onload = (e) => {
 
                 // init previous correct attempts (if any)
                 if (ATTEMPTS.length) {
+                    updateAttemptCounter();
                     ATTEMPTS.filter(attempt => attemptIsCorrect(attempt, GAMEDATA.ids))
                         .forEach(correctAttempt => {
                             const categoryEl = getCategoryElement(correctAttempt);
