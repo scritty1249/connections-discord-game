@@ -57,6 +57,7 @@ body {
     font-family: "Lucida Grande", sans-serif;
     &.hide {
         animation: fadeOut 0.75s forwards;
+        pointer-events: none;
     }
     > div:first-of-type {
         width: 100%;
