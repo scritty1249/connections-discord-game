@@ -33,5 +33,5 @@ export function getChallengeNumber (currentDate) {
         throw new Error(`Parameter must be a Date object, not [${typeof currentDate}].`);
     const CONNECTIONS_START_DATE = new Date("2023-06-12");
     const diffMs = Math.abs(currentDate - CONNECTIONS_START_DATE);
-    return Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1; // 1000ms * 60s * 60m * 24h
+    return Math.floor(diffMs / (1000 * 60 * 60 * 24)) - 1; // 1000ms * 60s * 60m * 24h
 }
