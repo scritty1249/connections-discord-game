@@ -53,9 +53,15 @@ export function createCardElement (content, onclick, ...classList) {
     return cardEl;
 }
 
-export function createCategoryElements (categories) { // categories here is an Array of Strings, containing the category names. Categories is assumed to be sorted by difficulty
-    return Array.from(categories, (category, idx) =>
-        createCardElement(category, null, "category", `color-${idx + 1}`));
+export function createCategoryElements (categories) { // categories here is an Array of category entries, containing the category names and an Array of corrosponding words. Categories are to be sorted by difficulty
+    return Array.from(categories, ([category, words], idx) => {
+        const el = createCardElement(category, null, "category", `color-${idx + 1}`);
+        el.appendChild(document.createElement("br"))
+        const wordsEl = document.createElement("span");
+        wordsEl.innerHTML = words.join(", ");
+        el.appendChild(wordsEl);
+        return el;
+    });
 }
 
 // resolves to false if duration expires, and true if popup is dismissed by user

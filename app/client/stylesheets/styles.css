@@ -125,8 +125,9 @@ body {
     align-content: center; 
     width: 80%;
     height: auto;
-    font-family: "HelveticaNeue-Bold", "Helvetica Neue Bold", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-    font-weight: 350;
+    font-family: "HelveticaNeue-Bold", "Helvetica Neue Bold", "Helvetica Neue", Helvetica;
+    font-size: larger;
+    font-weight: bold;
     overflow: scroll; /* never clip- need to detect with JS */
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -159,6 +160,7 @@ body {
     width: 60%;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
+    font-size: medium;
     place-items: center;
     gap: calc(var(--spacing) * 2);
     > div.pill {
@@ -236,8 +238,8 @@ body {
         z-index: 1;
         --bg-color: var(--white);
         --fg-color: var(--black);
-        font-weight: 500;
         overflow-wrap: break-word;
+        line-height: 2;
         hyphens: manual;
         opacity: 1;
         transition:
@@ -268,7 +270,6 @@ body {
         --color: var(--white);
         background-color: var(--color);
         color: var(--black);
-        font-weight: 650;
         opacity: 1;
         transition: opacity var(--category-reveal-transition-duration) ease-in;
         &.color-1 {
@@ -282,6 +283,9 @@ body {
         }
         &.color-4 {
             --color: #a354a8; /* purple */
+        }
+        > span:last-child {
+            font-weight: lighter;
         }
         @starting-style {
             opacity: 0;
@@ -299,37 +303,12 @@ body {
     border: 1px solid var(--color);
     background-color: var(--black);
     color: var(--color);
-    text-transform: uppercase;
+    text-transform: capitalize;
     &.disabled {
         --color: #8b8b8b;
         pointer-events: none;
     }
 }
-
-.icon {
-    --size: auto;
-    border-radius: 50%;
-    /*
-    width: var(--size);
-    height: var(--size);
-    &.xsm {
-        --size: 32px;
-    }
-    &.sm {
-        --size: 64px;
-    }
-    &.md {
-        --size: 128px;
-    }
-    &.lg {
-        --size: 256px;
-    }
-    &.xlg {
-        --size: 512px;
-    }
-    */
-}
-
 
 .shake-incorrect {
     animation: shake-incorrect 0.2s ease-in-out 0s 2;

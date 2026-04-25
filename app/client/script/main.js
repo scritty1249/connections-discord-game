@@ -297,7 +297,7 @@ window.onload = (e) => {
             // create card elements
             {
                 const solvedWordIds = [];
-                createCategoryElements(Object.keys(GAMEDATA.categories))
+                createCategoryElements(Array.from(Object.entries(GAMEDATA.categories), (key, value) => [key, Array.from(value, ({word}) => word)]))
                     .forEach(categoryEl => ELEMENTS.CATEGORIES.push(categoryEl));
 
                 // init previous correct attempts (if any)
