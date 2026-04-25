@@ -25,7 +25,7 @@ export function isSameDay (date1, date2) {
 }
 
 export function formatNumberString (number) {
-    return number.toLocaleString('en-US'); // because no other kind matters! lol
+    return number.toLocaleString("en-US"); // because no other kind matters! lol
 }
 
 export function getChallengeNumber (currentDate) {

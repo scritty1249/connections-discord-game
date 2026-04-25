@@ -15,6 +15,7 @@ const ELEMENTS = {
     WORD_GRID: null,
     CATEGORY_GRID: null,
     MENU: null,
+    ATTEMPT_COUNTER: null,
     selectedCount: 0,
     get SELECTED () {
         return [...document.getElementsByClassName("selected")];
@@ -167,8 +168,10 @@ function submitHandler (e) {
             .then((success) => {
                 if (!success)
                     console.warn("Submission failed, attempt not recorded.");
-                else
+                else {
                     newAttemptMade = true;
+                    ELEMENTS.ATTEMPT_COUNTER.innerHTML = (ATTEMPTS.length + 1).toLocaleString("en-US");
+                }
             })
             .then(() => {
                 if (ELEMENTS.CATEGORY_GRID.children.length != 4) {
@@ -235,6 +238,7 @@ function oncloseHandler () {
 async function setWinScreen (first = true) {
     queueGenerateCard();
     ELEMENTS.MENU.classList.add("hide");
+    ELEMENTS.ATTEMPT_COUNTER.classList.add("hide");
     if (first)
         return await popup("You beat today's challenge!", 5000);
 }
@@ -247,6 +251,7 @@ window.onload = (e) => {
     ELEMENTS.WORD_GRID = document.getElementById("words");
     ELEMENTS.MENU = document.getElementById("buttons");
     ELEMENTS.CATEGORY_GRID = document.getElementById("categories");
+    ELEMENTS.ATTEMPT_COUNTER = document.getElementById("attempt-count");
     Promise.all([
         // retreive categories
         fetch(API_ENDPOINT + "/get-gamedata")
