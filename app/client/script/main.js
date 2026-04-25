@@ -202,7 +202,7 @@ function playCorrectAttemptAnimation (categoryEl, wordEls, wordContainer, catego
 
 function getCategoryElement (attempt) { // attempt is an Array of Numbers
     const categoryEl = ELEMENTS.CATEGORIES.filter(categoryEl =>
-        categoryEl.innerHTML == getCategoryData(attempt, GAMEDATA.categories));
+        categoryEl?.dataset.key == getCategoryData(attempt, GAMEDATA.categories));
     return (categoryEl.length) ? categoryEl[0] : undefined;
 }
 

@@ -56,7 +56,8 @@ export function createCardElement (content, onclick, ...classList) {
 export function createCategoryElements (categories) { // categories here is an Array of category entries, containing the category names and an Array of corrosponding words. Categories are to be sorted by difficulty
     return Array.from(categories, ([category, words], idx) => {
         const el = createCardElement(category, null, "category", `color-${idx + 1}`);
-        el.appendChild(document.createElement("br"))
+        el.appendChild(document.createElement("br"));
+        el.dataset.key = category;
         const wordsEl = document.createElement("span");
         wordsEl.innerHTML = words.join(", ");
         el.appendChild(wordsEl);
