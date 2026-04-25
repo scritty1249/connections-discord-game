@@ -17,7 +17,7 @@
 }
 @font-face {
     font-family: KarnakDeco;
-    src: url("/fonts/K22 Karnak Deco/K22 Karnak Deco.otf") format("opentype");
+    src: url("/fonts/K22KarnakDeco/K22KarnakDeco.otf") format("opentype");
 }
 
 * {
@@ -54,7 +54,7 @@ body {
     height: 100%;
     color: var(--white);
     align-content: center;
-    font-family: KarnakDeco, "Lucida Grande", sans-serif;
+    font-family: "Lucida Grande", sans-serif;
     &.hide {
         animation: fadeOut 0.75s forwards;
     }
@@ -87,6 +87,9 @@ body {
         background: url("/connections-icon.svg") center / cover no-repeat;
         width: 6rem !important;
         height: 6rem;
+    }
+    .light {
+        font-weight: lighter;
     }
     .title {
         font-size: xx-large;
