@@ -339,7 +339,18 @@ body {
 }
 
 .jump {
-    animation: jump 1s ease-out;
+    --delay: .1s;
+    --duration: .5s;
+    animation: jump var(--duration) ease-out;
+    &.delay-1 {
+        animation-delay: calc((var(--delay) + (var(--duration) / 10)));
+    }
+    &.delay-2 {
+        animation-delay: calc(2 * (var(--delay) + (var(--duration) / 10)));
+    }
+    &.delay-3 {
+        animation-delay: calc(3 * (var(--delay) + (var(--duration) / 10)));
+    }
 }
 
 @keyframes shake-incorrect {
@@ -361,5 +372,5 @@ body {
 
 @keyframes jump {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(calc(-1 * var(--spacing) * 1.5)); }
+    50% { transform: translateY(calc(-1 * var(--spacing) * 3)); }
 }

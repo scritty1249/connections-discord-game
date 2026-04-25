@@ -127,9 +127,9 @@ export const cardFX = {
         ));
     },
     submit: async function (cardEls) {
-        for ( const cardEl of cardEls ) {
-            await playAnimation(cardEl, "jump");
-        }
+        return await Promise.all(Array.from(cardEls, (cardEl, idx) =>
+            playAnimation(cardEl, "jump", `delay-${idx}`)
+        ));
     },
     repeatAttempt: async function (cardEls) {
         return await Promise.all(Array.from(cardEls,

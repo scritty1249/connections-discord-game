@@ -113,6 +113,8 @@ async function submitAttempt () { // old attempts returned from api as an Array 
     try {
         if (await recordAttempt(new Set(wordIds))) {
             ATTEMPTS.push(wordIds);
+            newAttemptMade = true;
+            updateAttemptCounter();
             await animationPromise;
             return true;
         }
@@ -173,10 +175,6 @@ function submitHandler (e) {
             .then((success) => {
                 if (!success)
                     console.warn("Submission failed, attempt not recorded.");
-                else {
-                    newAttemptMade = true;
-                    updateAttemptCounter();
-                }
             })
             .then(() => {
                 if (ELEMENTS.CATEGORY_GRID.children.length != 4) {
@@ -381,6 +379,7 @@ window.onload = (e) => {
                 const loadingEl = document.getElementById("loading");
                 containerEl.classList.remove("hide");
                 loadingEl.classList.add("hide");
+                containerEl.scrollTop = 0;
             }
         });
 }
