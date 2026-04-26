@@ -6,4 +6,4 @@ A remake of the NYT Connections game as a Discord Activity using disgusting meth
 
 ## Known bugs
 - Does not alwasy retrieve new game data at the start of a new day- cron job execution time should be updated. Tried 12:00am, 12:05am
-- Submit button does not always appear on certain, smaller screen sizes (iPhone 6)
+- Submit button does not always appear on certain, smaller screen sizes (iPhone SE 2022)
