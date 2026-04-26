@@ -1,5 +1,4 @@
-import { scoreImage, getChannelData, updateChannelParticipants, getAttempts, setChannelMessage } from "../lib/server.js"
-import { sendChannelResults, getChannelMessage } from "../lib/discord.js";
+import { updateChannelParticipants, sendScorecard } from "../lib/server.js"
 
 export async function POST(req) {
     const { userdata, channel, name }  = await req.json();
@@ -16,24 +15,7 @@ export async function POST(req) {
         try {
             const { userid, avatar, attempts, name } = userdata;
             const channeldata = await updateChannelParticipants(channel, userid, name, avatar);
-            const messageid = channeldata.message === null ? await getChannelMessage(channel, new Date()) : channeldata.message;
-            const usernames = [];
-            const userdatas = await Promise.all(Array.from(Object.keys(channeldata.participants), async (participant) => {
-                const participantattempts = participant == String(userid) ? attempts : await getAttempts(participant);
-                usernames.push(channeldata.participants[participant].name);
-                return {
-                    attempts: participantattempts,
-                    avatar: channeldata.participants[participant].avatar,
-                    userid: participant
-                };
-            }));
-
-            const imgBlob = await scoreImage(...userdatas);
-            const newMessageid = await sendChannelResults(channel, messageid, usernames, imgBlob);
-            if (newMessageid && newMessageid != messageid)
-                await setChannelMessage(channel, newMessageid);
-            else if (!newMessageid)
-                console.warn("Unable to send or update message in channel. Does the bot lack permissions?");
+            await sendScorecard(channel);
             return new Response();
         } catch (err) {
             console.error("Fetch error:", err);

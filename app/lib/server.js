@@ -2,6 +2,7 @@ import { dateToString, formatNumberString, getChallengeNumber } from "./utils.js
 import * as ENDPOINT from "./endpoints.js";
 import { GameDB, UserDB } from "./store.js";
 import { createCanvasObject, drawScoreHorizontal, drawScoreVertical, canvasToImage, CANVAS_POSITION } from "./draw.js";
+import { sendChannelResults, getChannelMessage } from "../lib/discord.js";
 
 async function fetchGameData(gameDate) {
     const endpoint = ENDPOINT.GAME_DATA + dateToString(gameDate) + ".json"
@@ -110,14 +111,6 @@ export async function getGameData() {
     return await GameDB.get();
 }
 
-export async function getChannelData(channelid) {
-    return await UserDB.getChannel(channelid);
-}
-
-export async function setChannelMessage(channelid, messageid) {
-    return await UserDB.setChannelMessage(channelid, messageid);
-}
-
 export async function wipeAttempts() {
     // deletes attempts for all users
     return await UserDB.drop();
@@ -160,6 +153,29 @@ export async function scoreImage(userdata, ...userdatas) { // expects {attempts,
     const newData = Array.from(datas, ({attempts, userid, avatar}) => 
         ({stats: getCategoryStats(attempts, categoryWordIds), attempts: matchAttemptsToCategory(attempts, categories), id: userid, avatar: avatar}));
     return await generateScoreImage(challengeNum, ...newData);
+}
+
+export async function sendScorecard (channelid) {
+    const channeldata = await UserDB.getChannel(channelid);
+    const messageid = channeldata.message === null ? await getChannelMessage(channel, new Date()) : channeldata.message;
+    const usernames = [];
+    const imgBlob = await scoreImage(...(await Promise.all(Array.from(
+        Object.keys(channeldata.participants),
+        async (participant) => {
+            usernames.push(channeldata.participants[participant].name);
+            const userdata = await UserDB.getUser(userid);
+            return {
+                attempts: userdata === undefined ? [] : userdata.attempts,
+                avatar: channeldata.participants[participant].avatar,
+                userid: participant
+            };
+        }
+    ))));
+    const newMessageid = await sendChannelResults(channel, messageid, usernames, imgBlob);
+    if (newMessageid && newMessageid != messageid)
+        await UserDB.setChannelMessage(channel, newMessageid);
+    else if (!newMessageid)
+        console.warn("Unable to send or update message in channel. Does the bot lack permissions?");
 }
 
 // returns updated channel data for chaining

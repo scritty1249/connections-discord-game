@@ -1,4 +1,4 @@
-import { isUserAdmin, wipeAttempts, wipeUserAttempts, refreshGamestate } from "../lib/server.js";
+import { isUserAdmin, wipeAttempts, wipeUserAttempts, refreshGamestate, sendScorecard } from "../lib/server.js";
 import { verify } from "../lib/discord.js";
 import * as commands from "../lib/interaction-responses.js";
 import { promiseTimeout } from "../lib/utils.js";
@@ -14,7 +14,7 @@ export async function POST(req) {
             return new Response("invalid request signature", {status: 401}); // specified by discord api guidelines
         }
         const requestBody = JSON.parse(reqRawBody); // body should be JSON, should this should never fail...
-        const { type, token, data } = requestBody;
+        const { id: interactionid, type, token, data, channel_id: channelid } = requestBody;
         const user = requestBody.user ? requestBody.user : requestBody.member?.user;
         switch (type) {
             case 2: // APPLICATION COMMAND
@@ -23,7 +23,14 @@ export async function POST(req) {
                 switch (data?.type) { // shouldn't be null
                     case 4: // PRIMARY ENTRY POINT
                         switch (commandName) {
-                            case "launch": return commands.launch();
+                            case "launch":
+                                if (requestBody.context !== 1) { // invoked in server or group DM
+                                    waitUntil(
+                                        promiseTimeout(3000)// [!] unga bunga solution to ensuring waitUntil fires after the response...
+                                        .then(() => sendScorecard(channelid))
+                                    );
+                                }
+                                return commands.launch();
                         };
                     case 1: // chat command, usually a slash command
                         const { context } = requestBody;
