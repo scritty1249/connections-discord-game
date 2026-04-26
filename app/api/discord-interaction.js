@@ -30,6 +30,7 @@ export async function POST(req) {
                             case 1: // DM with the bot only
                                 switch (commandName) {
                                     case "api":
+                                        console.debug(requestBody);
                                         // api subcommand interactions should include an option field
                                         const { options } = data;
                                         const subCommandName = options?.[0]?.name?.toLowerCase();
