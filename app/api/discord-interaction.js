@@ -1,4 +1,4 @@
-import { isUserAdmin, wipeAttempts, refreshGamestate } from "../lib/server.js";
+import { isUserAdmin, wipeAttempts, wipeUserAttempts, refreshGamestate } from "../lib/server.js";
 import { verify } from "../lib/discord.js";
 import * as commands from "../lib/interaction-responses.js";
 import { promiseTimeout } from "../lib/utils.js";
@@ -43,16 +43,18 @@ export async function POST(req) {
                                                         case "nuke-userdata":
                                                             await wipeAttempts()
                                                                 .then((success) => commands.adminTools["nuke-userdata"](token, success))
-                                                                .then(() => console.info("Invoked: nuke-userdata"))
+                                                                .finally(() => console.info("Invoked: nuke-userdata"))
                                                         break;
                                                         case "refresh-gamestate":
                                                             await refreshGamestate()
                                                                 .then((success) => commands.adminTools["refresh-gamestate"](token, success))
-                                                                .then(() => console.info("Invoked: refresh-gamestate"))
+                                                                .finally(() => console.info("Invoked: refresh-gamestate"))
                                                         break;
                                                         case "drop-userdata":
-                                                            await commands.updateDeferredResponse("Command not yet supported.", token)
-                                                                .then(() => console.info("Invoked: drop-userdata (not implemented)"));
+                                                            const userid = options.options?.[0]?.value;
+                                                            await wipeUserAttempts(userid)
+                                                                .then((success) => commands.adminTools["drop-userdata"](token, success, userid))
+                                                                .finally(() => console.info("Invoked: drop-userdata"));
                                                         break;
                                                         default:
                                                             await commands.updateDeferredResponse(`Command '${subCommandName}' not recognized!`, token);
@@ -66,15 +68,36 @@ export async function POST(req) {
                                                 commands.updateDeferredResponse("Something went wrong on our side.", token);
                                             })
                                         );
-                                        return commands.deferResponse(true);
+                                        return commands.deferResponse(false);
                                     case "amiadmin":
                                         const isAdmin = await isUserAdmin(user?.id);
                                         return commands.messageResponse(isAdmin ? "Yes" : "No");
                                 };
                             break;
                             case 0: // Invoked in server
+                                if (commandName == "api") { // holy repetitive code
+                                    waitUntil(
+                                        promiseTimeout(3000)// [!] unga bunga solution to ensuring waitUntil fires after the response...
+                                            .then(() => isUserAdmin(user?.id))
+                                            .then(async (isAdmin) => {
+                                                if (isAdmin) {
+                                                    if (data.options?.[0]?.name?.toLowerCase() == "drop-userdata") {
+                                                        const userid = data.options.options?.[0]?.value;
+                                                        await wipeUserAttempts(userid)
+                                                            .then((success) => commands.adminTools["drop-userdata"](token, success, userid))
+                                                            .finally(() => console.info("Invoked: drop-userdata"));
+                                                    } else {
+                                                        commands.updateDeferredResponse("Invalid context to use this command.", token);
+                                                    }
+                                                } else {
+                                                    commands.updateDeferredResponse("Invalid context to use this command. (You are not registered as an admin)", token);
+                                                }
+                                            })
+                                    );
+                                    return commands.deferResponse(true); // hide this message in guilds(servers)
+                                }
                             case 2: // DM or group DM, does not need bot user to be a member
-                                return commands.messageResponse("There are currently no supported commands for servers. Message me directly to use commands."); // currently no supported commands for servers.
+                                return commands.messageResponse("This command is not supported for servers or group chats. Message me directly to use this command.");
                             default:
                                 return commands.messageResponse("Invalid context to use this command.");
                         };

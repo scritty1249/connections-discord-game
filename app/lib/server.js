@@ -194,3 +194,7 @@ export function getCategoryStats (attempts, categoryWordIds) { // categoryWordId
     });
     return stats;
 }
+
+export async function wipeUserAttempts (userid) {
+    return Boolean(await UserDB.dropUser(userid));
+}

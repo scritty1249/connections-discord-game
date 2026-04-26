@@ -50,6 +50,9 @@ export const UserDB = {
     getUser: async function (userid) { // json makes this a single call, so not wasteful to get everything here all the time...
         return (await redis.json.get(this._prefix.user + userid, "$"))?.[0];
     },
+    dropUser: async function (userid) {
+        return await redis.del(this._prefix.user + userid);
+    },
     // Channel related data
     channelExists: async function (channelid) {
         return Object.keys(await this.getChannels()).includes(String(channelid));
