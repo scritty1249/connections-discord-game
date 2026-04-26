@@ -52,7 +52,7 @@ export async function POST(req) {
                                                                 .finally(() => console.info("Invoked: refresh-gamestate"))
                                                         break;
                                                         case "drop-userdata":
-                                                            const userid = options.options?.[0]?.value;
+                                                            const userid = options?.[0].options?.[0]?.value;
                                                             await wipeUserAttempts(userid)
                                                                 .then((success) => commands.adminTools["drop-userdata"](token, success, userid))
                                                                 .finally(() => console.info("Invoked: drop-userdata"));
@@ -83,7 +83,7 @@ export async function POST(req) {
                                             .then(async (isAdmin) => {
                                                 if (isAdmin) {
                                                     if (data.options?.[0]?.name?.toLowerCase() == "drop-userdata") {
-                                                        const userid = data.options.options?.[0]?.value;
+                                                        const userid = data.options?.[0].options?.[0]?.value;
                                                         await wipeUserAttempts(userid)
                                                             .then((success) => commands.adminTools["drop-userdata"](token, success, userid))
                                                             .finally(() => console.info("Invoked: drop-userdata"));
