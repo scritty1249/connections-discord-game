@@ -14,7 +14,8 @@ export async function POST(req) {
             return new Response("invalid request signature", {status: 401}); // specified by discord api guidelines
         }
         const requestBody = JSON.parse(reqRawBody); // body should be JSON, should this should never fail...
-        const { type, user, token, data } = requestBody;
+        const { type, token, data } = requestBody;
+        const user = requestBody.user ? requestBody.user : requestBody.member?.user;
         switch (type) {
             case 2: // APPLICATION COMMAND
                 const commandName = data?.name?.toLowerCase();
