@@ -163,7 +163,7 @@ export async function sendScorecard (channelid) {
         Object.keys(channeldata.participants),
         async (participant) => {
             usernames.push(channeldata.participants[participant].name);
-            const userdata = await UserDB.getUser(userid);
+            const userdata = await UserDB.getUser(participant);
             return {
                 attempts: userdata === undefined ? [] : userdata.attempts,
                 avatar: channeldata.participants[participant].avatar,
