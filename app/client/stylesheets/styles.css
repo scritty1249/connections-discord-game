@@ -118,7 +118,7 @@ body {
 }
 
 #content-container {
-    position: relative;
+    position: fixed;
     display: flex;
     flex: 0 0 auto;
     flex-direction: column;
