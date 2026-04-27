@@ -118,7 +118,7 @@ body {
 }
 
 #content-container {
-    position: fixed;
+    position: relative;
     z-index: 0;
     margin: 20% auto 15% auto;
     box-sizing: border-box;
