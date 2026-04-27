@@ -128,7 +128,7 @@ body {
     font-family: "HelveticaNeue-Bold", "Helvetica Neue Bold", "Helvetica Neue", Helvetica;
     font-size: larger;
     font-weight: bold;
-    overflow-x: clip;
+    overflow-x: hidden;
     overflow-y: scroll;
     scrollbar-width: none;
     -ms-overflow-style: none;
