@@ -181,11 +181,12 @@ export async function sendScorecard (channelid) {
 // returns updated channel data for chaining
 export async function updateChannelParticipants (channelid, userid, username, avatar) {
     const userdata = { name: String(username), avatar: String(avatar) };
-    if (!await UserDB.channelExists(channelid)) {
-        await UserDB.newChannel(channelid, userid, username, avatar);
+    const channels = await UserDB.getChannels();
+    if (Object.keys(channels).includes(String(channelid))) {
+        await UserDB.setChannelUser(channelid, userid, username, avatar);
     } else {
         // create new channel entry if one does not already exist
-        await UserDB.setChannelUser(channelid, userid, username, avatar);
+        await UserDB.newChannel(channelid, userid, username, avatar);
     }
     return await UserDB.getChannel(channelid);
 }
