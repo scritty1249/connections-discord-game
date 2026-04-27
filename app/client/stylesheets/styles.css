@@ -156,7 +156,8 @@ body {
     margin: 0 auto;
     place-content: center;
     min-width: calc(8rem * 3);
-    max-width: 60%;
+    width: 100%;
+    justify-content: center;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     font-size: medium;
