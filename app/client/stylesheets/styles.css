@@ -118,7 +118,7 @@ body {
 }
 
 #content-container {
-    position: relative;
+    position: fixed;
     z-index: 0;
     margin: 20% auto 15% auto;
     box-sizing: border-box;
@@ -128,7 +128,8 @@ body {
     font-family: "HelveticaNeue-Bold", "Helvetica Neue Bold", "Helvetica Neue", Helvetica;
     font-size: larger;
     font-weight: bold;
-    overflow: scroll; /* never clip- need to detect with JS */
+    overflow-x: clip;
+    overflow-y: scroll;
     scrollbar-width: none;
     -ms-overflow-style: none;
     &::-webkit-scrollbar, &.hide {
@@ -142,6 +143,7 @@ body {
 #card-grid {
     --category-reveal-transition-duration: 1s;
     display: grid;
+    overflow: scroll;
     > div {
         grid-area: 1 / 1;
         display: grid;
@@ -196,8 +198,6 @@ body {
     color: var(--light-grey);
     margin: 5% auto;
     width: 100%;
-    position: sticky;
-    left: 0;
     font-weight: normal;
     text-align: center;
     align-content: center;
