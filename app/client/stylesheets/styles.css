@@ -118,12 +118,7 @@ body {
 }
 
 #content-container {
-    position: fixed;
-    display: flex;
-    flex: 0 0 auto;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    justify-content: center;
+    position: relative;
     z-index: 0;
     margin: 20% auto 15% auto;
     box-sizing: border-box;
@@ -159,12 +154,9 @@ body {
 #buttons {
     z-index: 2;
     margin: 0 auto;
-    position: sticky;
-    left: 0;
     place-content: center;
     min-width: calc(8rem * 3);
     width: 100%;
-    height: fit-content;
     justify-content: center;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
