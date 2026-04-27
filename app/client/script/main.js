@@ -1,4 +1,4 @@
-import { shuffle, attemptIsRepeat, attemptIsCorrect, attemptIsOneAway, softHypenateText, getCategoryData } from "./utils.js";
+import { shuffle, attemptIsRepeat, attemptIsCorrect, attemptIsOneAway, softHypenateText, getCategoryData, isOverflown } from "./utils.js";
 import { createCardElement, cardFX, popup, sortCardEls, createCategoryElements } from "./cards.js";
 import * as Discord from "./discord.js";
 
@@ -243,6 +243,17 @@ function oncloseHandler () {
         queueGenerateCard();
 }
 
+function onresizeHandler () {
+    { // adjust button wrapping
+        const buttonsEl = document.getElementById("buttons");
+        if (buttonsEl)
+            if (isOverflown(buttonsEl))
+                buttonsEl.classList.add("wrap");
+            else
+                buttonsEl.classList.remove("wrap");
+    }
+}
+
 async function setWinScreen (first = true) {
     queueGenerateCard();
     ELEMENTS.MENU.classList.add("hide");
@@ -370,6 +381,8 @@ window.onload = (e) => {
                         document.addEventListener("pagehide", oncloseHandler);
                         document.addEventListener("beforeunload", oncloseHandler);
                     }
+                    window.addEventListener("resize", onresizeHandler);
+                    onresizeHandler();
                 }
             }
             moveProgress(.2);

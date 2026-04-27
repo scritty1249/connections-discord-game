@@ -63,3 +63,7 @@ export async function waitForElementEvents (eventName, ...elements) {
             }, { once: true });
     })));
 }
+
+export const isOverflown = ({ clientWidth, scrollWidth }) => {
+    return scrollWidth > clientWidth;
+}
