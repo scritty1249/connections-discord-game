@@ -164,6 +164,7 @@ body {
     place-content: center;
     min-width: calc(8rem * 3);
     width: 100%;
+    height: fit-content;
     justify-content: center;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
