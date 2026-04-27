@@ -85,7 +85,7 @@ export function popup (message, durationMs = 1500) {
                     resolve(true);
                 }, { once: true });
             }, { once: true });
-            document.getElementById("content-container").appendChild(el);
+            document.body.appendChild(el);
         } catch (error) {
             reject(error);
         }

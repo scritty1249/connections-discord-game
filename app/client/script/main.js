@@ -294,7 +294,11 @@ window.onload = (e) => {
             .then(client_id => (
                 moveProgress(.2),
                 Discord.initSdk(client_id, API_ENDPOINT + "/discord-auth")))
+            .catch(() => {
+                popup("Failed to contact discord gateway! Restart and try again", 99 * 1000);
+            })
             .then(({discordSdk: sdk, user})=> {
+                if (!sdk) return;
                 moveProgress(.2);
                 discordSdk = sdk;
                 userData = user;
