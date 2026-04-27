@@ -119,6 +119,11 @@ body {
 
 #content-container {
     position: relative;
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: center;
     z-index: 0;
     margin: 20% auto 15% auto;
     box-sizing: border-box;
@@ -154,6 +159,8 @@ body {
 #buttons {
     z-index: 2;
     margin: 0 auto;
+    position: sticky;
+    left: 0;
     place-content: center;
     min-width: calc(8rem * 3);
     width: 100%;
@@ -196,6 +203,8 @@ body {
     color: var(--light-grey);
     margin: 5% auto;
     width: 100%;
+    position: sticky;
+    left: 0;
     font-weight: normal;
     text-align: center;
     align-content: center;
