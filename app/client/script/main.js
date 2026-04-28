@@ -386,8 +386,13 @@ window.onload = (e) => {
                         document.addEventListener("pagehide", oncloseHandler);
                         document.addEventListener("beforeunload", oncloseHandler);
                     }
-                    window.addEventListener("resize", onresizeHandler);
-                    onresizeHandler();
+                    { // monitor for resize events from within iframe
+                        const resizeObserver = new ResizeObserver((entries) => {
+                            onresizeHandler();
+                        });
+                        resizeObserver.observe(document.body);
+                        // window.addEventListener("resize", onresizeHandler);
+                    }
                 }
             }
             moveProgress(.2);
