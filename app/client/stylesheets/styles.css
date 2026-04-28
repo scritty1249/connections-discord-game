@@ -74,8 +74,8 @@ body {
         margin: 0 auto;
         transform: translateX(-50%);
         position: fixed;
-        left: 50%;
-        bottom: 1%;
+        left: 50dvw;
+        bottom: 2dvh;
         width: 60%;
         z-index: 5;
     }
