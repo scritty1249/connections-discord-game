@@ -64,6 +64,6 @@ export async function waitForElementEvents (eventName, ...elements) {
     })));
 }
 
-export const isOverflown = ({ clientWidth, scrollWidth }) => {
-    return scrollWidth > clientWidth;
+export const isOverflown = ({ offsetWidth, scrollWidth }) => {
+    return scrollWidth > offsetWidth;
 }
