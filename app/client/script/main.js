@@ -151,6 +151,7 @@ function wordClickHandler (e) {
 }
 
 function shuffleHandler (e) {
+    onresizeHandler(); // [!] testing - remove soon
     const unsolvedIds = getUnsolvedWordIds(ELEMENTS.WORDS);
     if (!unsolvedIds.length) return;
     BUTTONS.SHUFFLE.classList.add("disabled");
