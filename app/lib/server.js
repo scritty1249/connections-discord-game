@@ -157,7 +157,7 @@ export async function scoreImage(userdata, ...userdatas) { // expects {attempts,
 
 export async function sendScorecard (channelid) {
     const channeldata = await UserDB.getChannel(channelid);
-    const messageid = channeldata.message === null ? await getChannelMessage(channel, new Date()) : channeldata.message;
+    const messageid = channeldata.message === null ? await getChannelMessage(channelid, new Date()) : channeldata.message;
     const usernames = [];
     const imgBlob = await scoreImage(...(await Promise.all(Array.from(
         Object.keys(channeldata.participants),
