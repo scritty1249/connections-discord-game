@@ -9,7 +9,7 @@
     "crons": [
         {
             "path": "/api/refresh-gamestate",
-            "schedule": "8 0 * * *"
+            "schedule": "0 8 * * *"
         }
     ],
     "functions": {
