@@ -180,7 +180,8 @@ body {
         display: none;
     }
     &.wrap {
-      grid-template-columns: 1fr;
+        min-width: 8rem;
+        grid-template-columns: 1fr;
     }
 }
 
