@@ -76,7 +76,8 @@ body {
         position: fixed;
         left: 50dvw;
         bottom: 2dvh;
-        width: 60%;
+        width: 60dvw;
+        height: fit-content;
         z-index: 5;
     }
     .progress-bar {
