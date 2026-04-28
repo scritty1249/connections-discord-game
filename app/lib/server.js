@@ -171,9 +171,9 @@ export async function sendScorecard (channelid) {
             };
         }
     ))));
-    const newMessageid = await sendChannelResults(channel, messageid, usernames, imgBlob);
+    const newMessageid = await sendChannelResults(channelid, messageid, usernames, imgBlob);
     if (newMessageid && newMessageid != messageid)
-        await UserDB.setChannelMessage(channel, newMessageid);
+        await UserDB.setChannelMessage(channelid, newMessageid);
     else if (!newMessageid)
         console.warn("Unable to send or update message in channel. Does the bot lack permissions?");
 }
