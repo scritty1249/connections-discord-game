@@ -12,8 +12,8 @@ export function dateToString(dateObj) {
     return `${year}-${month}-${day}`;
 }
 
-export function unixTimestamp() {
-    return Math.floor(Date.now() / 1000);
+export function unixTimestamp(date = new Date()) {
+    return Math.floor(date.getTime() / 1000);
 }
 
 export async function promiseTimeout (timeoutMs) {

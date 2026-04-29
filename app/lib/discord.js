@@ -1,10 +1,17 @@
 import { DISCORD_AUTH, DISCORD_SEND_MESSAGE_BASE, DISCORD_WEBHOOK_BASE, DISCORD_GET_MESSAGE_BASE } from "./endpoints.js";
 import { default as nacl } from "tweetnacl";
-import { isSameDay } from "./utils.js";
+import { isSameDay, unixTimestamp } from "./utils.js";
 
 const DISCORD_MESSAGE_HISTORY_LIMIT = 50; // max number of messages to retrieve when searching for previous messages
+const DISCORD_INTERACTION_TOKEN_DURATION_S = 15* 60; // time limit of interation tokens, in seconds (15 minutes)
 
 export const CLIENT_ID = process.env.DISCORD_CLIENT_ID;
+
+export function isTokenValid(token, date = new Date()) { // does not check if either date is in the future
+    return token?.stamp
+    ? unixTimestamp(date) - token.stamp <= DISCORD_INTERACTION_TOKEN_DURATION_S
+    : false;
+}
 
 export async function authenticate (clientCode) {
     const response = await fetch(DISCORD_AUTH, {
@@ -131,4 +138,28 @@ function generateScorecardBody (usernames, scoreImage) {
     form.append("payload_json", JSON.stringify(payload));
     form.append("files[0]", scoreImage, "scorecard.png");
     return form;
+}
+
+// not the same as an interaction response. This is a "followup message" for an interaction. Limit is 5 per interaction when called in guilds that the app is not installed in.
+// https://docs.discord.com/developers/interactions/receiving-and-responding#create-followup-message
+export async function sendInterationMessage (token, messageBody) { 
+    const url = `${DISCORD_WEBHOOK_BASE}/${token}?wait=true`;
+    const response = await fetch(url, {
+        method: "POST",
+        body: messageBody
+    });
+    if (response.ok)
+        return await response.json();
+    return null;
+}
+
+export async function editInteractionMessage(token, messageid, messageBody) {
+    const url = `${DISCORD_WEBHOOK_BASE}/${token}/messages/${messageid}`;
+    const response = await fetch(url, {
+        method: "PATCH",
+        body: messageBody
+    });
+    if (response.ok)
+        return await response.json();
+    return null;
 }
