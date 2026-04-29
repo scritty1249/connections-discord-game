@@ -2,7 +2,8 @@ import { dateToString, formatNumberString, getChallengeNumber } from "./utils.js
 import * as ENDPOINT from "./endpoints.js";
 import { GameDB, UserDB } from "./store.js";
 import { createCanvasObject, drawScoreHorizontal, drawScoreVertical, canvasToImage, CANVAS_POSITION } from "./draw.js";
-import { sendChannelResults, getChannelMessage } from "../lib/discord.js";
+import { sendChannelResults, getChannelMessage, isTokenValid } from "../lib/discord.js";
+import { User, Snowflake, Token, Participant, ParticipantCardData } from "./structs.js";
 
 async function fetchGameData(gameDate) {
     const endpoint = ENDPOINT.GAME_DATA + dateToString(gameDate) + ".json"
@@ -30,7 +31,7 @@ async function storeGameData(gamedata) {
     return response;
 }
 
-async function generateScoreImage(challengeNumber, ...userdatas) { // userdata = { attempts, avatar, id }
+async function generateScoreImage(challengeNumber, ...userdatas) { // userdata = { attempts, avatar, id, stats }
     const { canvas, ctx } = createCanvasObject(challengeNumber);
     if (userdatas.length === 1) { // one player (horizontal card)
         const { id, attempts, avatar, stats } = userdatas[0];
@@ -122,20 +123,17 @@ export async function isUserAdmin(userid) {
 }
 
 export async function getUserData(userid) {
-    const userdata = await UserDB.getUser(userid);
-    if (userdata === undefined) {
-        await UserDB.newUser(userid);
-        return {
-            attempts: [], // don't create a key for attempts unless needed (when they submit an attempt). We are on the FREE storage tier
-            order: null // while we could generate an order here, we can stay within quota much more easily by offloading the task to the client.
-        };
+    const user = await UserDB.getUser(userid);
+    if (user.id === null) {
+        const newUser = User(userid);
+        await UserDB.newUser(newUser);
+        return newUser;
     }
-    return userdata;
+    return user;
 }
 
 export async function getAttempts(userid) {
-    const userdata = await UserDB.getUser(userid);
-    return userdata === undefined ? [] : userdata.attempts;
+    return (await UserDB.getUser(userid)).attempts;
 }
 
 export async function newAttempt(userid, attempt) { // attempt here is a Set of 4 ids (Numbers)
@@ -146,13 +144,64 @@ export async function newOrder(userid, order) { // order is an Array of 16 ids (
     return await UserDB.setOrder(userid, order);
 }
 
-export async function scoreImage(userdata, ...userdatas) { // expects {attempts, userid, avatar}
-    const datas = [userdata, ...userdatas];
+export async function scoreImage(...users) {
     const { categories, challengeNum } = await getGameData();
+    
+}
+
+async function getParticipantCardData (categories, ...participants) {
     const categoryWordIds = Array.from(Object.values(categories), category => Array.from(category, (word) => word.id));
-    const newData = Array.from(datas, ({attempts, userid, avatar}) => 
-        ({stats: getCategoryStats(attempts, categoryWordIds), attempts: matchAttemptsToCategory(attempts, categories), id: userid, avatar: avatar}));
-    return await generateScoreImage(challengeNum, ...newData);
+    const users = await Promise.all(Array.from(
+        participants, (participant) =>
+            UserDB.getUser(participant.id)
+                .then((user) => [user, participant])));
+    return Array.from(users, ([user, participant]) => {
+        const cardData = ParticipantCardData(user.id, participant.avatar, matchAttemptsToCategory(user.attempts, categories));
+        user.attempts.forEach((attempt, idx) => {
+            let difficulty = 1;
+            for (const categoryWords of categoryWordIds) {
+                if (categoryWords.every(wordId => attempt.includes(wordId))) {
+                    cardData.stats[String(difficulty)] = formatNumberString(idx + 1);
+                    return;
+                }
+                difficulty++;
+            }
+        });
+        return cardData;
+    });
+}
+
+export async function replyScorecard (interaction) {
+    const channel = await UserDB.getChannel(interaction.channel_id);
+    const token = Token(interaction.token, new Date());
+    UserDB.setChannelTokenRecent(interaction.channel_id, token);
+    if (interaction.type === 2) { // launch command
+        
+    } else if (interaction.type === 3) { // message component (button)
+        if (interaction.message?.id === channel.msg.id) { // called from most recent message
+            // update participants
+
+            // attempt to update message
+
+            // send new message if edit failed
+
+            // update DB after message edit/send, incase it failed
+
+            await UserDB.setChannelTokenMessage(interaction.channel_id, token);
+        } else { // called from older message, or a latest message does not exist
+            if (isTokenValid(channel.tok.msg)) {
+                // update participants
+
+                // update most recent message with message token from DB
+
+            } else {
+                // wipe and set participants
+
+            }
+            
+
+        }
+    }
 }
 
 export async function sendScorecard (channelid) {
@@ -179,14 +228,14 @@ export async function sendScorecard (channelid) {
 }
 
 // returns updated channel data for chaining
-export async function updateChannelParticipants (channelid, userid, username, avatar) {
+export async function updateChannelParticipants (channelid, token, userid, username, avatar) {
     const userdata = { name: String(username), avatar: String(avatar) };
     const channels = await UserDB.getChannels();
     if (Object.keys(channels).includes(String(channelid))) {
         await UserDB.setChannelUser(channelid, userid, username, avatar);
     } else {
         // create new channel entry if one does not already exist
-        await UserDB.newChannel(channelid, userid, username, avatar);
+        await UserDB.newChannel(channelid, token, userid, username, avatar);
     }
     return await UserDB.getChannel(channelid);
 }
