@@ -94,7 +94,7 @@ async function parseApiCommand (interaction) {
             else
                 await commands.updateDeferredResponse("Invalid context to use this command.", token);
         }).then(() => console.debug("Queue execution finished.")
-        ).catch((error) => {
+        ).catch(async (error) => {
             console.error(error);
             await commands.updateDeferredResponse("Something went wrong on our side.", token);
         })
