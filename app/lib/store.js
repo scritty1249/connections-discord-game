@@ -2,6 +2,7 @@
 import * as Edge from "@vercel/edge-config";
 import { Redis } from "@upstash/redis";
 import { EDGE_WRITE } from "./endpoints.js";
+import { Token, User, Channel } from "./structs.js";
 
 const redis = Redis.fromEnv();
 const GAMEDATA_KEY = "gamedata";
@@ -35,11 +36,8 @@ export const UserDB = {
         }
     },
     // Userdata related functions
-    newUser: async function (userid, order = null, attempt = null) {
-        return await redis.json.set(this._prefix.user + userid, "$", {
-            attempts: attempt === null ? [] : [attempt],
-            order: order
-        });
+    newUser: async function (user) {
+        return await redis.json.set(this._prefix.user + user.id, "$", user);
     },
     setOrder: async function (userid, order) {
         return await redis.json.set(this._prefix.user + userid, "$.order", order);
@@ -48,7 +46,10 @@ export const UserDB = {
         return await redis.json.arrappend(this._prefix.user + userid, "$.attempts", attempt);
     },
     getUser: async function (userid) { // json makes this a single call, so not wasteful to get everything here all the time...
-        return (await redis.json.get(this._prefix.user + userid, "$"))?.[0];
+        const data = (await redis.json.get(this._prefix.user + userid, "$"))?.[0];
+        return data === undefined
+            ? User()
+            : User(userid, data.attempts, data.order);
     },
     dropUser: async function (userid) {
         return await redis.del(this._prefix.user + userid);
@@ -58,28 +59,33 @@ export const UserDB = {
         return (await redis.json.get(this._prefix.channel, "$"))?.[0];
     },
     getChannel: async function (channelid) {
-        return (await redis.json.get(this._prefix.channel, `$['${channelid}']`))?.[0];
+        const channel = (await redis.json.get(this._prefix.channel, `$['${channelid}']`))?.[0];
+        return channel === undefined
+            ? null
+            : Channel(channel);
     },
-    newChannel: async function (channelid, userid, username, useravatar) {
+    newChannel: async function (channelid, interactionToken = null, participant = null) {
         return await redis.json.set(this._prefix.channel, `$['${channelid}']`, {
-            message: null,
-            participants: {
-                [userid]: {
-                    name: username,
-                    avatar: useravatar
-                }
-            }
+            tok: {
+                recent: interactionToken ?? Token(),
+                msg: Token()
+            },
+            msg: Token(),
+            participants: participant ? { [participant.id]: participant } : {}
         });
     },
-    setChannelUser: async function (channelid, userid, username, useravatar) {
-        return await redis.json.set(this._prefix.channel, `$['${channelid}'].participants['${userid}']`, {
-            name: username,
-            avatar: useravatar
-        });
+    setChannelParticipant: async function (channelid, participant) {
+        return await redis.json.set(this._prefix.channel, `$['${channelid}'].participants['${participant.id}']`, participant);
     },
-    setChannelMessage: async function (channelid, messageid) {
-        return await redis.json.set(this._prefix.channel, `$['${channelid}'].message`, messageid ? JSON.stringify(messageid) : null); // upstash redis json tries to serialize this as an Integer to save space, but snowflake IDs exceed the maximum bitsize as an int- causing them to end in "00" instead of their normal values.
-    }
+    setChannelMessage: async function (channelid, messageToken) {
+        return await redis.json.set(this._prefix.channel, `$['${channelid}'].msg`, messageToken);
+    },
+    setChannelTokenRecent: async function (channelid, token) {
+        return await redis.json.set(this._prefix.channel, `$['${channelid}'].tok.recent`, token);
+    },
+    setChannelTokenMessage: async function (channelid, token) {
+        return await redis.json.set(this._prefix.channel, `$['${channelid}'].tok.msg`, token);
+    },
 };
 
 export const GameDB = {
