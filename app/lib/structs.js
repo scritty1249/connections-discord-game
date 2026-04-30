@@ -15,6 +15,9 @@ export const Participant = (userid, username, avatarFilename) => ({
     id: Snowflake(userid),
     name: username,
     avatar: avatarFilename,
+    equals(other) { return (
+        this.id == other?.id && this.name == other?.name && this.avatar == other?.avatar
+    )},
     toJSON() { return {
         name: this.name,
         avatar: this.avatar,
