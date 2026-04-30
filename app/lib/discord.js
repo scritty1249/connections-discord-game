@@ -82,12 +82,20 @@ export function generateScorecardBody (usernames, scoreImage) {
         components: [
             {
                 type: 1,
-                components: [{
-                    type: 2,
-                    label: "Play now!",
-                    style: 1,
-                    custom_id: "launch"
-                }]
+                components: [
+                    {
+                        type: 2,
+                        label: "Play now!",
+                        style: 1,
+                        custom_id: "launch"
+                    },
+                    {
+                        type: 2,
+                        label: "test",
+                        style: 1,
+                        url: `https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}`
+                    }
+                ]
             }
         ]
     };
