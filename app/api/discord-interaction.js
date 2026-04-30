@@ -134,6 +134,6 @@ async function executeApiCommand (interaction) {
 async function launch (interaction) {
     const { channel_id, token, context } = interaction;
     if (context !== INTERACTION.CONTEXT.BOT_DM)
-        waitUntil(touchChannel(channel_id, token, context !== INTERACTION.CONTEXT.GUILD));
+        waitUntil(touchChannel(channel_id, token, context === INTERACTION.CONTEXT.GUILD));
     return commands.launch();
 }
