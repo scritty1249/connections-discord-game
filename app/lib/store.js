@@ -59,21 +59,22 @@ export const UserDB = {
         return (await redis.json.get(this._prefix.channel, "$"))?.[0];
     },
     getChannel: async function (channelid) {
-        return Channel((await redis.json.get(this._prefix.channel, `$['${channelid}']`))?.[0]);
+        const channel = (await redis.json.get(this._prefix.channel, `$['${channelid}']`))?.[0];
+        return channel === undefined
+            ? null
+            : Channel(channel);
     },
-    newChannel: async function (channelid, interactionToken, participant) {
+    newChannel: async function (channelid, interactionToken = null, participant = null) {
         return await redis.json.set(this._prefix.channel, `$['${channelid}']`, {
             tok: {
-                recent: interactionToken,
+                recent: interactionToken ?? Token(),
                 msg: Token()
             },
             msg: Token(),
-            participants: {
-                [participant.id]: participant
-            }
+            participants: participant ? { [participant.id]: participant } : {}
         });
     },
-    setChannelUser: async function (channelid, participant) {
+    setChannelParticipant: async function (channelid, participant) {
         return await redis.json.set(this._prefix.channel, `$['${channelid}'].participants['${participant.id}']`, participant);
     },
     setChannelMessage: async function (channelid, messageToken) {
