@@ -2,7 +2,7 @@ import { dateToString, formatNumberString, getChallengeNumber, unixTimestamp } f
 import * as ENDPOINT from "./endpoints.js";
 import { GameDB, UserDB } from "./store.js";
 import { createCanvasObject, drawScoreHorizontal, drawScoreVertical, canvasToImage, CANVAS_POSITION } from "./draw.js";
-import { editInteractionMessage, sendInterationMessage, isTokenValid } from "../lib/discord.js";
+import { editInteractionMessage, sendInterationMessage, isTokenValid, generateScorecardBody } from "../lib/discord.js";
 import { User, Snowflake, Token, Participant, ParticipantCardData } from "./structs.js";
 
 async function fetchGameData(gameDate) {
@@ -177,24 +177,27 @@ export async function scoreImage(...users) {
 
 export async function replyScorecard (channelid) {
     const channel = await UserDB.getChannel(channelid);
+    const participants = Object.values(channel.participants);
     if (channel === null) return;
     if (!Object.values(channel.participants).length) return console.warn("Attempted to generate scorecard for a channel with no participants");
     
     // generate card
     const { categories, challengeNum } = await getGameData();
-    const participants = await getParticipantCardData(categories, ...Object.values(channel.participants));
+    const participantCardData = await getParticipantCardData(categories, ...participants);
+    const participantNames = Array.from(participants, ({ name }) => name);
 
-    const imageBlob = await generateScoreImage(challengeNum, ...participants);
+    const imageBlob = await generateScoreImage(challengeNum, ...participantCardData);
+    const messageBody = generateScorecardBody(participantNames, imageBlob);
 
     // message to discord
     if (isTokenValid(channel.tok.recent)) {
         if (
             channel.tok.recent.id == channel.tok.msg.id
-            && (await editInteractionMessage(channel.tok.msg.id, channel.msg.id)) !== null
+            && (await editInteractionMessage(channel.tok.msg.id, channel.msg.id, messageBody)) !== null
         ) return console.debug("Edited message for interaction");
         else console.debug("Failed to edit interaction using message token");
         // send new message if edit fails or recent token is not from recent message
-        const message = await sendInterationMessage(channel.tok.recent.id, imageBlob);
+        const message = await sendInterationMessage(channel.tok.recent.id, messageBody);
         if (message !== null)
             return await Promise.all([
                 UserDB.setChannelMessage(channelid, Token(message.id, unixTimestamp())),

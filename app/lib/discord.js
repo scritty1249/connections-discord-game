@@ -64,7 +64,7 @@ export function verify (requestHeaders, requestBodyStr) {
     );
 }
 
-function generateScorecardBody (usernames, scoreImage) {
+export function generateScorecardBody (usernames, scoreImage) {
     const form = new FormData();
     const names = usernames.length == 1
         ? usernames[0]
