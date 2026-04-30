@@ -1,4 +1,4 @@
-import { DISCORD_AUTH, DISCORD_SEND_MESSAGE_BASE, DISCORD_WEBHOOK_BASE, DISCORD_GET_MESSAGE_BASE } from "./endpoints.js";
+import { DISCORD_AUTH, DISCORD_WEBHOOK_BASE, DISCORD_API_BASE } from "./endpoints.js";
 import { default as nacl } from "tweetnacl";
 import { isSameDay, unixTimestamp } from "./utils.js";
 
@@ -88,12 +88,6 @@ export function generateScorecardBody (usernames, scoreImage) {
                         label: "Play now!",
                         style: 1,
                         custom_id: "launch"
-                    },
-                    {
-                        type: 2,
-                        label: "test",
-                        style: 5,
-                        url: `https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}`
                     }
                 ]
             }
