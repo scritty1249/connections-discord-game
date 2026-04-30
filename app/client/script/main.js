@@ -5,7 +5,7 @@ import * as Discord from "./discord.js";
 const API_ENDPOINT = window.origin + "/api";
 let discordSdk = null;
 let userData = null;
-let newAttemptMade = false;
+let sentHeartbeat = false;
 
 const GAMEDATA = {categories: null, challenge: 0, ids: null};
 const ATTEMPTS = [];
@@ -36,7 +36,7 @@ const BUTTONS = {
 
 async function recordAttempt (attempt) { // attempt is expected to be a Set of 4 Numbers
     try {
-        const bodyData = {attempt: [...attempt]};
+        const bodyData = {attempt: [...attempt], channel: discordSdk.channelId};
         if (ORDER.wasUpdated)
             bodyData.order = ORDER.CURR;
         const resp = await fetch(API_ENDPOINT + "/record-attempt?id=" + userData?.id, {
@@ -111,11 +111,19 @@ async function submitAttempt () { // old attempts returned from api as an Array 
             .then(() => cardFX.incorrect(selectedWordEls));
     }
     try {
+        const heartbeatPromise = sentHeartbeat
+            ? Promise.resolve()
+            : queueRecordParticipant()
+                .then((success) => sentHeartbeat = success);
         if (await recordAttempt(new Set(wordIds))) {
             ATTEMPTS.push(wordIds);
             newAttemptMade = true;
             updateAttemptCounter();
-            await animationPromise;
+            await Promise.all([
+                heartbeatPromise,
+                animationPromise
+            ]);
+            queueGenerateCard();
             return true;
         }
     } catch (error) {
@@ -219,28 +227,31 @@ function updateAttemptCounter () {
 }
 
 async function queueGenerateCard () {
-    return await fetch(API_ENDPOINT + "/generate-card", {
+    return (await fetch(API_ENDPOINT + "/generate-card", {
+        method: "POST",
+        keepalive: true,
+        body: JSON.stringify({ channel: discordSdk.channelId })
+    })).ok;
+}
+
+async function queueRecordParticipant () {
+    return (await fetch(API_ENDPOINT + "/record-participant", {
         method: "POST",
         keepalive: true,
         body: JSON.stringify({
             channel: discordSdk.channelId,
-            userdata: {
-                userid: userData.id,
-                name: userData.global_name,
+            participant: {
+                id: userData.id,
+                nick: userData.global_name,
                 avatar: userData.avatar,
-                attempts: ATTEMPTS
             }
         })}
-    );
+    )).ok;
 }
 
 function oncloseHandler () {
-    if (ORDER.wasUpdated && ORDER.CURR != null) {
+    if (ORDER.wasUpdated && ORDER.CURR != null)
         queueRecordOrder(ORDER.CURR);
-        if (discordSdk.guildId !== null)
-            queueGenerateCard();
-    } else if (newAttemptMade && discordSdk.guildId !== null)
-        queueGenerateCard();
 }
 
 function onresizeHandler () {
@@ -255,7 +266,6 @@ function onresizeHandler () {
 }
 
 async function setWinScreen (first = true) {
-    queueGenerateCard();
     ELEMENTS.MENU.classList.add("hide");
     ELEMENTS.ATTEMPT_COUNTER.classList.add("hide");
     if (first)
@@ -313,7 +323,6 @@ window.onload = (e) => {
                         }
                     }).then(({ attempts, order }) => {
                         ORDER.PREV = order;
-                        newAttemptMade = !Boolean(attempts);
                         if (attempts)
                             ATTEMPTS.push(...Array.from(attempts, attempt => attempt.toSorted()));
                     })
