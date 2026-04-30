@@ -63,7 +63,7 @@ async function parseSlashCommand (interaction) {
                     return commands.deferResponse(false);
                 case "amiadmin":
                     return commands.messageResponse(
-                        (await isUserAdmin(interaction.user ?? interaction.member?.user))
+                        (await isUserAdmin(interaction.user?.id ?? interaction.member?.user?.id))
                         ? "Yes"
                         : "No"
                     );
