@@ -39,7 +39,7 @@ async function parseCommandInteraction (interaction) {
             return await launch(interaction);
         default:
             console.warn("Unknown Application Command Interaction");
-            console.dir(interaction);
+            console.dir(interaction, { depth: null });
     };
 }
 
@@ -49,7 +49,7 @@ async function parseComponentInteraction (interaction) {
             return await launch(interaction);
         default:
             console.warn("Unknown Message Component Interaction");
-            console.dir(interaction);
+            console.dir(interaction, { depth: null });
     };
 }
 
@@ -77,7 +77,7 @@ async function parseSlashCommand (interaction) {
             };
         default:
             console.warn("Invalid Slash Command Interaction");
-            console.dir(interaction);
+            console.dir(interaction, { depth: null });
     };
 }
 
