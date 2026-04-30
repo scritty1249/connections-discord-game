@@ -69,7 +69,7 @@ export function generateScorecardBody (usernames, scoreImage, silent = false) {
     const names = usernames.length == 1
         ? usernames[0]
         : usernames.length == 2
-        ? `${silent ? "@silent " : ""}${usernames[0]} and ${usernames[1]}`
+        ? `${usernames[0]} and ${usernames[1]}`
         : usernames.slice(0, -1).join(", ") + " and " + usernames.at(-1);
 
     const payload = {
@@ -93,6 +93,8 @@ export function generateScorecardBody (usernames, scoreImage, silent = false) {
             }
         ]
     };
+    if (silent)
+        payload.flags = 4096; // suppress notifications
     form.append("payload_json", JSON.stringify(payload));
     form.append("files[0]", scoreImage, "scorecard.png");
     return form;
