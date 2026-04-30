@@ -178,10 +178,12 @@ export async function scoreImage(...users) {
 export async function replyScorecard (channelid) {
     const channel = await UserDB.getChannel(channelid);
     if (channel === null) return;
+    if (!Object.values(channel.participants).length) return console.warn("Attempted to generate scorecard for a channel with no participants");
     
     // generate card
     const { categories, challengeNum } = await getGameData();
     const participants = await getParticipantCardData(categories, ...Object.values(channel.participants));
+
     const imageBlob = await generateScoreImage(challengeNum, ...participants);
 
     // message to discord
