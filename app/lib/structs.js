@@ -53,6 +53,7 @@ export const User = (userid = null, attempts = [], order = null) => ({
 });
 
 export const Channel = (channeldata) => ({ // for deserialization
+    isGuild: channeldata?.isGuild ?? true,
     tok: {
         recent: Token(
             Snowflake(channeldata?.tok?.recent?.id),

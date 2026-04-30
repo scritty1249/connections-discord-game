@@ -64,12 +64,12 @@ export function verify (requestHeaders, requestBodyStr) {
     );
 }
 
-export function generateScorecardBody (usernames, scoreImage) {
+export function generateScorecardBody (usernames, scoreImage, silent = false) {
     const form = new FormData();
     const names = usernames.length == 1
         ? usernames[0]
         : usernames.length == 2
-        ? `${usernames[0]} and ${usernames[1]}`
+        ? `${silent ? "@silent" : ""}${usernames[0]} and ${usernames[1]}`
         : usernames.slice(0, -1).join(", ") + " and " + usernames.at(-1);
 
     const payload = {

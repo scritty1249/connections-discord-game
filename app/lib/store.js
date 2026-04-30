@@ -64,8 +64,9 @@ export const UserDB = {
             ? null
             : Channel(channel);
     },
-    newChannel: async function (channelid, interactionToken = null, participant = null) {
+    newChannel: async function (channelid, interactionToken = null, participant = null, isGuild = true) {
         return await redis.json.set(this._prefix.channel, `$['${channelid}']`, {
+            isGuild: isGuild,
             tok: {
                 recent: interactionToken ?? Token(),
                 msg: Token()

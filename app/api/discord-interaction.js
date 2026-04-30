@@ -133,7 +133,7 @@ async function executeApiCommand (interaction) {
 // doesn't create channel if context is DM
 async function launch (interaction) {
     const { channel_id, token, context } = interaction;
-    if (context !== 1) // invoked in server or group dm
-        waitUntil(touchChannel(channel_id, token));
+    if (context !== INTERACTION.CONTEXT.BOT_DM)
+        waitUntil(touchChannel(channel_id, token, context !== INTERACTION.CONTEXT.GUILD));
     return commands.launch();
 }

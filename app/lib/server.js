@@ -188,7 +188,7 @@ export async function replyScorecard (channelid) {
     const participantNames = Array.from(participants, ({ name }) => name);
 
     const imageBlob = await generateScoreImage(challengeNum, ...participantCardData);
-    const messageBody = generateScorecardBody(participantNames, imageBlob);
+    const messageBody = generateScorecardBody(participantNames, imageBlob, !channel.isGuild);
 
     // message to discord
     if (isTokenValid(channel.tok.recent)) {
@@ -215,11 +215,11 @@ export async function replyScorecard (channelid) {
 }
 
 // Updates most recent interaction token for a specified channel. Creates a new channel entry if one does not already exist.
-export async function touchChannel (channelid, interactionToken) {
+export async function touchChannel (channelid, interactionToken, isGuild) {
     const channel = await UserDB.getChannel(channelid);
     const token = Token(interactionToken, unixTimestamp());
     if (channel === null)
-        await UserDB.newChannel(channelid, token);
+        await UserDB.newChannel(channelid, token, null, isGuild);
     else
         await UserDB.setChannelTokenRecent(channelid, token);
 }
