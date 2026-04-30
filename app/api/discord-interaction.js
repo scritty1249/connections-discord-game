@@ -9,7 +9,7 @@ export async function POST(req) {
         // verify interaction
         const body = await req.text();
         const headers = req.headers;
-        if (verify(headers, body)) return commands.invalidInteraction();
+        if (!verify(headers, body)) return commands.invalidInteraction();
 
         const interaction = JSON.parse(body); // body should be JSON, should this should never fail...
         return await parseInteraction(interaction);
