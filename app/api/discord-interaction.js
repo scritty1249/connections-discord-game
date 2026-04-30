@@ -1,4 +1,4 @@
-import { isUserAdmin, wipeAttempts, wipeUserAttempts, refreshGamestate, sendScorecard, touchChannel } from "../lib/server.js";
+import { isUserAdmin, wipeAttempts, wipeUserAttempts, refreshGamestate, touchChannel } from "../lib/server.js";
 import { verify, INTERACTION } from "../lib/discord.js";
 import * as commands from "../lib/interaction-responses.js";
 import { promiseTimeout } from "../lib/utils.js";
