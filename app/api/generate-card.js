@@ -1,21 +1,13 @@
-import { updateChannelParticipants, sendScorecard } from "../lib/server.js"
+import { addChannelParticipant, replyScorecard } from "../lib/server.js"
+import { Participant } from "../lib/structs.js";
 
 export async function POST(req) {
-    const { userdata, channel, name }  = await req.json();
-    if (
-        !userdata
-        || !channel
-        || userdata.userid === undefined
-        || userdata.avatar === undefined
-        || userdata.attempts === undefined
-        || userdata.name === undefined
-    ) {
+    const { channel }  = await req.json();
+    if (!channel) {
         return new Response("Missing required payload.", {status: 400, statusText: "Missing required payload."});
     } else {
         try {
-            const { userid, avatar, attempts, name } = userdata;
-            const channeldata = await updateChannelParticipants(channel, userid, name, avatar);
-            await sendScorecard(channel);
+            await replyScorecard(channel);
             return new Response();
         } catch (err) {
             console.error("Fetch error:", err);
