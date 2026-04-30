@@ -1,8 +1,8 @@
-import { dateToString, formatNumberString, getChallengeNumber } from "./utils.js";
+import { dateToString, formatNumberString, getChallengeNumber, unixTimestamp } from "./utils.js";
 import * as ENDPOINT from "./endpoints.js";
 import { GameDB, UserDB } from "./store.js";
 import { createCanvasObject, drawScoreHorizontal, drawScoreVertical, canvasToImage, CANVAS_POSITION } from "./draw.js";
-import { sendChannelResults, getChannelMessage, isTokenValid } from "../lib/discord.js";
+import { editInteractionMessage, sendInterationMessage, isTokenValid } from "../lib/discord.js";
 import { User, Snowflake, Token, Participant, ParticipantCardData } from "./structs.js";
 
 async function fetchGameData(gameDate) {
@@ -89,6 +89,28 @@ function matchAttemptsToCategory(attempts, categories) { // categories is raw da
         ));
 }
 
+async function getParticipantCardData (categories, ...participants) {
+    const categoryWordIds = Array.from(Object.values(categories), category => Array.from(category, (word) => word.id));
+    const users = await Promise.all(Array.from(
+        participants, (participant) =>
+            UserDB.getUser(participant.id)
+                .then((user) => [user, participant])));
+    return Array.from(users, ([user, participant]) => {
+        const cardData = ParticipantCardData(user.id, participant.avatar, matchAttemptsToCategory(user.attempts, categories));
+        user.attempts.forEach((attempt, idx) => {
+            let difficulty = 1;
+            for (const categoryWords of categoryWordIds) {
+                if (categoryWords.every(wordId => attempt.includes(wordId))) {
+                    cardData.stats[String(difficulty)] = formatNumberString(idx + 1);
+                    return;
+                }
+                difficulty++;
+            }
+        });
+        return cardData;
+    });
+}
+
 export async function refreshGamestate() {
     try {
         const data = await fetchGameData(new Date());
@@ -106,6 +128,10 @@ export async function refreshGamestate() {
         console.error(error);
         return false;
     }
+}
+
+export async function wipeUserAttempts (userid) {
+    return Boolean(await UserDB.dropUser(userid));
 }
 
 export async function getGameData() {
@@ -149,118 +175,57 @@ export async function scoreImage(...users) {
     
 }
 
-async function getParticipantCardData (categories, ...participants) {
-    const categoryWordIds = Array.from(Object.values(categories), category => Array.from(category, (word) => word.id));
-    const users = await Promise.all(Array.from(
-        participants, (participant) =>
-            UserDB.getUser(participant.id)
-                .then((user) => [user, participant])));
-    return Array.from(users, ([user, participant]) => {
-        const cardData = ParticipantCardData(user.id, participant.avatar, matchAttemptsToCategory(user.attempts, categories));
-        user.attempts.forEach((attempt, idx) => {
-            let difficulty = 1;
-            for (const categoryWords of categoryWordIds) {
-                if (categoryWords.every(wordId => attempt.includes(wordId))) {
-                    cardData.stats[String(difficulty)] = formatNumberString(idx + 1);
-                    return;
-                }
-                difficulty++;
-            }
-        });
-        return cardData;
-    });
-}
+export async function replyScorecard (channelid) {
+    const channel = await UserDB.getChannel(channelid);
+    if (channel === null) return;
+    
+    // generate card
+    const { categories, challengeNum } = await getGameData();
+    const participants = await getParticipantCardData(categories, ...Object.values(channel.participants));
+    const imageBlob = await generateScoreImage(challengeNum, ...participants);
 
-export async function replyScorecard (interaction) {
-    const channel = await UserDB.getChannel(interaction.channel_id);
-    const token = Token(interaction.token, new Date());
-    UserDB.setChannelTokenRecent(interaction.channel_id, token);
-    if (interaction.type === 2) { // launch command
-        
-    } else if (interaction.type === 3) { // message component (button)
-        if (interaction.message?.id === channel.msg.id) { // called from most recent message
-            // update participants
-
-            // attempt to update message
-
-            // send new message if edit failed
-
-            // update DB after message edit/send, incase it failed
-
-            await UserDB.setChannelTokenMessage(interaction.channel_id, token);
-        } else { // called from older message, or a latest message does not exist
-            if (isTokenValid(channel.tok.msg)) {
-                // update participants
-
-                // update most recent message with message token from DB
-
-            } else {
-                // wipe and set participants
-
-            }
-            
-
-        }
+    // message to discord
+    if (isTokenValid(channel.tok.recent)) {
+        if (
+            channel.tok.recent.id == channel.tok.msg.id
+            && (await editInteractionMessage(channel.tok.msg.id, channel.msg.id)) !== null
+        ) return console.debug("Edited message for interaction");
+        // send new message if edit fails or recent token is not from recent message
+        const message = await sendInterationMessage(channel.tok.recent.id, imageBlob);
+        if (message !== null)
+            return await Promise.all([
+                UserDB.setChannelMessage(channelid, Token(message.id, unixTimestamp())),
+                UserDB.setChannelTokenMessage(channelid, channel.tok.recent)
+            ]).then(() => console.debug("Sent new message for interaction"));
     }
+    // failed
+    const nullToken = Token();
+    await Promise.all([
+        UserDB.setChannelTokenRecent(channelid, nullToken),
+        UserDB.setChannelTokenMessage(channelid, nullToken)
+    ]);
+    console.debug("Failed to send or edit message for interaction. No valid token to edit recent message or send a new one");
 }
 
-export async function sendScorecard (channelid) {
-    const channeldata = await UserDB.getChannel(channelid);
-    const messageid = channeldata.message === null ? await getChannelMessage(channelid, new Date()) : channeldata.message;
-    const usernames = [];
-    const imgBlob = await scoreImage(...(await Promise.all(Array.from(
-        Object.keys(channeldata.participants),
-        async (participant) => {
-            usernames.push(channeldata.participants[participant].name);
-            const userdata = await UserDB.getUser(participant);
-            return {
-                attempts: userdata === undefined ? [] : userdata.attempts,
-                avatar: channeldata.participants[participant].avatar,
-                userid: participant
-            };
-        }
-    ))));
-    const newMessageid = await sendChannelResults(channelid, messageid, usernames, imgBlob);
-    if (newMessageid && newMessageid != messageid)
-        await UserDB.setChannelMessage(channelid, newMessageid);
-    else if (!newMessageid)
-        console.warn("Unable to send or update message in channel. Does the bot lack permissions?");
+// Updates most recent interaction token for a specified channel. Creates a new channel entry if one does not already exist.
+export async function touchChannel (channelid, interactionToken) {
+    const channel = await UserDB.getChannel(channelid);
+    if (channel === null)
+        await UserDB.newChannel(channelid, interactionToken);
+    else
+        await UserDB.setChannelTokenRecent(channelid, interactionToken);
 }
 
-// returns updated channel data for chaining
-export async function updateChannelParticipants (channelid, token, userid, username, avatar) {
-    const userdata = { name: String(username), avatar: String(avatar) };
-    const channels = await UserDB.getChannels();
-    if (Object.keys(channels).includes(String(channelid))) {
-        await UserDB.setChannelUser(channelid, userid, username, avatar);
-    } else {
+export async function addChannelParticipant (channelid, participant, interactionToken = Token()) {
+    const channel = await UserDB.getChannel(channelid);
+    if (channel === null) {
         // create new channel entry if one does not already exist
-        await UserDB.newChannel(channelid, token, userid, username, avatar);
+        await UserDB.newChannel(channelid, null, participant);
+    } else if (
+        Object.keys(channel.participants).includes(participant?.id)
+        || !channel.participants[participant.id].equals(participant)
+    ) {
+        // update if any part of the Participant changed, or if participant does not yet exist
+        await UserDB.setChannelParticipant(channelid, participant);
     }
-    return await UserDB.getChannel(channelid);
-}
-
-export function getCategoryStats (attempts, categoryWordIds) { // categoryWordIds is an Array of Arrays, with the index of each nested Array corrosponding to category difficulty and each Number within matching the ID of a word for that category.
-    const stats = {
-        "1": null,
-        "2": null,
-        "3": null,
-        "4": null,
-        total: attempts.length ? formatNumberString(attempts.length) : null
-    };
-    attempts.forEach((attempt, idx) => {
-        let difficulty = 1;
-        for (const categoryWords of categoryWordIds) {
-            if (categoryWords.every(wordId => attempt.includes(wordId))) {
-                stats[String(difficulty)] = formatNumberString(idx + 1);
-                return;
-            }
-            difficulty++;
-        }            
-    });
-    return stats;
-}
-
-export async function wipeUserAttempts (userid) {
-    return Boolean(await UserDB.dropUser(userid));
 }
