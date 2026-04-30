@@ -1,4 +1,4 @@
-import { newAttempt, newOrder } from "../lib/server.js"
+import { newAttempt, newOrder } from "../lib/server.js";
 
 export async function POST(req) {
     const { searchParams: params } = new URL(req.url);
