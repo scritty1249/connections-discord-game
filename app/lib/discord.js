@@ -92,7 +92,7 @@ export function generateScorecardBody (usernames, scoreImage) {
                     {
                         type: 2,
                         label: "test",
-                        style: 1,
+                        style: 5,
                         url: `https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}`
                     }
                 ]
