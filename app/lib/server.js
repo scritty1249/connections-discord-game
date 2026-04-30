@@ -97,6 +97,7 @@ async function getParticipantCardData (categories, ...participants) {
                 .then((user) => [user, participant])));
     return Array.from(users, ([user, participant]) => {
         const cardData = ParticipantCardData(user.id, participant.avatar, matchAttemptsToCategory(user.attempts, categories));
+        cardData.stats.total = formatNumberString(user.attempts.length);
         user.attempts.forEach((attempt, idx) => {
             let difficulty = 1;
             for (const categoryWords of categoryWordIds) {
