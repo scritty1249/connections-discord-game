@@ -271,6 +271,8 @@ async function setWinScreen (first = true) {
         return await popup("You beat today's challenge!", 5000);
 }
 
+const closeTimeout = Discord.createCloseTimeout(discordSdk);
+
 let loadingProgress = 0;
 const LOADING_BAR = document.getElementById("loading-bar");
 const moveProgress = (prog) => (loadingProgress += prog, LOADING_BAR.style.setProperty("--progress", loadingProgress));

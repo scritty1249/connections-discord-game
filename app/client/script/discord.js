@@ -1,6 +1,16 @@
-import { DiscordSDK } from "@discord/embedded-app-sdk";
+import { DiscordSDK, RPCCloseCodes } from "@discord/embedded-app-sdk";
+
+export const INTERACTION_TIMEOUT_S = 15 * 60;
 
 export const AVATAR_URL = (userid, avatar, sizepx = 128) => `https://cdn.discordapp.com/avatars/${userid}/${avatar}.png?size=${sizepx}`;
+
+export function createCloseTimeout (discordSdk, retryMs = 1000) {
+    const close = () => discordSdk.close(RPCCloseCodes.CLOSE_NORMAL, "Interaction limit exceeded.");
+    return setTimeout(() => {
+        if (discordSdk === null && retryMs) setInterval(() => { if (discordSdk !== null) close() }, retryMs);
+        else close();
+    }, INTERACTION_TIMEOUT_S * 1000);
+}
 
 export async function getClient (serverEndpoint) {
     return await fetch(serverEndpoint, {
