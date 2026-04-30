@@ -117,7 +117,6 @@ async function submitAttempt () { // old attempts returned from api as an Array 
                 .then((success) => sentHeartbeat = success);
         if (await recordAttempt(new Set(wordIds))) {
             ATTEMPTS.push(wordIds);
-            newAttemptMade = true;
             updateAttemptCounter();
             await Promise.all([
                 heartbeatPromise,
