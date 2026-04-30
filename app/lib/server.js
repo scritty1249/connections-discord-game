@@ -210,10 +210,11 @@ export async function replyScorecard (channelid) {
 // Updates most recent interaction token for a specified channel. Creates a new channel entry if one does not already exist.
 export async function touchChannel (channelid, interactionToken) {
     const channel = await UserDB.getChannel(channelid);
+    const token = Token(interactionToken, unixTimestamp());
     if (channel === null)
-        await UserDB.newChannel(channelid, interactionToken);
+        await UserDB.newChannel(channelid, token);
     else
-        await UserDB.setChannelTokenRecent(channelid, interactionToken);
+        await UserDB.setChannelTokenRecent(channelid, token);
 }
 
 export async function addChannelParticipant (channelid, participant) {
