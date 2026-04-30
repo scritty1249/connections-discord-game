@@ -13,7 +13,7 @@ export async function POST(req) {
         return new Response("Missing required payload.", {status: 400, statusText: "Missing required payload."});
     } else {
         try {
-            const { userid, avatar, name: nick } = participant;
+            const { userid, avatar, nick } = participant;
             const participantData = Participant(userid, nick, avatar);
             await addChannelParticipant(channel, participantData);
             return new Response();

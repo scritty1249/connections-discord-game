@@ -1,4 +1,4 @@
-import { addChannelParticipant, replyScorecard } from "../lib/server.js"
+import { replyScorecard } from "../lib/server.js"
 import { Participant } from "../lib/structs.js";
 
 export async function POST(req) {

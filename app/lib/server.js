@@ -216,7 +216,7 @@ export async function touchChannel (channelid, interactionToken) {
         await UserDB.setChannelTokenRecent(channelid, interactionToken);
 }
 
-export async function addChannelParticipant (channelid, participant, interactionToken = Token()) {
+export async function addChannelParticipant (channelid, participant) {
     const channel = await UserDB.getChannel(channelid);
     if (channel === null) {
         // create new channel entry if one does not already exist
