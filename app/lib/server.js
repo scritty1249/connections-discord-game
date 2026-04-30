@@ -192,6 +192,7 @@ export async function replyScorecard (channelid) {
             channel.tok.recent.id == channel.tok.msg.id
             && (await editInteractionMessage(channel.tok.msg.id, channel.msg.id)) !== null
         ) return console.debug("Edited message for interaction");
+        else console.debug("Failed to edit interaction using message token");
         // send new message if edit fails or recent token is not from recent message
         const message = await sendInterationMessage(channel.tok.recent.id, imageBlob);
         if (message !== null)

@@ -106,6 +106,7 @@ export async function sendInterationMessage (token, messageBody) {
     });
     if (response.ok)
         return await response.json();
+    console.dir(await response.json());
     return null;
 }
 
@@ -117,5 +118,6 @@ export async function editInteractionMessage(token, messageid, messageBody) {
     });
     if (response.ok)
         return await response.json();
+    console.dir(await response.json());
     return null;
 }
