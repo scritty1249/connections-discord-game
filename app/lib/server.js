@@ -222,7 +222,7 @@ export async function addChannelParticipant (channelid, participant, interaction
         // create new channel entry if one does not already exist
         await UserDB.newChannel(channelid, null, participant);
     } else if (
-        Object.keys(channel.participants).includes(participant?.id)
+        !Object.keys(channel.participants).includes(participant?.id)
         || !channel.participants[participant.id].equals(participant)
     ) {
         // update if any part of the Participant changed, or if participant does not yet exist
