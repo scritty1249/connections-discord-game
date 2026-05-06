@@ -1,6 +1,7 @@
 import { shuffle, attemptIsRepeat, attemptIsCorrect, attemptIsOneAway, softHypenateText, getCategoryData, isOverflown } from "./utils.js";
 import { createCardElement, cardFX, popup, sortCardEls, createCategoryElements } from "./cards.js";
 import * as Discord from "./discord.js";
+import { EGGS, BURNT_EGGS } from "./eggs.js";
 
 const API_ENDPOINT = window.origin + "/api";
 let discordSdk = null;
@@ -86,7 +87,11 @@ async function submitAttempt () { // old attempts returned from api as an Array 
     BUTTONS.SUBMIT.classList.add("disabled");
     // attempts within ATTEMPTS should already be sorted
     let animationPromise = cardFX.submit(selectedWordEls);
-    if (attemptIsRepeat(wordIds, ATTEMPTS)) {
+    if (BURNT_EGGS[String(userData.id)] && Math.random() < .15) { // [!] redundant code, but is for easter egg
+        console.debug("Incorrect attempt");
+        animationPromise = animationPromise
+            .then(() => cardFX.incorrect(selectedWordEls));
+    } else if (attemptIsRepeat(wordIds, ATTEMPTS)) {
         console.debug("Repeated attempt");
         incrementAttempt = false;
         animationPromise = animationPromise
@@ -272,7 +277,7 @@ async function setWinScreen (first = true) {
     ELEMENTS.MENU.classList.add("hide");
     ELEMENTS.ATTEMPT_COUNTER.classList.add("hide");
     if (first)
-        return await popup("You beat today's challenge!", 5000);
+        return await popup(EGGS[String(userData.id)] ?? BURNT_EGGS[String(userData.id)] ?? "You beat today's challenge!", 5000);
 }
 
 const closeTimeout = Discord.createCloseTimeout(discordSdk);
