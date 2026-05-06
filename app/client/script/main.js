@@ -87,7 +87,7 @@ async function submitAttempt () { // old attempts returned from api as an Array 
     BUTTONS.SUBMIT.classList.add("disabled");
     // attempts within ATTEMPTS should already be sorted
     let animationPromise = cardFX.submit(selectedWordEls);
-    if (BURNT_EGGS[String(userData.id)] && Math.random() < .15) { // [!] redundant code, but is for easter egg
+    if (String(userData.id) in BURNT_EGGS && Math.random() < .15) { // [!] redundant code, but is for easter egg
         console.debug("Incorrect attempt");
         animationPromise = animationPromise
             .then(() => cardFX.incorrect(selectedWordEls));
