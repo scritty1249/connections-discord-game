@@ -1,7 +1,7 @@
 import { shuffle, attemptIsRepeat, attemptIsCorrect, attemptIsOneAway, softHypenateText, getCategoryData, isOverflown } from "./utils.js";
 import { createCardElement, cardFX, popup, sortCardEls, createCategoryElements } from "./cards.js";
 import * as Discord from "./discord.js";
-import { EGGS, BURNT_EGGS } from "./eggs.js";
+import { EGGS, BURNT_EGGS } from "./egg.js";
 
 const API_ENDPOINT = window.origin + "/api";
 let discordSdk = null;
