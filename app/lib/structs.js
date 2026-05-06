@@ -11,16 +11,18 @@ export const Token = (id = null, timestamp = null) => ({
     stamp: timestamp,
 });
 
-export const Participant = (userid, username, avatarFilename) => ({
+export const Participant = (userid, username, avatarFilename, timestamp) => ({
     id: Snowflake(userid),
     name: username,
     avatar: avatarFilename,
+    stamp: timestamp,
     equals(other) { return (
         this.id == other?.id && this.name == other?.name && this.avatar == other?.avatar
     )},
     toJSON() { return {
         name: this.name,
         avatar: this.avatar,
+        stamp: this.stamp
     }}
 });
 

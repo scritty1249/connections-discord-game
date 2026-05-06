@@ -1,5 +1,6 @@
 import { addChannelParticipant } from "../lib/server.js"
 import { Participant } from "../lib/structs.js";
+import { unixTimestamp } from "../lib/utils.js";
 
 export async function POST(req) {
     const { participant, channel }  = await req.json();
@@ -14,7 +15,7 @@ export async function POST(req) {
     } else {
         try {
             const { id, avatar, nick } = participant;
-            const participantData = Participant(id, nick, avatar);
+            const participantData = Participant(id, nick, avatar, unixTimestamp);
             await addChannelParticipant(channel, participantData);
             return new Response();
         } catch (err) {

@@ -6,7 +6,6 @@ import { EGGS, BURNT_EGGS } from "./egg.js";
 const API_ENDPOINT = window.origin + "/api";
 let discordSdk = null;
 let userData = null;
-let sentHeartbeat = false;
 
 const GAMEDATA = {categories: null, challenge: 0, ids: null};
 const ATTEMPTS = [];
@@ -119,10 +118,7 @@ async function submitAttempt () { // old attempts returned from api as an Array 
     }
     try {
         if (incrementAttempt) {
-            const heartbeatPromise = sentHeartbeat
-                ? Promise.resolve()
-                : queueRecordParticipant()
-                    .then((success) => sentHeartbeat = success);
+            const heartbeatPromise = queueRecordParticipant();
             if (await recordAttempt(new Set(wordIds))) {
                 ATTEMPTS.push(wordIds);
                 updateAttemptCounter();

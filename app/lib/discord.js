@@ -73,7 +73,7 @@ export function generateScorecardBody (usernames, scoreImage, silent = false) {
         : usernames.slice(0, -1).join(", ") + " and " + usernames.at(-1);
 
     const payload = {
-        content: `${names} ${usernames.length > 1 ? "were" : "was"} playing${usernames.legnth > 4 ? " (not all of them may fit on the card)" : ""}`,
+        content: `${names} ${usernames.length > 1 ? "were" : "was"} playing`,
         attachments: [{
             "id": 0,
             "description": "Illustration of challenge results",

@@ -171,14 +171,11 @@ export async function newOrder(userid, order) { // order is an Array of 16 ids (
     return await UserDB.setOrder(userid, order);
 }
 
-export async function scoreImage(...users) {
-    const { categories, challengeNum } = await getGameData();
-    
-}
-
 export async function replyScorecard (channelid) {
     const channel = await UserDB.getChannel(channelid);
-    const participants = Object.values(channel.participants);
+    const participants = Object.values(channel.participants)
+        .sort((a, b) => (b.stamp ?? 0) - (a.stamp ?? 0))
+        .slice(-4);
     if (channel === null) return;
     if (!Object.values(channel.participants).length) return console.warn("Attempted to generate scorecard for a channel with no participants");
     
