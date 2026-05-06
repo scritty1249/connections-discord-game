@@ -17,7 +17,7 @@ export const Participant = (userid, username, avatarFilename, timestamp) => ({
     avatar: avatarFilename,
     stamp: timestamp,
     equals(other) { return (
-        this.id == other?.id && this.name == other?.name && this.avatar == other?.avatar
+        this.id == other?.id && this.name == other?.name && this.avatar == other?.avatar && this.stamp == other?.stamp
     )},
     toJSON() { return {
         name: this.name,
