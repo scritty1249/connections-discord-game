@@ -78,6 +78,7 @@ async function submitAttempt () { // old attempts returned from api as an Array 
         console.error(`Something went wrong while submitting! ${selectedWordEls.length} words selected - 4 required`);
         return false;
     }
+    let incrementAttempt = true;
     const wordIds = Array.from(selectedWordEls, (wordEl) => parseInt(wordEl.dataset.id)).sort();
     selectedWordEls.forEach((wordEl) => wordEl.classList.remove("selected"));
     ELEMENTS.selectedCount = 0;
@@ -87,6 +88,7 @@ async function submitAttempt () { // old attempts returned from api as an Array 
     let animationPromise = cardFX.submit(selectedWordEls);
     if (attemptIsRepeat(wordIds, ATTEMPTS)) {
         console.debug("Repeated attempt");
+        incrementAttempt = false;
         animationPromise = animationPromise
         .then(() => Promise.all([
             cardFX.repeatAttempt(selectedWordEls),
@@ -111,19 +113,21 @@ async function submitAttempt () { // old attempts returned from api as an Array 
             .then(() => cardFX.incorrect(selectedWordEls));
     }
     try {
-        const heartbeatPromise = sentHeartbeat
-            ? Promise.resolve()
-            : queueRecordParticipant()
-                .then((success) => sentHeartbeat = success);
-        if (await recordAttempt(new Set(wordIds))) {
-            ATTEMPTS.push(wordIds);
-            updateAttemptCounter();
-            await Promise.all([
-                heartbeatPromise,
-                animationPromise
-            ]);
-            queueGenerateCard();
-            return true;
+        if (incrementAttempt) {
+            const heartbeatPromise = sentHeartbeat
+                ? Promise.resolve()
+                : queueRecordParticipant()
+                    .then((success) => sentHeartbeat = success);
+            if (await recordAttempt(new Set(wordIds))) {
+                ATTEMPTS.push(wordIds);
+                updateAttemptCounter();
+                await Promise.all([
+                    heartbeatPromise,
+                    animationPromise
+                ]);
+                queueGenerateCard();
+                return true;
+            }
         }
     } catch (error) {
         console.error(error);
