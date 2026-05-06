@@ -18,7 +18,7 @@ async function fetchGameData(gameDate) {
         challengeNum: getChallengeNumber(gameDate),
         categories: {}
     };
-    data.forEach(({title, cards}) => gamedata.categories[title] = Array.from(cards, c => ({word: c.content, id: c.position}) )); // card "position" is actually id (internally). The "positions" stay the same even after shuffing
+    data.forEach(({title, cards}) => gamedata.categories[title] = Array.from(cards, c => ({word: c.content ?? c.image_alt_text, id: c.position}) )); // card "position" is actually id (internally). The "positions" stay the same even after shuffing
     return gamedata;
 }
 
