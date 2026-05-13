@@ -246,7 +246,7 @@ async function queueRecordParticipant () {
             channel: discordSdk.channelId,
             participant: {
                 id: userData.id,
-                nick: userData.global_name,
+                nick: userData.nickname ?? userData.global_name,
                 avatar: userData.avatar,
             }
         })}
@@ -318,11 +318,8 @@ window.onload = (e) => {
                 moveProgress(.2);
                 discordSdk = sdk;
                 userData = user;
-                return discordSdk.commands.getInstanceConnectedParticipants()
-                    .then((res) => {
-                        console.log("Loaded: " + JSON.stringify(res ?? {}));
-                        return fetch(`${API_ENDPOINT}/get-userdata?id=${userData?.id}`);
-                    }).then(resp => {
+                return fetch(`${API_ENDPOINT}/get-userdata?id=${userData?.id}`)
+                    .then(resp => {
                         moveProgress(.2);
                         if (resp.ok) {
                             return resp.json();
