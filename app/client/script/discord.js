@@ -66,5 +66,5 @@ export async function initSdk (client_id, serverEndpoint) {
         user = participants?.filter(({id}) => id == user.id)?.[0] ?? user;
     }
 
-    return {discordSdk: discordSdk, user: auth?.user};
+    return {discordSdk: discordSdk, user: user};
 }
