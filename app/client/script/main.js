@@ -318,10 +318,12 @@ window.onload = (e) => {
                 moveProgress(.2);
                 discordSdk = sdk;
                 userData = user;
-                console.log("Loaded: " + JSON.stringify(user ?? {}));
-                return fetch(
-                        `${API_ENDPOINT}/get-userdata?id=${userData?.id}`
-                    ).then(resp => {
+                return discordSdk.commands.getInstanceConnectedParticipants()
+                    .then((res) => {
+                        if (res)
+                            print("Loaded: " + JSON.stringify(res));
+                        return fetch(`${API_ENDPOINT}/get-userdata?id=${userData?.id}`);
+                    }).then(resp => {
                         moveProgress(.2);
                         if (resp.ok) {
                             return resp.json();
