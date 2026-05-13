@@ -320,8 +320,7 @@ window.onload = (e) => {
                 userData = user;
                 return discordSdk.commands.getInstanceConnectedParticipants()
                     .then((res) => {
-                        if (res)
-                            print("Loaded: " + JSON.stringify(res));
+                        print("Loaded: " + JSON.stringify(res ?? {}));
                         return fetch(`${API_ENDPOINT}/get-userdata?id=${userData?.id}`);
                     }).then(resp => {
                         moveProgress(.2);
