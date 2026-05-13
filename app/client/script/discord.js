@@ -60,6 +60,11 @@ export async function initSdk (client_id, serverEndpoint) {
     if (auth === null) {
         throw new Error("Discord authentication failed");
     }
+    let { user } = auth;
+    if (user) {
+        const { participants } = await discordSdk.commands.getInstanceConnectedParticipants();
+        user = participants?.filter(({id}) => id == user.id)?.[0] ?? user;
+    }
 
     return {discordSdk: discordSdk, user: auth?.user};
 }
