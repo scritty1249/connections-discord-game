@@ -187,13 +187,13 @@ export async function replyScorecard (channelid) {
     const messageBody = generateScorecardBody(participantNames, imageBlob, !channel.isGuild);
 
     // message to discord
-    if (isTokenValid(channel.tok.recent)) {
-        if (
-            channel.tok.recent.id == channel.tok.msg.id
-            && (await editInteractionMessage(channel.tok.msg.id, channel.msg.id, messageBody)) !== null
-        ) return console.debug("Edited message for interaction");
-        else console.debug("Failed to edit interaction using message token");
-        // send new message if edit fails or recent token is not from recent message
+    if (isTokenValid(channel.tok.msg) && channel.msg.id) {
+        // edit existing message if it exists and the token is still valid
+        if ((await editInteractionMessage(channel.tok.msg.id, channel.msg.id, messageBody)) !== null)
+            return console.debug("Edited message for interaction");
+        console.debug("Failed to edit interaction using message token");
+    } else if (isTokenValid(channel.tok.recent)) {
+        // send new message using recent token if edit fails or no message exists yet
         const message = await sendInterationMessage(channel.tok.recent.id, messageBody);
         if (message !== null)
             return await Promise.all([
@@ -201,7 +201,7 @@ export async function replyScorecard (channelid) {
                 UserDB.setChannelTokenMessage(channelid, channel.tok.recent)
             ]).then(() => console.debug("Sent new message for interaction"));
     }
-    // failed
+    // failed or no token stored
     const nullToken = Token();
     await Promise.all([
         UserDB.setChannelTokenRecent(channelid, nullToken),
