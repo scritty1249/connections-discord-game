@@ -174,14 +174,13 @@ export async function newOrder(userid, order) { // order is an Array of 16 ids (
 export async function replyScorecard (channelid) {
     const channel = await UserDB.getChannel(channelid);
     const participants = Object.values(channel.participants)
-        .sort((a, b) => (b.stamp ?? 0) - (a.stamp ?? 0))
-        .slice(-4);
+        .sort((a, b) => (b.stamp ?? 0) - (a.stamp ?? 0));
     if (channel === null) return;
     if (!Object.values(channel.participants).length) return console.warn("Attempted to generate scorecard for a channel with no participants");
     
     // generate card
     const { categories, challengeNum } = await getGameData();
-    const participantCardData = await getParticipantCardData(categories, ...participants);
+    const participantCardData = await getParticipantCardData(categories, ...participants.slice(-4));
     const participantNames = Array.from(participants, ({ name }) => name);
 
     const imageBlob = await generateScoreImage(challengeNum, ...participantCardData);
