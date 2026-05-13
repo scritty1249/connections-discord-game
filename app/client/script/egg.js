@@ -2,7 +2,8 @@
 // [!] may contain personally identifiable information, do not carry to offical releases
 
 export const EGGS = {
-    "142887455580880896": "And that's the connections effect."
+    "142887455580880896": "And that's the connections effect.",
+    "398684726430531597": "Did you fucking cheat?"
 };
 
 export const BURNT_EGGS = {
