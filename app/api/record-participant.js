@@ -15,7 +15,7 @@ export async function POST(req) {
     } else {
         try {
             const { id, avatar, nick } = participant;
-            const participantData = Participant(id, nick, avatar, unixTimestamp);
+            const participantData = Participant(id, nick, avatar, unixTimestamp());
             await addChannelParticipant(channel, participantData);
             return new Response();
         } catch (err) {
